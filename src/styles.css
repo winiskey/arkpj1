@@ -1,0 +1,252 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Rajdhani:wght@500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --font-display: "Rajdhani", "Noto Sans SC", sans-serif;
+  --font-body: "Noto Sans SC", "Segoe UI", sans-serif;
+  --clip-corner: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--color-base, #050507);
+  background-image: radial-gradient(circle at 50% -10%, #15161a 0%, #050507 80%);
+  background-attachment: fixed;
+  color: #ffffff;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  ::selection {
+    background: #d4be88;
+    color: #000000;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+    border-left: 1px solid rgba(255, 255, 255, 0.03);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
+    transition: background 0.2s;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(212, 190, 136, 0.4);
+  }
+}
+
+@layer components {
+
+  /* Global Button System: Liquid & Elegant */
+  .btn-primary {
+    @apply relative overflow-hidden bg-accent font-sans text-sm font-bold text-black transition-all duration-snappy rounded-sm;
+    box-shadow: 0 4px 12px -4px rgba(212, 190, 136, 0.4);
+  }
+
+  .btn-primary:hover {
+    @apply brightness-110;
+    box-shadow: 0 0 20px -2px rgba(212, 190, 136, 0.5), inset 0 0 12px rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+  }
+
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+
+  .btn-secondary {
+    @apply relative overflow-hidden bg-transparent font-sans text-sm font-bold text-accent border border-accent/40 transition-all duration-snappy rounded-sm;
+  }
+
+  .btn-secondary:hover {
+    @apply border-accent text-accent bg-accent/10;
+    box-shadow: 0 8px 24px -6px rgba(212, 190, 136, 0.15), inset 0 0 16px rgba(212, 190, 136, 0.05);
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary:active {
+    transform: scale(0.98);
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .clip-corner {
+    clip-path: var(--clip-corner);
+  }
+
+  .hud-panel {
+    position: relative;
+    overflow: hidden;
+    /* Sharper, crisp borders for a hardware feel instead of soft glass */
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    /* Tighter radius for industrial look */
+    border-radius: 16px;
+    background: rgba(12, 13, 16, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    /* Improved depth: sharp inner highlight + deep ambient shadow */
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 16px 40px -8px rgba(0, 0, 0, 0.6);
+    /* Snappy transition curve */
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 0.2s ease,
+      box-shadow 0.2s ease,
+      background-color 0.2s ease;
+    will-change: transform;
+  }
+
+  .hud-panel:hover {
+    border-color: rgba(212, 190, 136, 0.2);
+    border-top-color: rgba(212, 190, 136, 0.4);
+    background: rgba(18, 19, 23, 0.75);
+    box-shadow: inset 0 1px 0 rgba(212, 190, 136, 0.1),
+      0 20px 48px -8px rgba(0, 0, 0, 0.7),
+      0 0 24px -4px rgba(212, 190, 136, 0.15);
+  }
+
+  .hud-panel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 40%);
+    pointer-events: none;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+  }
+
+  .hud-panel:hover::before {
+    opacity: 1;
+    background: linear-gradient(180deg, rgba(212, 190, 136, 0.06) 0%, transparent 50%);
+  }
+
+  .bg-grid {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* Scanline removed for a cleaner look and better performance */
+  .scanline-overlay {
+    display: none;
+  }
+
+  .animate-spin-slow {
+    animation: spin 32s linear infinite;
+  }
+
+  .animate-spin-slower {
+    animation: spin 46s linear infinite reverse;
+  }
+}
+
+.jingchu-title-art {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.18em 0.3em 0.1em;
+  isolation: isolate;
+}
+
+.jingchu-title-art::before {
+  content: "";
+  position: absolute;
+  inset: 24% -4% 20%;
+  background: linear-gradient(90deg, rgba(20, 20, 20, 0.8), rgba(40, 40, 40, 0.9), rgba(20, 20, 20, 0.8));
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.05);
+  z-index: -2;
+  border-radius: 4px;
+}
+
+.jingchu-title-art::after {
+  content: "";
+  position: absolute;
+  inset: 4% 0 2%;
+  background: linear-gradient(180deg, rgba(255, 248, 232, 0.12), transparent 35%, rgba(0, 0, 0, 0.16));
+  z-index: -1;
+}
+
+.jingchu-title-art__echo,
+.jingchu-title-art__text {
+  font-family: var(--font-body);
+  font-size: clamp(4.4rem, 10.6vw, 8.2rem);
+  font-weight: 900;
+  line-height: 0.84;
+  letter-spacing: 0.06em;
+}
+
+.jingchu-title-art__echo {
+  position: absolute;
+  transform: translate(0.08em, 0.16em);
+  color: rgba(255, 236, 220, 0.22);
+  text-shadow: 0 0 24px rgba(255, 231, 215, 0.08);
+}
+
+.jingchu-title-art__text {
+  position: relative;
+  background: linear-gradient(180deg, #fffdf5 0%, #fff4d2 28%, #f0ddbf 52%, #fefaf2 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow:
+    -2px -2px 0 rgba(121, 52, 44, 0.35),
+    2px 2px 0 rgba(121, 52, 44, 0.28),
+    0 0 24px rgba(255, 237, 220, 0.22);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
