@@ -1,282 +1,230 @@
-import { ArrowRight, BookOpen, CalendarDays, Crosshair, ShieldAlert, Trophy, Users2 } from "lucide-react";
+import { ArrowRight, BookOpen, CalendarDays, MapPin, Radio, ShieldAlert, Trophy, Users2 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useRef } from "react";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 import { ClipButton } from "../components/ClipButton";
 import { ScrollReveal } from "../components/ScrollReveal";
-import { InfoPanel } from "../components/InfoPanel";
 import { PageFrame } from "../components/PageFrame";
-import { ParticleLogo } from "../components/ParticleLogo";
-import { SectionHeader } from "../components/SectionHeader";
-import { InteractiveParticleLogo } from "../components/InteractiveParticleLogo";
 import { useSiteData } from "../context/SiteDataContext";
-import { LOGO_IMAGE_SRC } from "../lib/logo";
-import { useNavigate } from "react-router-dom";
+import { SpotlightCard } from "../components/SpotlightCard";
+import { MagneticWrapper } from "../components/MagneticWrapper";
+
+const liveStatusTone = {
+  LIVE: {
+    label: "主会场直播中",
+    tone: "border-live/35 bg-live/15 text-[#ffd8cf]",
+  },
+  UPCOMING: {
+    label: "即将开播",
+    tone: "border-brand/24 bg-brand/10 text-brandStrong",
+  },
+  OFFLINE: {
+    label: "暂未开播",
+    tone: "border-white/10 bg-white/[0.05] text-text2",
+  },
+} as const;
+
+function formatEventDate(date: string) {
+  return date.replace(/-/g, ".");
+}
 
 export function HomePage() {
-  const navigate = useNavigate();
   const {
-    data: { overviewPanels, siteMeta, teams, themeRules },
+    data: { liveBroadcast, siteMeta, teams, themeRules },
   } = useSiteData();
-  const liveLink = siteMeta.ctaLinks.find((link) => link.href === "/live");
-  const rulesLink = siteMeta.ctaLinks.find((link) => link.href === "/rules");
 
-  const heroSignals = [
+  const logoRef = useRef<HTMLImageElement>(null);
+
+  useGSAP(
+    () => {
+      const logo = logoRef.current;
+      if (!logo) return;
+
+      const xTo = gsap.quickTo(logo, "x", { duration: 1.2, ease: "power3.out" });
+      const yTo = gsap.quickTo(logo, "y", { duration: 1.2, ease: "power3.out" });
+
+      const handleMouseMove = (e: MouseEvent) => {
+        const { clientX, clientY } = e;
+        const { innerWidth, innerHeight } = window;
+        // Increase multiplier drastically from 60 to 240 for noticeable movement
+        const xOffset = ((clientX / innerWidth) - 0.5) * -240;
+        const yOffset = ((clientY / innerHeight) - 0.5) * -240;
+        xTo(xOffset);
+        yTo(yOffset);
+      };
+
+      window.addEventListener("mousemove", handleMouseMove);
+      return () => {
+        window.removeEventListener("mousemove", handleMouseMove);
+      };
+    }
+  );
+
+  const primaryPrize = siteMeta.prizePool[0];
+  const statusMeta = liveStatusTone[liveBroadcast.status as keyof typeof liveStatusTone] ?? liveStatusTone.OFFLINE;
+  const heroMeta = [
     {
-      icon: Users2,
-      label: "Registered Squads",
-      value: String(teams.length).padStart(2, "0"),
-      detail: "official roster sync",
+      icon: CalendarDays,
+      label: "开赛时间",
+      value: formatEventDate(siteMeta.startDate),
     },
     {
-      icon: Crosshair,
-      label: "Theme Routes",
-      value: String(themeRules.length).padStart(2, "0"),
-      detail: "parallel scoring lanes",
+      icon: MapPin,
+      label: "赛事形态",
+      value: siteMeta.locationLabel,
     },
     {
       icon: Trophy,
-      label: "Top Reward",
-      value: siteMeta.prizePool[0]?.value ?? "--",
-      detail: siteMeta.prizePool[0]?.label ?? "champion pool",
+      label: primaryPrize?.label ?? "冠军奖励",
+      value: primaryPrize?.value ?? "--",
+    },
+  ];
+  const liveMetrics = [
+    {
+      label: "参赛队伍",
+      value: String(teams.length).padStart(2, "0"),
+      detail: "已完成队伍档案同步",
+    },
+    {
+      label: "主题线路",
+      value: String(themeRules.length).padStart(2, "0"),
+      detail: "计分与限制规则并行",
+    },
+    {
+      label: "冠军奖励",
+      value: primaryPrize?.value ?? "--",
+      detail: primaryPrize?.label ?? "奖励池",
     },
   ];
 
   return (
-    <PageFrame className="max-w-none gap-0 px-0 pb-0 pt-20">
-      {/* Hero Section: Full-Bleed Environment & Floating Layers */}
-      <section className="relative flex min-h-[auto] lg:min-h-[calc(100svh-4rem)] items-center justify-center overflow-hidden">
-        {/* Layer 0: The Abyssal Void (Base Dark Tech Vibe) */}
-        <div className="pointer-events-none absolute inset-0 bg-base z-0" />
+    <PageFrame className="relative min-h-[100dvh] w-full overflow-hidden selection:bg-brand/90 selection:text-black">
+      {/* 1. Logo Core Matrix (Absolute Background) */}
+      <div className="pointer-events-none absolute left-[65%] top-[55%] -z-30 flex h-[160vw] w-[160vw] max-w-[1600px] -translate-x-1/2 -translate-y-1/2 items-center justify-center opacity-[0.06] mix-blend-screen md:left-[70%] md:h-[120vw] md:w-[120vw] xl:left-[75%] xl:top-1/2 xl:h-[100vw] xl:w-[100vw]">
+        {/* Adjusted to be much dimmer and pushed deep into the background to avoid distraction */}
+        <img ref={logoRef} src="/logo.svg" alt="Core Matrix" className="animate-spin-slower h-full w-full object-contain brightness-75 drop-shadow-[0_0_40px_rgba(214,192,138,0.15)]" />
+      </div>
 
+      {/* Deep environmental radial glow (Backlight for the logo) */}
+      <div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_70%_50%,rgba(214,192,138,0.06),transparent_75%)]" />
 
+      <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1536px] flex-col px-5 py-12 md:px-10 md:py-20 xl:px-16">
 
-        {/* Layer 2: The Structural Container */}
-        <div className="relative z-20 flex w-full flex-col justify-between gap-10 px-4 py-10 md:px-8 lg:px-16 xl:px-24 lg:h-[calc(100svh-6rem)] lg:flex-row lg:items-center lg:gap-24 lg:py-24">
+        {/* Spatial Asymmetrical Layout */}
+        <div className="flex flex-1 flex-col justify-center gap-14 lg:flex-row lg:items-center lg:justify-between lg:gap-20">
 
-          {/* Left Column: The Floating Emblem & Core CTA */}
-          <div className="relative z-10 flex flex-col items-start max-w-2xl gsap-stagger-item lg:pb-10">
-            {/* Status Badge */}
-            <div className="mb-6 inline-flex items-center gap-3 border border-white/10 bg-white/[0.02] px-4 py-2 font-display text-[10px] uppercase tracking-[0.24em] text-white/50 rounded-full backdrop-blur">
-              <span className="h-1.5 w-1.5 rounded-full animate-pulse-subtle bg-accent shadow-[0_0_8px_rgba(212,190,136,0.6)]" />
-              PORTAL ONLINE
+          {/* L-Wing: Title & Core Focus */}
+          <ScrollReveal delay={0} distance={40} className="relative z-20 flex max-w-[640px] flex-col justify-center space-y-10 lg:w-1/2">
+            <div className="flex flex-wrap items-center gap-4 text-text2">
+              <span className="rounded-full border border-brand/20 bg-brand/10 px-5 py-2 font-display text-[11px] font-semibold uppercase tracking-[0.22em] text-brand">
+                Season Interface
+              </span>
+              <span className="font-display text-xs uppercase tracking-[0.18em] text-white/50">{siteMeta.eventCode}</span>
             </div>
 
-            {/* ── Hero Title: 荆楚歌 #2 ─────────────────────────────────────── */}
-            <div className="relative mt-6">
-              {/* classification label */}
-              <div className="relative flex items-center gap-3 mb-6">
-                <div className="h-[2px] w-4 bg-accent/40" />
-                <span className="font-display text-[11px] tracking-[0.3em] text-white/60 uppercase">
-                  JINGCHUGE // SEASON 02
-                </span>
-              </div>
-
-              {/* Main Title Grouping */}
-              <div className="flex items-baseline gap-4">
-                <h1
-                  className="relative leading-none tracking-tight text-white/90 drop-shadow-[0_4px_32px_rgba(0,0,0,0.5)]"
-                  style={{
-                    fontFamily: "'Noto Sans SC', sans-serif",
-                    fontWeight: 900,
-                    fontSize: 'clamp(3rem, 8.5vw, 7.5rem)',
-                  }}
-                >
-                  荆楚歌
-                  {/* Subtle Accent Glow behind title */}
-                  <div className="absolute -inset-8 bg-accent/10 blur-[60px] -z-10 pointer-events-none" />
-                </h1>
-
-                <span
-                  className="font-display text-[0.45em] font-bold text-accent relative top-[-0.1em]"
-                  style={{
-                    fontSize: 'clamp(2rem, 4vw, 3.525rem)',
-                    fontFamily: "'Rajdhani', sans-serif",
-                  }}
-                >
+            <div className="space-y-4">
+              <div className="font-display text-[13px] uppercase tracking-[0.25em] text-white/40">Signal Ceremony / Entry Sequence</div>
+              <h1 className="font-title text-[4.8rem] font-black leading-[0.95] tracking-tight text-white drop-shadow-2xl sm:text-[5.8rem] md:text-[6.8rem] xl:text-[8.2rem]">
+                荆楚歌
+                <span className="ml-4 inline-block align-top font-display text-[1.8rem] font-bold uppercase tracking-[0.16em] text-brand/90 drop-shadow-lg md:text-[2.4rem] xl:text-[3rem]">
                   #2
                 </span>
-              </div>
-
-              {/* Subtitle / Descriptive text */}
-              <div className="relative mt-4 flex items-center gap-4">
-                <div className="h-[1px] w-12 bg-white/20" />
-                <span className="font-sans text-[12px] font-bold tracking-[0.4em] text-white/60 uppercase">
-                  湖北高校集成战略联赛
-                </span>
-              </div>
+              </h1>
             </div>
-            {/* ── End Hero Title ────────────────────────────────────────────── */}
 
-            {/* Event Meta Subtitle with improved contrast and alignment */}
-            <div className="mt-12 mb-2 max-w-lg">
-              <div className="text-xl font-sans font-medium leading-relaxed tracking-wide text-white/80 md:text-2xl border-l-[3px] border-accent/80 pl-6">
-                {siteMeta.subtitle}
-              </div>
-              <div className="mt-3 pl-7 font-display text-[11px] uppercase tracking-[0.4em] text-white/50">
-                {siteMeta.eventCode} // ARCHIVE 01-B
-              </div>
+            <p className="max-w-[540px] text-balance font-title text-xl font-bold leading-relaxed text-white/70 shadow-black drop-shadow-md md:text-2xl md:leading-relaxed">
+              湖北高校集成战略赛事主站
+            </p>
+
+            <div className="pt-8">
+              <MagneticWrapper strength={40}>
+                <ClipButton size="lg" to="/live" variant="primary" className="!rounded-full border-none !bg-brand px-10 py-5 font-bold !text-black shadow-[0_0_40px_-5px_rgba(214,192,138,0.6)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-black hover:!bg-brandStrong hover:shadow-[0_0_60px_-10px_rgba(231,215,173,0.8)]">
+                  进入主会场现场
+                  <ArrowRight className="ml-3 h-5 w-5" />
+                </ClipButton>
+              </MagneticWrapper>
             </div>
-            {/* ── End Hero Title ────────────────────────────────────────────── */}
+          </ScrollReveal>
 
-            {/* Extended CTA Buttons */}
-            <div className="mt-10 flex flex-col gap-4 w-full gsap-stagger-item sm:flex-row sm:items-center">
-              <button
-                className="relative px-10 py-5 bg-accent text-black font-display text-lg font-black uppercase tracking-widest overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95 group shadow-[0_0_32px_rgba(212,190,136,0.3)]"
-                style={{
-                  clipPath: 'polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)',
-                }}
-                onClick={() => navigate('/live')}
-              >
-                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 skew-x-[-20deg]" />
-                <span className="relative z-10 flex items-center gap-3">
-                  进入赛事大厅
-                  <ArrowRight className="h-5 w-5" />
-                </span>
-              </button>
+          {/* R-Wing: Floating Glass Matrix */}
+          <div className="relative z-20 flex flex-col gap-6 lg:w-[480px]">
 
-              <button
-                className="relative w-full px-8 py-4 border border-white/20 text-white/80 font-display text-sm font-bold uppercase tracking-[.25em] transition-all duration-300 hover:bg-white/5 hover:text-white group sm:w-auto"
-                style={{
-                  clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)',
-                }}
-                onClick={() => navigate('/rules')}
-              >
-                <span className="relative z-10 flex items-center gap-3">
-                  查看完整规则
-                  <BookOpen className="h-4 w-4 opacity-60 group-hover:opacity-100" />
-                </span>
-              </button>
-            </div>
-          </div>
+            {/* Live Status Glass Pill */}
+            <ScrollReveal delay={0.15} distance={20} className="w-full">
+              <SpotlightCard spotlightColor="rgba(255,255,255,0.08)" className="group relative flex items-center justify-between overflow-hidden rounded-[40px] border border-white/10 bg-white/[0.04] p-5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_20px_40px_-20px_rgba(0,0,0,0.6)] backdrop-blur-3xl transition-all duration-500 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.06] hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),0_30px_50px_-20px_rgba(0,0,0,0.7)]">
+                <div className="absolute inset-0 -z-10 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                <div className="flex items-center gap-5">
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-full border ${statusMeta.tone}`}>
+                    <Radio className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <div className="font-display text-[11px] uppercase tracking-[0.2em] text-white/50">当前状态</div>
+                    <div className="mt-1 font-title text-lg font-bold text-white/90">{statusMeta.label}</div>
+                  </div>
+                </div>
+                <div className="rounded-full border border-white/10 bg-black/40 px-4 py-2 font-display text-[11px] uppercase tracking-[0.16em] text-brand/80">
+                  {liveBroadcast.roomLabel}
+                </div>
+              </SpotlightCard>
+            </ScrollReveal>
 
-          {/* Right Column: Enlarged Artifact Core */}
-          <div className="relative w-full max-w-[600px] shrink-0 gsap-stagger-item flex items-center justify-center lg:flex mt-6 lg:mt-0">
-            {/* Massive background glow to balance the left side */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-accent/15 rounded-full blur-[120px] z-0 animate-pulse-slow" />
+            {/* Quick Portals - Teams Glass */}
+            <ScrollReveal delay={0.25} distance={20} className="w-full">
+              <SpotlightCard spotlightColor="rgba(214,192,138,0.15)" className="group relative overflow-hidden rounded-[40px] border border-white/10 bg-white/[0.03] p-6 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08),0_24px_48px_-24px_rgba(0,0,0,0.7)] backdrop-blur-3xl transition-all duration-500 hover:-translate-y-1 hover:border-brand/40 hover:bg-white/[0.05] hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),0_0_50px_-10px_rgba(214,192,138,0.2)]">
+                <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_100%_0%,rgba(214,192,138,0.15),transparent_60%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                <Link to="/teams" className="relative z-10 flex items-center justify-between outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-2xl">
+                  <div className="flex items-center gap-6">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-white/70 transition-all duration-500 group-hover:border-brand/40 group-hover:bg-brand/10 group-hover:text-brand group-hover:shadow-[0_0_20px_-5px_rgba(214,192,138,0.4)]">
+                      <Users2 className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <div className="font-title text-2xl font-bold text-white/90 transition-colors group-hover:text-white">队伍情报</div>
+                      <div className="mt-1.5 font-display text-[11px] uppercase tracking-[0.2em] text-white/40">{String(teams.length).padStart(2, "0")} 支队伍档案同步</div>
+                    </div>
+                  </div>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/30 text-white/40 transition-all duration-500 group-hover:bg-brand/20 group-hover:text-brand">
+                    <ArrowRight className="h-5 w-5" />
+                  </div>
+                </Link>
+              </SpotlightCard>
+            </ScrollReveal>
 
-            {/* Central Floating Particle Logo Entity */}
-            <div className="relative z-10 flex flex-col items-center justify-center gap-6">
-              <InteractiveParticleLogo
-                imageSrc={LOGO_IMAGE_SRC}
-                width={800}
-                height={800}
-                particleDensity={8}
-                interactionRadius={40}
-                particleColor="212, 190, 136"
-                className="w-[500px] h-[500px] object-contain transition-transform duration-700 hover:scale-105"
-              />
+            {/* Quick Portals - Rules Glass */}
+            <ScrollReveal delay={0.35} distance={20} className="w-full">
+              <SpotlightCard spotlightColor="rgba(214,192,138,0.15)" className="group relative overflow-hidden rounded-[40px] border border-white/10 bg-white/[0.03] p-6 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08),0_24px_48px_-24px_rgba(0,0,0,0.7)] backdrop-blur-3xl transition-all duration-500 hover:-translate-y-1 hover:border-brand/40 hover:bg-white/[0.05] hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),0_0_50px_-10px_rgba(214,192,138,0.2)]">
+                <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_100%_0%,rgba(214,192,138,0.15),transparent_60%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                <Link to="/rules" className="relative z-10 flex items-center justify-between outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-2xl">
+                  <div className="flex items-center gap-6">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-white/70 transition-all duration-500 group-hover:border-brand/40 group-hover:bg-brand/10 group-hover:text-brand group-hover:shadow-[0_0_20px_-5px_rgba(214,192,138,0.4)]">
+                      <ShieldAlert className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <div className="font-title text-2xl font-bold text-white/90 transition-colors group-hover:text-white">赛事手册</div>
+                      <div className="mt-1.5 font-display text-[11px] uppercase tracking-[0.2em] text-white/40">{String(themeRules.length).padStart(2, "0")} 条主题线路复核</div>
+                    </div>
+                  </div>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/30 text-white/40 transition-all duration-500 group-hover:bg-brand/20 group-hover:text-brand">
+                    <ArrowRight className="h-5 w-5" />
+                  </div>
+                </Link>
+              </SpotlightCard>
+            </ScrollReveal>
 
-              {/* Bottom detail text */}
-              <div className="flex items-center gap-3 bg-black/40 px-4 py-1.5 rounded-full border border-white/5">
-                <div className="w-2 h-2 rounded-full bg-accent animate-pulse shadow-[0_0_8px_#d4be88]" />
-                <span className="font-sans text-[11px] font-bold tracking-[0.3em] text-white/70">SYSTEM ONLINE</span>
-              </div>
-            </div>
           </div>
         </div>
-      </section>
 
-      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-40 px-5 py-32 md:px-8 lg:px-10 lg:py-48">
-        <ScrollReveal distance={40} delay={0.1}>
-          <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-            <div>
-              <SectionHeader enTitle="MISSION OVERVIEW" cnTitle="赛事概览" />
-              <div className="mt-12 grid gap-10 md:grid-cols-3">
-                {overviewPanels.map((panel) => (
-                  <article key={panel.title} className="hud-panel group relative overflow-hidden p-8 transition-all duration-500 hover:-translate-y-1 hover:bg-white/[0.04]">
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                    <div className="relative font-display text-[10px] uppercase tracking-[0.2em] text-accent/60 transition-colors group-hover:text-accent/80">{panel.label}</div>
-                    <h3 className="relative mt-4 font-sans text-xl font-medium tracking-wide text-white/90">
-                      {panel.title}
-                    </h3>
-                    <p className="relative mt-4 text-[14px] leading-relaxed text-white/60 transition-colors group-hover:text-white/80">{panel.content}</p>
-                    <div className="absolute bottom-6 right-6 translate-x-4 opacity-0 transition-all duration-500 group-hover:translate-x-0 group-hover:opacity-100">
-                      <ArrowRight className="h-4 w-4 text-white/40" />
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </div>
-
-            <InfoPanel
-              title="奖金与关键信息"
-              label="EVENT BRIEF"
-              items={[
-                <span key="date">开赛时间：2026 年 3 月 8 日，{siteMeta.locationLabel}。</span>,
-                <span key="champion">冠军奖励：{siteMeta.prizePool[0].value}；亚军奖励：{siteMeta.prizePool[1].value}。</span>,
-                <span key="others">其余参赛队伍保底奖励：{siteMeta.prizePool[2].value}。</span>,
-                <span key="judging">总分由主题得分与队伍系数共同决定，实时榜单需经过裁判组复核。</span>,
-              ]}
-            />
-          </section>
+        {/* Floating Base (Event Brief) */}
+        <ScrollReveal delay={0.45} distance={20} className="relative z-20 mt-20 grid grid-cols-1 gap-6 sm:grid-cols-3 lg:mt-auto xl:gap-12">
+          {heroMeta.map((item) => (
+            <SpotlightCard key={item.label} spotlightColor="rgba(255,255,255,0.06)" className="group flex flex-col justify-between rounded-[32px] border border-white/5 bg-transparent p-6 transition-all duration-500 hover:-translate-y-1 hover:border-white/10 hover:bg-white/[0.02] hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.5)] lg:p-8">
+              <div className="font-display text-[11px] font-bold uppercase tracking-[0.25em] text-white/40 transition-colors group-hover:text-white/60">{item.label}</div>
+              <div className="mt-5 font-display text-2xl font-semibold tracking-wider text-white/80 transition-colors group-hover:text-brand lg:text-[1.7rem]">{item.value}</div>
+            </SpotlightCard>
+          ))}
         </ScrollReveal>
 
-        <ScrollReveal distance={40} delay={0.2}>
-          <section className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
-            <InfoPanel
-              title="官网交付范围"
-              label="SITE SYSTEM"
-              items={[
-                <span key="live">赛事大厅：查看当前轮次、赛程安排与实时排行榜。</span>,
-                <span key="teams">队伍情报：浏览样例战队资料、宣言、成员职责与主题分工。</span>,
-                <span key="rules">规则总览：按赛制、通用规则、主题计分、系数和决赛说明完整拆解。</span>,
-              ]}
-            />
-            <div>
-              <SectionHeader enTitle="THEME PREVIEW" cnTitle="主题分布" />
-              <div className="mt-12 grid gap-10 md:grid-cols-3">
-                {themeRules.map((theme) => (
-                  <article key={theme.id} className="hud-panel group relative overflow-hidden p-8 transition-all duration-500 hover:bg-white/[0.04]">
-                    <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-accent/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100 blur-xl" />
-                    <div className="relative flex items-start justify-between gap-4">
-                      <h3 className="font-sans text-xl font-medium tracking-wide text-white/90">
-                        {theme.name}
-                      </h3>
-                      <Crosshair className="h-4 w-4 shrink-0 text-white/20 transition-all duration-700 group-hover:rotate-90 group-hover:text-accent/60" />
-                    </div>
-                    <p className="relative mt-5 text-[14px] leading-relaxed text-white/60 transition-colors group-hover:text-white/80">{theme.finalMultiplier}</p>
-                    <div className="relative mt-6 border-t border-white/[0.08] pt-4 font-display text-[9px] uppercase tracking-[0.2em] text-white/40 transition-colors group-hover:text-white/60">
-                      RESTRICTIONS {theme.restrictions.length} / GROUPS {theme.scoreGroups.length}
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </div>
-          </section>
-        </ScrollReveal>
-
-        <ScrollReveal distance={40} delay={0.3}>
-          <section className="hud-panel grid gap-10 p-8 lg:grid-cols-[1fr_1fr] lg:p-12">
-            <div className="max-w-prose">
-              <div className="font-display text-[10px] uppercase tracking-[0.24em] text-accent/80">文档备案</div>
-              <h3 className="mt-3 font-sans text-3xl font-medium tracking-wide text-white/95">
-                规则文档已结构化入站
-              </h3>
-              <p className="mt-5 text-[14px] leading-relaxed text-white/70">
-                原始 DOCX 作为赛事真源已经被拆解为站内内容模块，当前官网展示的是裁判与选手都能直接阅读的结构化版本，而不是原文附件嵌入。
-              </p>
-            </div>
-            <div className="grid gap-6 md:grid-cols-2">
-              <div className="group border border-white/[0.05] bg-white/[0.01] p-6 rounded-sm transition-colors hover:bg-white/[0.03]">
-                <ShieldAlert className="h-5 w-5 text-white/30 transition-transform duration-500 group-hover:scale-110 group-hover:text-white/60" />
-                <div className="mt-5 font-sans text-lg font-medium text-white/90">
-                  系数复核
-                </div>
-                <p className="mt-4 text-[13px] leading-relaxed text-white/60 transition-colors group-hover:text-white/80">
-                  超时、重复六星与共享余额都会影响最终系数，单独保留裁判组的系数复核通道确保准确无误。
-                </p>
-              </div>
-              <div className="group border border-white/[0.05] bg-white/[0.01] p-6 rounded-sm transition-colors hover:bg-white/[0.03]">
-                <BookOpen className="h-5 w-5 text-white/30 transition-transform duration-500 group-hover:scale-110 group-hover:text-white/60" />
-                <div className="mt-5 font-sans text-lg font-medium text-white/90">
-                  结构化内容
-                </div>
-                <p className="mt-4 text-[13px] leading-relaxed text-white/60 transition-colors group-hover:text-white/80">
-                  三大主题分别按限制条件、关卡加分、倍率和处罚项展开，拒绝纯文本粘贴，方便选手速查阅。
-                </p>
-              </div>
-            </div>
-          </section>
-        </ScrollReveal>
       </div>
-    </PageFrame >
+    </PageFrame>
   );
 }

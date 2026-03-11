@@ -1,47 +1,147 @@
-import type { ReactNode } from "react";
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes, KeyboardEvent, PointerEvent, ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+
+type ClipButtonVariant = "primary" | "secondary" | "ghost";
+type ClipButtonSize = "md" | "lg";
 
 interface ClipButtonProps {
   children: ReactNode;
   className?: string;
+  variant?: ClipButtonVariant;
+  size?: ClipButtonSize;
   primary?: boolean;
   to?: string;
   href?: string;
   onClick?: () => void;
+  target?: AnchorHTMLAttributes<HTMLAnchorElement>["target"];
+  rel?: AnchorHTMLAttributes<HTMLAnchorElement>["rel"];
+  type?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
 }
 
-const sharedClassName =
-  "group clip-corner relative inline-flex items-center justify-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-[0.15em] transition-all duration-300 overflow-hidden";
+interface Ripple {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+}
+
+const variantClassName: Record<ClipButtonVariant, string> = {
+  primary: "btn-primary",
+  secondary: "btn-secondary",
+  ghost: "btn-ghost",
+};
+
+const sizeClassName: Record<ClipButtonSize, string> = {
+  md: "px-5 py-3 text-[11px]",
+  lg: "px-7 py-4 text-[12px]",
+};
 
 export function ClipButton({
   children,
   className = "",
-  primary = false,
+  variant,
+  size = "md",
+  primary,
   to,
   href,
   onClick,
+  target,
+  rel,
+  type = "button",
 }: ClipButtonProps) {
-  const tone = primary
-    ? "bg-white text-black shadow-glow hover:bg-accent hover:shadow-glowStrong focus:ring-2 focus:ring-accent/50"
-    : "border border-white/10 bg-black/40 text-white hover:border-white/30 hover:bg-white/5";
+  const [ripples, setRipples] = useState<Ripple[]>([]);
+  const [pressed, setPressed] = useState(false);
+  const timeoutIdsRef = useRef<number[]>([]);
+  const resolvedVariant = variant ?? (primary ? "primary" : "secondary");
+  const combined = [
+    "clip-corner",
+    variantClassName[resolvedVariant],
+    sizeClassName[size],
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
-  // More subtle, faster sweeping light
-  const glowOverlay = <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-300 group-hover:translate-x-full" />;
+  useEffect(() => {
+    return () => {
+      timeoutIdsRef.current.forEach((timeoutId) => window.clearTimeout(timeoutId));
+      timeoutIdsRef.current = [];
+    };
+  }, []);
+
+  const releasePress = useCallback(() => {
+    setPressed(false);
+  }, []);
+
+  const spawnRipple = useCallback((x: number, y: number, sizePx: number) => {
+    const nextRipple = {
+      id: Date.now() + Math.random(),
+      x,
+      y,
+      size: sizePx,
+    };
+
+    setRipples((current) => [...current, nextRipple]);
+    const timeoutId = window.setTimeout(() => {
+      setRipples((current) => current.filter((ripple) => ripple.id !== nextRipple.id));
+      timeoutIdsRef.current = timeoutIdsRef.current.filter((currentId) => currentId !== timeoutId);
+    }, 540);
+    timeoutIdsRef.current.push(timeoutId);
+  }, []);
+
+  const handlePointerDown = useCallback((event: PointerEvent<HTMLElement>) => {
+    if (!event.isPrimary || event.button !== 0) {
+      return;
+    }
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const sizePx = Math.max(rect.width, rect.height) * 1.15;
+    spawnRipple(event.clientX - rect.left, event.clientY - rect.top, sizePx);
+    setPressed(true);
+  }, [spawnRipple]);
+
+  const handleKeyDown = useCallback((event: KeyboardEvent<HTMLElement>) => {
+    if ((event.key !== "Enter" && event.key !== " ") || event.repeat) {
+      return;
+    }
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const sizePx = Math.max(rect.width, rect.height) * 0.9;
+    spawnRipple(rect.width / 2, rect.height / 2, sizePx);
+    setPressed(true);
+  }, [spawnRipple]);
 
   const content = (
     <>
-      <span className="relative z-10 flex items-center gap-2 group-hover:translate-x-0.5 transition-transform duration-300">
+      <span className="flex items-center gap-2 transition-transform duration-[160ms] group-hover:translate-x-0.5 group-active:translate-x-0">
         {children}
       </span>
-      {glowOverlay}
+      {ripples.map((ripple) => (
+        <span
+          key={ripple.id}
+          aria-hidden="true"
+          className="btn-ripple"
+          style={{ height: ripple.size, left: ripple.x, top: ripple.y, width: ripple.size }}
+        />
+      ))}
     </>
   );
 
-  const combined = `${sharedClassName} ${tone} ${className}`;
+  const interactionProps = {
+    "data-pressed": pressed ? "true" : undefined,
+    onBlur: releasePress,
+    onKeyDown: handleKeyDown,
+    onKeyUp: releasePress,
+    onPointerCancel: releasePress,
+    onPointerDown: handlePointerDown,
+    onPointerLeave: releasePress,
+    onPointerUp: releasePress,
+  };
 
   if (to) {
     return (
-      <Link className={combined} to={to}>
+      <Link {...interactionProps} className={`${combined} group`} onClick={onClick} to={to}>
         {content}
       </Link>
     );
@@ -49,14 +149,14 @@ export function ClipButton({
 
   if (href) {
     return (
-      <a className={combined} href={href} onClick={onClick}>
+      <a {...interactionProps} className={`${combined} group`} href={href} onClick={onClick} rel={rel} target={target}>
         {content}
       </a>
     );
   }
 
   return (
-    <button className={combined} onClick={onClick} type="button">
+    <button {...interactionProps} className={`${combined} group`} onClick={onClick} type={type}>
       {content}
     </button>
   );

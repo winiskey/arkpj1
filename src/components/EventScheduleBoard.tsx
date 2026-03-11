@@ -1,6 +1,7 @@
 import { Fragment, memo, useState } from "react";
 import { CalendarDays, ChevronDown, Clock3 } from "lucide-react";
 import type { ScheduleDay, SchedulePeriod, ScheduleSlot, ScheduleSlotTone } from "../content";
+import { SpotlightCard } from "./SpotlightCard";
 
 interface EventScheduleBoardProps {
   days: ScheduleDay[];
@@ -23,28 +24,28 @@ const periodMeta: Record<SchedulePeriod, { label: string; time: string }> = {
 
 const toneStyles: Record<ScheduleSlotTone, { shell: string; strip: string; chip: string; title: string; meta: string; note: string }> = {
   default: {
-    shell: "border-white/10 bg-black/24 hover:border-white/18 hover:bg-white/[0.06]",
-    strip: "via-accent",
-    chip: "border-accent/18 bg-accent/10 text-accent",
-    title: "text-white group-hover:text-accent",
-    meta: "text-white/48",
-    note: "text-white/42",
+    shell: "border-white/5 bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04] shadow-[inset_0_1px_1px_rgba(255,255,255,0.03)]",
+    strip: "via-white/20",
+    chip: "border-white/10 bg-white/[0.05] text-white/70",
+    title: "text-white/80 group-hover:text-white",
+    meta: "text-white/40",
+    note: "text-white/30",
   },
   alert: {
-    shell: "border-rose-400/22 bg-rose-500/10 hover:border-rose-300/36 hover:bg-rose-500/14",
-    strip: "via-rose-300",
-    chip: "border-rose-300/30 bg-rose-400/14 text-rose-100",
-    title: "text-rose-50 group-hover:text-white",
-    meta: "text-rose-100/70",
-    note: "text-rose-100/60",
+    shell: "border-rose-400/10 bg-rose-500/5 hover:border-rose-400/20 hover:bg-rose-500/10 shadow-[inset_0_1px_1px_rgba(251,113,133,0.08)]",
+    strip: "via-rose-400/30",
+    chip: "border-rose-400/20 bg-rose-400/10 text-rose-200",
+    title: "text-rose-100 group-hover:text-white",
+    meta: "text-rose-200/60",
+    note: "text-rose-200/40",
   },
   featured: {
-    shell: "border-sky-300/24 bg-sky-400/10 hover:border-sky-200/38 hover:bg-sky-400/14",
-    strip: "via-sky-200",
-    chip: "border-sky-200/30 bg-sky-300/14 text-sky-100",
-    title: "text-sky-50 group-hover:text-white",
-    meta: "text-sky-100/78",
-    note: "text-sky-100/65",
+    shell: "border-brand/10 bg-brand/5 hover:border-brand/20 hover:bg-brand/10 shadow-[inset_0_1px_1px_rgba(214,192,138,0.15)]",
+    strip: "via-brand/30",
+    chip: "border-brand/20 bg-brand/10 text-brand",
+    title: "text-brand group-hover:text-brandStrong",
+    meta: "text-brand/60",
+    note: "text-brand/40",
   },
 };
 
@@ -119,15 +120,14 @@ export const EventScheduleBoard = memo(function EventScheduleBoard({ days, teamN
   }
 
   return (
-    <div className="hud-panel overflow-hidden rounded-[32px] border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.22)]">
-      <div className="absolute inset-0 bg-grid opacity-[0.08]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,209,255,0.14),transparent_36%),radial-gradient(circle_at_bottom_right,rgba(251,113,133,0.1),transparent_28%)]" />
+    <SpotlightCard className="group relative overflow-hidden rounded-[40px] border border-white/5 bg-white/[0.015] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.4)] backdrop-blur-2xl" spotlightColor="rgba(255,255,255,0.04)">
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,rgba(214,192,138,0.06),transparent_50%)]" />
 
-      <div className="relative z-10 border-b border-white/10 px-5 py-5 md:px-6 md:py-6">
+      <div className="relative z-10 border-b border-white/5 px-6 py-6 md:px-8 md:py-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-2xl">
-            <div className="font-display text-xs tracking-[0.32em] text-accent">赛程同步</div>
-            <p className="mt-3 text-sm leading-7 text-white/65">
+            <div className="font-display text-xs tracking-[0.32em] text-brand/70">赛程同步</div>
+            <p className="mt-3 text-sm leading-7 text-white/50">
               {expanded
                 ? "展示全部赛程，点击下方按钮可折叠回焦点视图。"
                 : "默认聚焦近期赛事，点击下方可展开完整赛程。"
@@ -136,12 +136,12 @@ export const EventScheduleBoard = memo(function EventScheduleBoard({ days, teamN
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/24 px-3.5 py-2 text-[11px] tracking-[0.22em] text-white/55">
-              <CalendarDays className="h-4 w-4 text-accent" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/5 bg-white/[0.03] px-4 py-2 text-[11px] tracking-[0.22em] text-white/50 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
+              <CalendarDays className="h-4 w-4 text-white/60" />
               {days.length} 天排期
             </div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/24 px-3.5 py-2 text-[11px] tracking-[0.22em] text-white/55">
-              <Clock3 className="h-4 w-4 text-accent" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/5 bg-white/[0.03] px-4 py-2 text-[11px] tracking-[0.22em] text-white/50 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
+              <Clock3 className="h-4 w-4 text-white/60" />
               {totalSlots} 场已录入
             </div>
           </div>
@@ -150,17 +150,17 @@ export const EventScheduleBoard = memo(function EventScheduleBoard({ days, teamN
 
       {/* ── Desktop: Grid View ── */}
       <div className="relative z-10 hidden overflow-x-auto md:block">
-        <div className="min-w-[940px] p-4 md:p-5">
-          <div className="grid grid-cols-[170px_repeat(3,minmax(0,1fr))] gap-3">
-            <div className="rounded-[24px] border border-white/10 bg-white/[0.04] px-5 py-4">
-              <div className="font-display text-[11px] tracking-[0.3em] text-accent">日期</div>
-              <div className="mt-2 text-xs tracking-[0.24em] text-white/45">星期 / 日期</div>
+        <div className="min-w-[940px] p-6 lg:p-8">
+          <div className="grid grid-cols-[170px_repeat(3,minmax(0,1fr))] gap-4">
+            <div className="rounded-[24px] border border-white/5 bg-white/[0.02] px-5 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+              <div className="font-display text-[11px] tracking-[0.3em] text-brand/70">日期</div>
+              <div className="mt-2 text-xs tracking-[0.24em] text-white/40">星期 / 日期</div>
             </div>
             {periodOrder.map((period) => (
-              <div key={period} className="rounded-[24px] border border-white/10 bg-white/[0.04] px-5 py-4">
-                <div className="font-display text-2xl font-black tracking-[0.16em] text-white">{period}</div>
-                <div className="mt-2 font-display text-xs tracking-[0.26em] text-accent">{periodMeta[period].time}</div>
-                <div className="mt-1 text-xs tracking-[0.24em] text-white/45">{periodMeta[period].label}</div>
+              <div key={period} className="rounded-[24px] border border-white/5 bg-white/[0.02] px-5 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+                <div className="font-display text-2xl font-black tracking-[0.16em] text-white/80">{period}</div>
+                <div className="mt-2 font-display text-xs tracking-[0.26em] text-brand/60">{periodMeta[period].time}</div>
+                <div className="mt-1 text-xs tracking-[0.24em] text-white/40">{periodMeta[period].label}</div>
               </div>
             ))}
 
@@ -169,14 +169,14 @@ export const EventScheduleBoard = memo(function EventScheduleBoard({ days, teamN
 
               return (
                 <Fragment key={day.date}>
-                  <div className={`flex min-h-[116px] flex-col justify-center rounded-[26px] border px-5 py-4 transition-colors ${today ? "border-accent/40 bg-accent/10 shadow-glow" : "border-white/10 bg-white/[0.03]"}`}>
+                  <div className={`flex min-h-[116px] flex-col justify-center rounded-[26px] border px-5 py-4 transition-colors ${today ? "border-brand/20 bg-brand/5 shadow-[inset_1px_0_0_rgba(214,192,138,0.4)]" : "border-white/5 bg-white/[0.015]"}`}>
                     <div className="flex items-center gap-2">
-                      <div className={`font-display text-3xl font-black tracking-[0.14em] ${today ? "text-accent" : "text-white"}`}>{day.date}</div>
+                      <div className={`font-display text-3xl font-black tracking-[0.14em] ${today ? "text-brand" : "text-white/80"}`}>{day.date}</div>
                       {today ? (
-                        <span className="rounded bg-accent px-2 py-0.5 font-display text-[9px] font-bold tracking-[0.2em] text-black">今天</span>
+                        <span className="rounded bg-brand px-2 py-0.5 font-display text-[9px] font-bold tracking-[0.2em] text-black">今天</span>
                       ) : null}
                     </div>
-                    <div className={`mt-2 text-xs tracking-[0.24em] ${today ? "text-accent/80" : "text-white/45"}`}>{day.weekday}</div>
+                    <div className={`mt-2 text-xs tracking-[0.24em] ${today ? "text-brand/60" : "text-white/40"}`}>{day.weekday}</div>
                   </div>
 
                   {periodOrder.map((period) => {
@@ -188,8 +188,8 @@ export const EventScheduleBoard = memo(function EventScheduleBoard({ days, teamN
                         {slot ? (
                           <ScheduleEntry slot={slot} teamName={teamName} />
                         ) : (
-                          <div className="flex min-h-[108px] items-center justify-center rounded-[24px] border border-dashed border-white/10 bg-white/[0.02] font-display text-xs tracking-[0.32em] text-white/20">
-                            无赛事
+                          <div className="flex w-full h-full min-h-[108px] items-center justify-center rounded-[24px] border border-dashed border-white/5 bg-white/[0.01] font-display text-xs tracking-[0.2em] text-white/20">
+                            NO MATCH
                           </div>
                         )}
                       </div>
@@ -250,9 +250,9 @@ export const EventScheduleBoard = memo(function EventScheduleBoard({ days, teamN
 
       {/* ── Expand / Collapse Toggle ── */}
       {needsCollapse ? (
-        <div className="relative z-10 border-t border-white/10 px-5 py-4 md:px-6">
+        <div className="relative z-10 border-t border-white/5 px-6 py-5 md:px-8">
           <button
-            className="group flex w-full items-center justify-center gap-2 rounded-[16px] border border-white/10 bg-white/[0.03] py-3 font-display text-xs tracking-[0.2em] text-white/60 transition-all duration-300 hover:border-accent/30 hover:bg-accent/5 hover:text-accent"
+            className="flex w-full items-center justify-center gap-2 rounded-[20px] border border-white/5 bg-white/[0.02] py-4 font-display text-xs tracking-[0.2em] text-white/50 transition-all hover:border-brand/30 hover:bg-brand/5 hover:text-brand"
             onClick={() => setExpanded(!expanded)}
             type="button"
           >
@@ -261,6 +261,6 @@ export const EventScheduleBoard = memo(function EventScheduleBoard({ days, teamN
           </button>
         </div>
       ) : null}
-    </div>
+    </SpotlightCard>
   );
 });

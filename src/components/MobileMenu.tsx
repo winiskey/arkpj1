@@ -1,93 +1,225 @@
 import { X } from "lucide-react";
+import { type KeyboardEvent as ReactKeyboardEvent, type RefObject, useEffect, useRef } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { LOGO_IMAGE_SRC } from "../lib/logo";
 
 interface MobileMenuProps {
-    isOpen: boolean;
-    onClose: () => void;
-    navItems: { to: string; label: string }[];
-    startDate: string;
+  isOpen: boolean;
+  onClose: () => void;
+  navItems: { to: string; label: string }[];
+  startDate: string;
+  triggerRef: RefObject<HTMLButtonElement>;
 }
 
-export function MobileMenu({ isOpen, onClose, navItems, startDate }: MobileMenuProps) {
-    const location = useLocation();
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',');
 
-    // Close on route change
-    useEffect(() => {
+function getFocusableElements(container: HTMLElement | null) {
+  if (!container) {
+    return [] as HTMLElement[];
+  }
+
+  return Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+    (element) => !element.hasAttribute("disabled") && element.getAttribute("aria-hidden") !== "true",
+  );
+}
+
+export function MobileMenu({ isOpen, onClose, navItems, startDate, triggerRef }: MobileMenuProps) {
+  const location = useLocation();
+  const panelRef = useRef<HTMLElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const lastActiveElementRef = useRef<HTMLElement | null>(null);
+  const wasOpenRef = useRef(false);
+
+  useEffect(() => {
+    onClose();
+  }, [location.pathname, onClose]);
+
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+
+    if (isOpen) {
+      lastActiveElementRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      window.setTimeout(() => {
+        closeButtonRef.current?.focus();
+      }, 30);
+    } else if (wasOpenRef.current) {
+      window.setTimeout(() => {
+        const focusTarget = triggerRef.current ?? lastActiveElementRef.current;
+        focusTarget?.focus();
+      }, 10);
+    }
+
+    wasOpenRef.current = isOpen;
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen, triggerRef]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
         onClose();
-    }, [location.pathname, onClose]);
+        return;
+      }
 
-    // Lock body scroll when open
-    useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = "hidden";
-        } else {
-            document.body.style.overflow = "";
+      if (event.key !== "Tab") {
+        return;
+      }
+
+      const focusableElements = getFocusableElements(panelRef.current);
+      if (focusableElements.length === 0) {
+        event.preventDefault();
+        return;
+      }
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      const activeElement = document.activeElement as HTMLElement | null;
+
+      if (event.shiftKey) {
+        if (!activeElement || activeElement === firstElement || !panelRef.current?.contains(activeElement)) {
+          event.preventDefault();
+          lastElement.focus();
         }
-        return () => {
-            document.body.style.overflow = "";
-        };
-    }, [isOpen]);
+        return;
+      }
 
-    return (
-        <>
-            {/* Backdrop */}
-            <div
-                className={`fixed inset-0 z-40 bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-                    }`}
-                onClick={onClose}
-            />
+      if (!activeElement || activeElement === lastElement || !panelRef.current?.contains(activeElement)) {
+        event.preventDefault();
+        firstElement.focus();
+      }
+    };
 
-            {/* Slide-in Drawer */}
-            <div
-                className={`fixed inset-y-0 right-0 z-50 w-72 flex flex-col border-l border-white/10 bg-black/95 backdrop-blur-xl transition-transform duration-300 ease-out ${isOpen ? "translate-x-0" : "translate-x-full"
-                    }`}
-            >
-                {/* Header */}
-                <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.08]">
-                    <span className="font-display text-xs uppercase tracking-[0.3em] text-accent/80">NAVIGATION</span>
-                    <button
-                        aria-label="关闭菜单"
-                        title="关闭菜单"
-                        className="flex h-9 w-9 items-center justify-center rounded-sm border border-white/10 bg-white/[0.03] text-white/60 hover:text-white transition-colors"
-                        onClick={onClose}
-                        type="button"
-                    >
-                        <X className="h-4 w-4" />
-                    </button>
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
+  const handleDialogKeyDown = (event: ReactKeyboardEvent<HTMLElement>) => {
+    if (event.key !== "Tab") {
+      return;
+    }
+
+    const focusableElements = getFocusableElements(panelRef.current);
+    if (focusableElements.length === 0) {
+      event.preventDefault();
+    }
+  };
+
+  return (
+    <>
+      <div
+        aria-hidden="true"
+        className={`fixed inset-0 z-40 bg-black/72 backdrop-blur-md transition-opacity duration-[220ms] ${
+          isOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+        }`}
+        onClick={onClose}
+      />
+
+      <aside
+        ref={panelRef}
+        aria-hidden={!isOpen}
+        aria-labelledby="mobile-navigation-title"
+        aria-modal="true"
+        className={`fixed inset-y-0 right-0 z-50 flex w-full max-w-[28rem] flex-col border-l border-brand/12 bg-[linear-gradient(180deg,rgba(17,19,23,0.98),rgba(11,13,16,0.98))] shadow-[0_0_0_1px_rgba(214,192,138,0.06),0_24px_80px_-24px_rgba(0,0,0,0.92)] transition-transform duration-[320ms] ease-[var(--ease-out)] lg:hidden ${
+          isOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+        id="mobile-navigation-dialog"
+        onKeyDown={handleDialogKeyDown}
+        role="dialog"
+      >
+        <div className="border-b border-white/8 px-5 pb-5 pt-6">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="interactive-surface flex h-12 w-12 items-center justify-center rounded-2xl border border-brand/18 bg-brand/8">
+                <img alt="荆楚歌 Logo" className="h-7 w-7 brightness-0 invert" src={LOGO_IMAGE_SRC} />
+              </div>
+              <div>
+                <div className="section-kicker">Navigation Deck</div>
+                <div className="mt-2 font-title text-2xl font-black tracking-[0.03em] text-text1" id="mobile-navigation-title">
+                  赛事导航
                 </div>
-
-                {/* Nav Links */}
-                <nav className="flex flex-1 flex-col gap-1 p-4">
-                    {navItems.map((item, i) => {
-                        const isActive =
-                            item.to === "/" ? location.pathname === "/" : location.pathname.startsWith(item.to);
-                        return (
-                            <NavLink
-                                key={item.to}
-                                to={item.to}
-                                className={`relative flex items-center gap-4 px-5 py-4 font-display text-sm uppercase tracking-[0.22em] transition-all duration-300 ${isActive
-                                    ? "text-white bg-white/[0.06] border-l-2 border-accent"
-                                    : "text-white/50 hover:text-white hover:bg-white/[0.03] border-l-2 border-transparent"
-                                    }`}
-                            >
-                                <span className="font-display text-[10px] text-accent/40 tabular-nums">
-                                    {String(i + 1).padStart(2, "0")}
-                                </span>
-                                {item.label}
-                            </NavLink>
-                        );
-                    })}
-                </nav>
-
-                {/* Footer */}
-                <div className="px-6 py-5 border-t border-white/[0.08]">
-                    <div className="font-display text-[10px] uppercase tracking-[0.3em] text-white/20">
-                        Season Active
-                    </div>
-                    <div className="mt-1 font-display text-sm text-accent/70">{startDate}</div>
-                </div>
+              </div>
             </div>
-        </>
-    );
+            <button
+              ref={closeButtonRef}
+              aria-label="关闭菜单"
+              className="btn-ghost h-12 w-12 shrink-0 rounded-2xl px-0 py-0"
+              onClick={onClose}
+              tabIndex={isOpen ? undefined : -1}
+              type="button"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <p className="mt-4 max-w-sm text-sm leading-6 text-text2">
+            在赛事大厅、队伍情报与规则手册之间快速切换，保持当前战局与资料入口的连续感。
+          </p>
+        </div>
+
+        <nav className="flex flex-1 flex-col gap-3 px-4 py-5">
+          {navItems.map((item, index) => {
+            const isActive = item.to === "/" ? location.pathname === "/" : location.pathname.startsWith(item.to);
+            return (
+              <NavLink
+                key={item.to}
+                className={`interactive-surface group clip-corner relative flex min-h-[72px] items-center justify-between gap-4 overflow-hidden border px-5 py-4 transition-[transform,opacity,border-color,background-color,color] duration-[280ms] ease-[var(--ease-out)] ${
+                  isOpen ? "translate-x-0 opacity-100" : "translate-x-4 opacity-0"
+                } ${
+                  isActive
+                    ? "border-brand/30 bg-brand/12 text-text1 shadow-brand"
+                    : "border-white/8 bg-white/[0.03] text-text2 hover:border-brand/18 hover:bg-white/[0.05] hover:text-text1"
+                }`}
+                style={{ transitionDelay: isOpen ? `${100 + index * 45}ms` : "0ms" }}
+                tabIndex={isOpen ? undefined : -1}
+                to={item.to}
+              >
+                <div>
+                  <div className="font-display text-[11px] uppercase tracking-[0.18em] text-brand/70">
+                    {String(index + 1).padStart(2, "0")}
+                  </div>
+                  <div className="mt-2 font-title text-2xl font-black tracking-[0.03em] transition-transform duration-[180ms] group-hover:-translate-y-px">
+                    {item.label}
+                  </div>
+                </div>
+                <div className="font-display text-xs uppercase tracking-[0.18em] text-text3 transition-colors duration-[180ms] group-hover:text-brand/70">
+                  {isActive ? "Current" : "Open"}
+                </div>
+              </NavLink>
+            );
+          })}
+        </nav>
+
+        <div className="border-t border-white/8 px-5 py-5">
+          <div
+            className={`panel-data interactive-surface flex items-center justify-between rounded-[20px] px-5 py-4 transition-[transform,opacity] duration-[280ms] ease-[var(--ease-out)] hover:border-brand/16 hover:bg-white/[0.05] ${
+              isOpen ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
+            }`}
+            style={{ transitionDelay: isOpen ? `${100 + navItems.length * 45}ms` : "0ms" }}
+          >
+            <div>
+              <div className="section-kicker">Season Start</div>
+              <div className="mt-2 font-display text-lg font-bold tracking-[0.08em] text-text1">{startDate}</div>
+            </div>
+            <div className="section-tag">Tactical Archive</div>
+          </div>
+        </div>
+      </aside>
+    </>
+  );
 }
+
