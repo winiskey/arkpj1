@@ -571,43 +571,43 @@
             <div class="section-title">关卡加分<button class="section-reset-btn" onclick="resetSection(this)">重置</button>
             </div>
             <div class="checkbox-grid">
-                <label class="checkbox-item"><input type="checkbox" class="sa-stage" value="50" onchange="calc()"> 呼吸
+                <label class="checkbox-item"><input type="checkbox" id="sa-stage-breath" class="sa-stage" value="50" onchange="calc()"> 呼吸
                     <span class="score-badge">+50</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sa-stage" value="50" onchange="calc()"> 夺树者
+                <label class="checkbox-item"><input type="checkbox" id="sa-stage-tree" class="sa-stage" value="50" onchange="calc()"> 夺树者
                     <span class="score-badge">+50</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sa-stage" value="75" onchange="calc()"> 大地醒转
+                <label class="checkbox-item"><input type="checkbox" id="sa-stage-earthwake" class="sa-stage" value="75" onchange="calc()"> 大地醒转
                     <span class="score-badge">+75</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sa-stage" value="30" onchange="calc()"> 禁区
+                <label class="checkbox-item"><input type="checkbox" id="sa-stage-ban" class="sa-stage" value="30" onchange="calc()"> 禁区
                     <span class="score-badge">+30</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sa-stage" value="30" onchange="calc()">
+                <label class="checkbox-item"><input type="checkbox" id="sa-stage-collapse" class="sa-stage" value="30" onchange="calc()">
                     坍缩体的午后 <span class="score-badge">+30</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sa-stage" value="50" onchange="calc()"> 亡者行军
+                <label class="checkbox-item"><input type="checkbox" id="sa-stage-march" class="sa-stage" value="50" onchange="calc()"> 亡者行军
                     <span class="score-badge">+50</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sa-stage" value="50" onchange="calc()"> 混乱的表象
+                <label class="checkbox-item"><input type="checkbox" id="sa-stage-chaos" class="sa-stage" value="50" onchange="calc()"> 混乱的表象
                     <span class="score-badge">+50</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sa-stage" value="50" onchange="calc()"> 何处无山海
+                <label class="checkbox-item"><input type="checkbox" id="sa-stage-mountains" class="sa-stage" value="50" onchange="calc()"> 何处无山海
                     <span class="score-badge">+50</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sa-stage" value="60" onchange="calc()"> 本能污染
+                <label class="checkbox-item"><input type="checkbox" id="sa-stage-instinct" class="sa-stage" value="60" onchange="calc()"> 本能污染
                     <span class="score-badge">+60</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sa-stage" value="80" onchange="calc()">
+                <label class="checkbox-item"><input type="checkbox" id="sa-stage-carnival" class="sa-stage" value="80" onchange="calc()">
                     人造物狂欢节 <span class="score-badge">+80</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sa-stage" value="80" onchange="calc()"> 生灵的终点
+                <label class="checkbox-item"><input type="checkbox" id="sa-stage-endpoint" class="sa-stage" value="80" onchange="calc()"> 生灵的终点
                     <span class="score-badge">+80</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sa-stage" value="50" onchange="calc()"> 巍峨银凇
+                <label class="checkbox-item"><input type="checkbox" id="sa-stage-silverpine" class="sa-stage" value="50" onchange="calc()"> 巍峨银凇
                     <span class="score-badge">+50</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sa-stage" value="150" onchange="calc()"> 深寒造像
+                <label class="checkbox-item"><input type="checkbox" id="sa-stage-statue" class="sa-stage" value="150" onchange="calc()"> 深寒造像
                     <span class="score-badge">+150</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sa-stage" value="100" onchange="calc()"> 萨米之熵
+                <label class="checkbox-item"><input type="checkbox" id="sa-stage-entropy" class="sa-stage" value="100" onchange="calc()"> 萨米之熵
                     <span class="score-badge">+100</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sa-stage" value="250" onchange="calc()"> 虚无之偶
+                <label class="checkbox-item"><input type="checkbox" id="sa-stage-idol" class="sa-stage" value="250" onchange="calc()"> 虚无之偶
                     <span class="score-badge">+250</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sa-stage" value="150" onchange="calc()">
+                <label class="checkbox-item"><input type="checkbox" id="sa-stage-gardener" class="sa-stage" value="150" onchange="calc()">
                     园丁（基础） <span class="score-badge">+150</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sa-stage" value="300" onchange="calc()">
+                <label class="checkbox-item"><input type="checkbox" id="sa-stage-sentinel" class="sa-stage" value="300" onchange="calc()">
                     哨兵（基础） <span class="score-badge">+300</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sa-stage" value="100" onchange="calc()"> 时光之沙
+                <label class="checkbox-item"><input type="checkbox" id="sa-stage-sands" class="sa-stage" value="100" onchange="calc()"> 时光之沙
                     <span class="score-badge">+100</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sa-stage" value="180" onchange="calc()"> 迈入永恒
+                <label class="checkbox-item"><input type="checkbox" id="sa-stage-eternity" class="sa-stage" value="180" onchange="calc()"> 迈入永恒
                     <span class="score-badge">+180</span></label>
             </div>
         </div>
@@ -647,29 +647,29 @@
             <div class="section-title">普通关卡<button class="section-reset-btn" onclick="resetSection(this)">重置</button>
             </div>
             <div class="checkbox-grid">
-                <label class="checkbox-item"><input type="checkbox" class="sk-stage" value="75" onchange="calc()"> 赴敌者
+                <label class="checkbox-item"><input type="checkbox" id="sk-stage-foe" class="sk-stage" value="75" onchange="calc()"> 赴敌者
                     <span class="score-badge">+75</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sk-stage" value="75" onchange="calc()"> 王冠之下
+                <label class="checkbox-item"><input type="checkbox" id="sk-stage-crown" class="sk-stage" value="75" onchange="calc()"> 王冠之下
                     <span class="score-badge">+75</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sk-stage" value="100" onchange="calc()">
+                <label class="checkbox-item"><input type="checkbox" id="sk-stage-courtyard" class="sk-stage" value="100" onchange="calc()">
                     离歌的庭院 <span class="score-badge">+100</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sk-stage" value="30" onchange="calc()"> 混沌
+                <label class="checkbox-item"><input type="checkbox" id="sk-stage-chaos" class="sk-stage" value="30" onchange="calc()"> 混沌
                     <span class="score-badge">+30</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sk-stage" value="40" onchange="calc()"> 神出鬼没
+                <label class="checkbox-item"><input type="checkbox" id="sk-stage-ghost" class="sk-stage" value="40" onchange="calc()"> 神出鬼没
                     <span class="score-badge">+40</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sk-stage" value="40" onchange="calc()"> 争议频发
+                <label class="checkbox-item"><input type="checkbox" id="sk-stage-controversy" class="sk-stage" value="40" onchange="calc()"> 争议频发
                     <span class="score-badge">+40</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sk-stage" value="50" onchange="calc()"> 莱茵卫士
+                <label class="checkbox-item"><input type="checkbox" id="sk-stage-rhine" class="sk-stage" value="50" onchange="calc()"> 莱茵卫士
                     <span class="score-badge">+50</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sk-stage" value="50" onchange="calc()"> 建制
+                <label class="checkbox-item"><input type="checkbox" id="sk-stage-regime" class="sk-stage" value="50" onchange="calc()"> 建制
                     <span class="score-badge">+50</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sk-stage" value="40" onchange="calc()"> 神圣的渴求
+                <label class="checkbox-item"><input type="checkbox" id="sk-stage-sacred" class="sk-stage" value="40" onchange="calc()"> 神圣的渴求
                     <span class="score-badge">+40</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sk-stage" value="50" onchange="calc()"> 谋求共识
+                <label class="checkbox-item"><input type="checkbox" id="sk-stage-consensus" class="sk-stage" value="50" onchange="calc()"> 谋求共识
                     <span class="score-badge">+50</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sk-stage" value="70" onchange="calc()"> 外道
+                <label class="checkbox-item"><input type="checkbox" id="sk-stage-heresy" class="sk-stage" value="70" onchange="calc()"> 外道
                     <span class="score-badge">+70</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sk-stage" value="90" onchange="calc()"> 洞天福地
+                <label class="checkbox-item"><input type="checkbox" id="sk-stage-paradise" class="sk-stage" value="90" onchange="calc()"> 洞天福地
                     <span class="score-badge">+90</span></label>
             </div>
         </div>
@@ -830,11 +830,11 @@
             <div class="section-title">关卡加分<button class="section-reset-btn" onclick="resetSection(this)">重置</button>
             </div>
             <div class="checkbox-grid">
-                <label class="checkbox-item"><input type="checkbox" class="sui-stage" value="30" onchange="calc()"> 夕娥忆
+                <label class="checkbox-item"><input type="checkbox" id="sui-stage-xye" class="sui-stage" value="30" onchange="calc()"> 夕娥忆
                     <span class="score-badge">+30</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sui-stage" value="70" onchange="calc()"> 求道
+                <label class="checkbox-item"><input type="checkbox" id="sui-stage-qiudao" class="sui-stage" value="70" onchange="calc()"> 求道
                     <span class="score-badge">+70</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sui-stage" value="50" onchange="calc()"> 仁义武
+                <label class="checkbox-item"><input type="checkbox" id="sui-stage-ryw" class="sui-stage" value="50" onchange="calc()"> 仁义武
                     <span class="score-badge">+50</span></label>
                 <label class="checkbox-item"><input type="checkbox" id="sui-stage-posz" class="sui-stage" value="0"
                         onchange="calc()"> 破岁阵祀 <span class="score-badge">+0</span></label>
@@ -848,37 +848,37 @@
                         onchange="calc()"> 谋岁者 <span class="score-badge">+200</span></label>
                 <label class="checkbox-item"><input type="checkbox" id="sui-stage-ms" class="sui-stage" value="200"
                         onchange="calc()"> 末狩 <span class="score-badge">+200</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sui-stage" value="30" onchange="calc()"> 赶场戏班
+                <label class="checkbox-item"><input type="checkbox" id="sui-stage-xiban" class="sui-stage" value="30" onchange="calc()"> 赶场戏班
                     <span class="score-badge">+30</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sui-stage" value="40" onchange="calc()"> 峥嵘战功
+                <label class="checkbox-item"><input type="checkbox" id="sui-stage-zhangong" class="sui-stage" value="40" onchange="calc()"> 峥嵘战功
                     <span class="score-badge">+40</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sui-stage" value="50" onchange="calc()">
+                <label class="checkbox-item"><input type="checkbox" id="sui-stage-butun" class="sui-stage" value="50" onchange="calc()">
                     忍气不吞声 <span class="score-badge">+50</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sui-stage" value="40" onchange="calc()"> 离域检查
+                <label class="checkbox-item"><input type="checkbox" id="sui-stage-liyu" class="sui-stage" value="40" onchange="calc()"> 离域检查
                     <span class="score-badge">+40</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sui-stage" value="30" onchange="calc()">
+                <label class="checkbox-item"><input type="checkbox" id="sui-stage-suixing" class="sui-stage" value="30" onchange="calc()">
                     岁醒天时被投出 <span class="score-badge">+30</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sui-stage" value="50" onchange="calc()"> 往事喑哑
+                <label class="checkbox-item"><input type="checkbox" id="sui-stage-yinya" class="sui-stage" value="50" onchange="calc()"> 往事喑哑
                     <span class="score-badge">+50</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sui-stage" value="60" onchange="calc()">
+                <label class="checkbox-item"><input type="checkbox" id="sui-stage-fangzhi" class="sui-stage" value="60" onchange="calc()">
                     邙山镇地方志 <span class="score-badge">+60</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sui-stage" value="50" onchange="calc()"> 砺锋
+                <label class="checkbox-item"><input type="checkbox" id="sui-stage-lifeng" class="sui-stage" value="50" onchange="calc()"> 砺锋
                     <span class="score-badge">+50</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sui-stage" value="70" onchange="calc()"> 不成烟火
+                <label class="checkbox-item"><input type="checkbox" id="sui-stage-yanhuo" class="sui-stage" value="70" onchange="calc()"> 不成烟火
                     <span class="score-badge">+70</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sui-stage" value="150" onchange="calc()"> 越山海
+                <label class="checkbox-item"><input type="checkbox" id="sui-stage-yueshanhai" class="sui-stage" value="150" onchange="calc()"> 越山海
                     <span class="score-badge">+150</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sui-stage" value="70" onchange="calc()"> 炎灼
+                <label class="checkbox-item"><input type="checkbox" id="sui-stage-yanzhuo" class="sui-stage" value="70" onchange="calc()"> 炎灼
                     <span class="score-badge">+70</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sui-stage" value="40" onchange="calc()"> 借力打力
+                <label class="checkbox-item"><input type="checkbox" id="sui-stage-jieli" class="sui-stage" value="40" onchange="calc()"> 借力打力
                     <span class="score-badge">+40</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sui-stage" value="30" onchange="calc()"> 人镇
+                <label class="checkbox-item"><input type="checkbox" id="sui-stage-renzhen" class="sui-stage" value="30" onchange="calc()"> 人镇
                     <span class="score-badge">+30</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sui-stage" value="25" onchange="calc()"> 遍地福音
+                <label class="checkbox-item"><input type="checkbox" id="sui-stage-fuyin" class="sui-stage" value="25" onchange="calc()"> 遍地福音
                     <span class="score-badge">+25</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sui-stage" value="25" onchange="calc()"> 相合
+                <label class="checkbox-item"><input type="checkbox" id="sui-stage-xianghe" class="sui-stage" value="25" onchange="calc()"> 相合
                     <span class="score-badge">+25</span></label>
-                <label class="checkbox-item"><input type="checkbox" class="sui-stage" value="30" onchange="calc()"> 时封
+                <label class="checkbox-item"><input type="checkbox" id="sui-stage-shifeng" class="sui-stage" value="30" onchange="calc()"> 时封
                     <span class="score-badge">+30</span></label>
             </div>
         </div>

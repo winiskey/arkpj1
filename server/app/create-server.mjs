@@ -4,6 +4,7 @@ import {
   createDefaultOpsState,
   createDefaultScoreSheetsState,
   createEmptyPublicContent,
+  ruleVersion,
   tournamentConfig,
 } from "./domain.mjs";
 import { createRequestContext, handlePreflight, HttpError, Router } from "./http.mjs";
@@ -60,7 +61,10 @@ export function createApp(config) {
   });
 
   router.register("GET", "/api/public/rule-config", async (context) => {
-    context.sendJson(200, tournamentConfig);
+    context.sendJson(200, {
+      ruleVersion,
+      tournamentConfig,
+    });
   });
 
   router.register("GET", "/api/admin/ops/bootstrap", withAdmin(async (context) => {

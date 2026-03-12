@@ -253,8 +253,9 @@ function renderComplianceBoard(summary) {
 
     const sections = [
         `<div class="summary-row"><div class="summary-main"><strong>???</strong><div class="summary-meta">${escapeHtml(summary.roster.pressureMemberName || "???")}</div></div><div class="summary-value">${summary.roster.pressureRoleValid ? "???" : "???"}</div></div>`,
-        `<div class="summary-row"><div class="summary-main"><strong>??????</strong><div class="summary-meta">?? ${summary.sharedIngots.limit} ?</div></div><div class="summary-value">${summary.sharedIngots.spent}</div></div>`,
+        `<div class="summary-row"><div class="summary-main"><strong>??????</strong><div class="summary-meta">?? ${summary.sharedIngots.limit} ? / ??? ${summary.sharedIngots.spent}</div></div><div class="summary-value">${summary.coefficientBreakdown.extraShopSpend.excess}</div></div>`,
         `<div class="summary-row"><div class="summary-main"><strong>????</strong><div class="summary-meta">?? ${summary.coachCalls.maxCount} ???? ${summary.coachCalls.maxMinutesPerCall} ??</div></div><div class="summary-value">${summary.coachCalls.totalCount}</div></div>`,
+        `<div class="summary-row"><div class="summary-main"><strong>??</strong><div class="summary-meta">?? ${formatScore(summary.coefficientBreakdown.totalDelta)}</div></div><div class="summary-value">${formatScore(summary.coefficient)}</div></div>`,
         `<div class="summary-row"><div class="summary-main"><strong>????</strong><div class="summary-meta">?? ${summary.blockingIssues.length} ? / ?? ${summary.warnings.length} ?</div></div><div class="summary-value">${summary.blockingIssues.length > 0 ? "???" : "??"}</div></div>`,
     ];
 
@@ -274,7 +275,7 @@ function renderTeamAggregate(aggregate) {
     document.getElementById("team-progress").textContent = aggregate ? `${aggregate.scoredCount} / ${aggregate.memberCount}` : "0 / 0";
     document.getElementById("team-raw-total").textContent = aggregate?.formatted?.rawTotal || "0";
     document.getElementById("team-pressure-bonus").textContent = aggregate?.formatted?.pressureBonus || "0";
-    document.getElementById("team-final-total").textContent = aggregate?.formatted?.teamTotal || "0";
+    document.getElementById("team-final-total").textContent = aggregate?.formatted?.finalTotal || aggregate?.formatted?.teamTotal || "0";
 
     const membersBoard = document.getElementById("team-members-board");
     if (!aggregate) {
@@ -327,8 +328,8 @@ function calcTeam() {
         return { total: 0, formula: "?????????????" };
     }
     return {
-        total: teamAggregateCache.teamTotal,
-        formula: `???? = ${teamAggregateCache.formatted.rawTotal} + ????? ${teamAggregateCache.formatted.pressureBonus}`,
+        total: teamAggregateCache.finalTotal ?? teamAggregateCache.teamTotal,
+        formula: `???? = (${teamAggregateCache.formatted.preCoefficientTotal} x ${teamAggregateCache.formatted.coefficient})`,
     };
 }
 
@@ -339,8 +340,11 @@ function calcSami() {
     if (gc("sa-gardener-nl")) raw += 50;
     if (gc("sa-sentinel-nl")) raw += 100;
     raw += gv("sa-end-link");
-    if (gc("sa-gift")) raw += 70;
-    return { total: raw, formula: `(${raw.toFixed(2)})` };
+    const multiplier = gc("sa-gift") ? 1.2 : 1;
+    return {
+        total: raw * multiplier,
+        formula: multiplier === 1 ? `(${raw.toFixed(2)})` : `(${raw.toFixed(2)} x ${multiplier.toFixed(2)})`,
+    };
 }
 
 function calcSarkaz() {
@@ -396,7 +400,7 @@ function calcSarkaz() {
     }
     if (gc("sk-roll")) ending *= 1.2;
     raw += ending;
-    return { total: raw * 0.75, formula: `(${raw.toFixed(2)} ? 0.75)` };
+    return { total: raw * 0.75, formula: `(${raw.toFixed(2)} x 0.75)` };
 }
 
 function calcSui() {
@@ -448,7 +452,7 @@ function calcSui() {
     if (gc("sui-pen-1")) multiplier *= 0.5;
     if (gc("sui-pen-2")) multiplier *= 0.5;
 
-    return { total: raw * multiplier, formula: `(${raw.toFixed(2)} ? ${multiplier.toFixed(2)})` };
+    return { total: raw * multiplier, formula: `(${raw.toFixed(2)} x ${multiplier.toFixed(2)})` };
 }
 
 function calculateCurrentResult() {

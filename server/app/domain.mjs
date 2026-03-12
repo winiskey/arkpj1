@@ -4,6 +4,7 @@ export const MATCH_STATUSES = ["IN_PROGRESS", "PENDING", "FINISHED"];
 export const MEMBER_RUN_STATUSES = ["LIVE", "PENDING", "FINISHED"];
 export const BROADCAST_STATUSES = ["LIVE", "UPCOMING", "OFFLINE"];
 export const SCHEDULE_SLOT_TONES = ["default", "alert", "featured"];
+export const ruleVersion = "jingchuge-2-docx-2026-03-12";
 
 const STATUS_WEIGHT = {
   draft: 0,
@@ -48,6 +49,11 @@ function nowIso() {
 function parseNumber(value, fallback = 0) {
   const nextValue = Number(value);
   return Number.isFinite(nextValue) ? nextValue : fallback;
+}
+
+function roundTo(value, precision = 4) {
+  const factor = 10 ** precision;
+  return Math.round((Number(value) || 0) * factor) / factor;
 }
 
 function stringArray(value) {
@@ -318,6 +324,54 @@ function groupDuplicateSixStars(operatorDrafts) {
     }));
 }
 
+function countDuplicateSixStarSelections(duplicateSixStars) {
+  return duplicateSixStars.reduce((sum, group) => sum + Math.max(group.entries.length - 1, 0), 0);
+}
+
+function buildCoefficientBreakdown(compliance, duplicateSixStars, sharedIngotsSpent) {
+  const overtimeSteps = Math.floor(
+    Math.max(compliance.overtimeMinutes, 0) / tournamentConfig.coefficientTracking.overtimeStepMinutes,
+  );
+  const duplicateCount = countDuplicateSixStarSelections(duplicateSixStars);
+  const extraShopSpend = Math.max(sharedIngotsSpent - tournamentConfig.sharedIngots.maxNetSpend, 0);
+
+  const overtimeDelta = roundTo(-overtimeSteps * tournamentConfig.coefficientTracking.overtimePenaltyPerStep);
+  const duplicateSixStarDelta = roundTo(
+    -duplicateCount * tournamentConfig.coefficientTracking.duplicateSixStarPenalty,
+  );
+  const extraShopSpendDelta = roundTo(
+    -extraShopSpend * tournamentConfig.coefficientTracking.extraShopSpendPenalty,
+  );
+  const totalDelta = roundTo(overtimeDelta + duplicateSixStarDelta + extraShopSpendDelta);
+  const finalValue = roundTo(tournamentConfig.coefficientTracking.initialValue + totalDelta);
+
+  return {
+    initialValue: tournamentConfig.coefficientTracking.initialValue,
+    overtime: {
+      minutes: compliance.overtimeMinutes,
+      stepMinutes: tournamentConfig.coefficientTracking.overtimeStepMinutes,
+      steps: overtimeSteps,
+      delta: overtimeDelta,
+    },
+    duplicateSixStars: {
+      duplicateCount,
+      groups: duplicateSixStars.map((group) => ({
+        operatorName: group.operatorName,
+        memberIds: group.memberIds,
+      })),
+      delta: duplicateSixStarDelta,
+    },
+    extraShopSpend: {
+      spent: sharedIngotsSpent,
+      limit: tournamentConfig.sharedIngots.maxNetSpend,
+      excess: extraShopSpend,
+      delta: extraShopSpendDelta,
+    },
+    totalDelta,
+    finalValue,
+  };
+}
+
 export function buildTeamComplianceSummary(team, rawCompliance = normalizeComplianceRecord(team.id)) {
   const compliance = normalizeComplianceRecord(team.id, rawCompliance);
   const pressureRoleAssigned = Boolean(compliance.pressureMemberId);
@@ -342,12 +396,6 @@ export function buildTeamComplianceSummary(team, rawCompliance = normalizeCompli
     blockingIssues.push(`Roster is short by ${missingMembers} member(s).`);
   }
 
-  if (sharedIngotsSpent > tournamentConfig.sharedIngots.maxNetSpend) {
-    blockingIssues.push(
-      `Shared ingot spend is over the limit by ${sharedIngotsSpent - tournamentConfig.sharedIngots.maxNetSpend}.`,
-    );
-  }
-
   if (compliance.coachCalls.length > tournamentConfig.coachCalls.maxCount) {
     blockingIssues.push("Coach call count exceeds the rule limit.");
   }
@@ -356,12 +404,24 @@ export function buildTeamComplianceSummary(team, rawCompliance = normalizeCompli
     blockingIssues.push("At least one coach call exceeds the per-call duration limit.");
   }
 
-  if (duplicateSixStars.length > 0) {
-    warnings.push("Duplicate six-star drafts require coefficient review.");
+  const coefficientBreakdown = buildCoefficientBreakdown(compliance, duplicateSixStars, sharedIngotsSpent);
+
+  if (coefficientBreakdown.overtime.delta !== 0) {
+    warnings.push(`Overtime coefficient penalty applied (${coefficientBreakdown.overtime.delta}).`);
+  } else if (compliance.overtimeMinutes > 0) {
+    warnings.push("Overtime minutes were recorded but did not reach the first 20-minute penalty step.");
   }
 
-  if (compliance.overtimeMinutes > 0) {
-    warnings.push("Overtime minutes were recorded and require coefficient review.");
+  if (coefficientBreakdown.duplicateSixStars.delta !== 0) {
+    warnings.push(
+      `Duplicate six-star coefficient penalty applied (${coefficientBreakdown.duplicateSixStars.delta}).`,
+    );
+  }
+
+  if (coefficientBreakdown.extraShopSpend.delta !== 0) {
+    warnings.push(
+      `Extra shop spend coefficient penalty applied (${coefficientBreakdown.extraShopSpend.delta}).`,
+    );
   }
 
   return {
@@ -393,12 +453,15 @@ export function buildTeamComplianceSummary(team, rawCompliance = normalizeCompli
     },
     operators: {
       duplicateSixStars,
+      duplicateCount: coefficientBreakdown.duplicateSixStars.duplicateCount,
       records: compliance.operatorDrafts,
     },
     overtime: {
       minutes: compliance.overtimeMinutes,
     },
     notes: compliance.notes,
+    coefficient: coefficientBreakdown.finalValue,
+    coefficientBreakdown,
     blockingIssues,
     warnings,
   };
@@ -482,7 +545,9 @@ export function buildTeamAggregate(team, rawCompliance, teamSheets) {
 
   const rawTotal = members.reduce((sum, member) => sum + member.score, 0);
   const pressureBonus = members.reduce((sum, member) => sum + member.pressureBonus, 0);
-  const teamTotal = rawTotal + pressureBonus;
+  const preCoefficientTotal = rawTotal + pressureBonus;
+  const coefficient = compliance.coefficient;
+  const finalTotal = roundTo(preCoefficientTotal * coefficient, 2);
   const status = deriveAggregateStatus(members);
   const finalizedCount = members.filter(
     (member) => member.sheet && (member.sheet.status === "final" || member.sheet.status === "published"),
@@ -490,6 +555,7 @@ export function buildTeamAggregate(team, rawCompliance, teamSheets) {
   const publishedCount = members.filter((member) => member.sheet?.status === "published").length;
   const scoredCount = members.filter((member) => member.sheet).length;
   const nextPendingMember = members.find((member) => !member.sheet || member.sheet.status === "draft") ?? null;
+  const publishBlockingIssues = [...compliance.blockingIssues];
 
   const updatedAt = members.reduce((latest, member) => {
     const candidate = member.sheet?.updatedAt ?? null;
@@ -505,18 +571,27 @@ export function buildTeamAggregate(team, rawCompliance, teamSheets) {
     scoredCount,
     finalizedCount,
     publishedCount,
-    publishReady: members.length > 0 && finalizedCount === members.length,
+    publishReady: members.length > 0 && finalizedCount === members.length && publishBlockingIssues.length === 0,
     rawTotal,
     pressureBonus,
-    teamTotal,
+    preCoefficientTotal,
+    coefficient,
+    coefficientBreakdown: compliance.coefficientBreakdown,
+    finalTotal,
+    teamTotal: finalTotal,
     formatted: {
       rawTotal: formatScore(rawTotal),
       pressureBonus: formatScore(pressureBonus),
-      teamTotal: formatScore(teamTotal),
+      preCoefficientTotal: formatScore(preCoefficientTotal),
+      coefficient: formatScore(coefficient),
+      finalTotal: formatScore(finalTotal),
+      teamTotal: formatScore(finalTotal),
     },
     pressureMemberId: complianceRecord.pressureMemberId,
     pressureMemberName: members.find((member) => member.memberId === complianceRecord.pressureMemberId)?.name ?? null,
     nextPendingMemberName: nextPendingMember?.name ?? null,
+    publishBlockingIssues,
+    warnings: compliance.warnings,
     members,
     compliance,
     updatedAt,
@@ -535,8 +610,8 @@ export function buildAllTeamAggregates(publicContent, opsState, scoreSheetsState
 
 function sortTeamsByAggregate(teams, aggregateMap) {
   return [...teams].sort((left, right) => {
-    const rightScore = aggregateMap.get(right.id)?.teamTotal ?? parseNumericScore(right.totalScore);
-    const leftScore = aggregateMap.get(left.id)?.teamTotal ?? parseNumericScore(left.totalScore);
+    const rightScore = aggregateMap.get(right.id)?.finalTotal ?? aggregateMap.get(right.id)?.teamTotal ?? parseNumericScore(right.totalScore);
+    const leftScore = aggregateMap.get(left.id)?.finalTotal ?? aggregateMap.get(left.id)?.teamTotal ?? parseNumericScore(left.totalScore);
 
     if (rightScore !== leftScore) {
       return rightScore - leftScore;
@@ -555,7 +630,7 @@ export function applyAggregateToPublicContent(publicContent, aggregates) {
   for (const team of nextContent.teams) {
     const aggregate = aggregateMap.get(team.id);
     if (aggregate) {
-      team.totalScore = aggregate.formatted.teamTotal;
+      team.totalScore = aggregate.formatted.finalTotal;
     }
 
     team.rank = rankByTeamId.get(team.id) ?? team.rank;
@@ -567,7 +642,7 @@ export function applyAggregateToPublicContent(publicContent, aggregates) {
       continue;
     }
 
-    entry.total = aggregate.formatted.teamTotal;
+    entry.total = aggregate.formatted.finalTotal;
     entry.details = `${aggregate.finalizedCount}/${aggregate.memberCount} 已确认 · ${aggregate.status.label}`;
   }
 
@@ -585,7 +660,7 @@ export function applyAggregateToPublicContent(publicContent, aggregates) {
   for (const match of nextContent.matches) {
     const aggregate = aggregateMap.get(match.teamId);
     if (aggregate) {
-      match.totalScore = aggregate.formatted.teamTotal;
+      match.totalScore = aggregate.formatted.finalTotal;
     }
   }
 
@@ -639,12 +714,12 @@ export function validateScoreSheetPayload(payload, team, { matchIdOptional = tru
     throw new Error("matchId must be a string, null, or omitted.");
   }
 
-  if (typeof body.previewScore !== "number" || !Number.isFinite(body.previewScore)) {
-    throw new Error("previewScore must be a finite number.");
+  if (body.previewScore !== undefined && (typeof body.previewScore !== "number" || !Number.isFinite(body.previewScore))) {
+    throw new Error("previewScore must be a finite number when provided.");
   }
 
-  if (typeof body.formulaText !== "string") {
-    throw new Error("formulaText must be a string.");
+  if (body.formulaText !== undefined && typeof body.formulaText !== "string") {
+    throw new Error("formulaText must be a string when provided.");
   }
 
   if (body.note !== undefined && typeof body.note !== "string") {
@@ -829,6 +904,7 @@ export function replaceAllSheetsForTeamPublish(state, teamId) {
 export function buildAdminBootstrap(publicContent, opsState, scoreSheetsState) {
   return {
     publicContent,
+    ruleVersion,
     tournamentConfig,
     opsState,
     scoreSheets: scoreSheetsState.sheets.map(summariseScoreSheet),
@@ -839,6 +915,7 @@ export function buildAdminBootstrap(publicContent, opsState, scoreSheetsState) {
 
 export function buildCalculatorBootstrap(publicContent, opsState, scoreSheetsState) {
   return {
+    ruleVersion,
     tournamentConfig,
     teams: publicContent.teams,
     matches: publicContent.matches,

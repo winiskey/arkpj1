@@ -16,11 +16,13 @@ import {
   replaceAllSheetsForTeamPublish,
   syncOpsStateWithTeams,
   syncScoreSheetsState,
+  tournamentConfig,
   updateScoreSheetStatus,
   upsertScoreSheet,
   validateScoreSheetPayload,
 } from "./domain.mjs";
 import { HttpError } from "./http.mjs";
+import { calculateThemeScore } from "./scoring.mjs";
 
 function timestamp() {
   return new Date().toISOString();
@@ -273,17 +275,24 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
       assertThemeMatchesMember(team, payload.memberId, payload.theme);
       assertMatchBelongsToTeam(publicContent, team.id, payload.matchId ?? null);
 
+      const computedScore = calculateThemeScore(payload.theme, payload.snapshot);
+      const nextPayload = {
+        ...payload,
+        previewScore: computedScore.previewScore,
+        formulaText: computedScore.formulaText,
+      };
+
       const nextScoreSheetsState = await scoreSheetsStore.update((state) =>
-        upsertScoreSheet(state, payload, randomUUID).state,
+        upsertScoreSheet(state, nextPayload, randomUUID).state,
       );
 
-      const sheet = payload.id
-        ? findScoreSheet(nextScoreSheetsState, { id: payload.id })
+      const sheet = nextPayload.id
+        ? findScoreSheet(nextScoreSheetsState, { id: nextPayload.id })
         : findScoreSheet(nextScoreSheetsState, {
-            teamId: payload.teamId,
-            memberId: payload.memberId,
-            theme: payload.theme,
-            matchId: payload.matchId ?? null,
+            teamId: nextPayload.teamId,
+            memberId: nextPayload.memberId,
+            theme: nextPayload.theme,
+            matchId: nextPayload.matchId ?? null,
           });
 
       return {
@@ -377,6 +386,10 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
       requireMember(team, payload.requestedByMemberId, "coach call requester");
       requireMember(team, payload.targetMemberId, "coach call target");
 
+      if (payload.durationMinutes > tournamentConfig.coachCalls.maxMinutesPerCall) {
+        throw new HttpError(400, "Coach call duration exceeds the per-call rule limit.");
+      }
+
       const nextCall = {
         id: randomUUID(),
         requestedByMemberId: payload.requestedByMemberId,
@@ -388,6 +401,10 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
 
       const nextOpsState = await opsStateStore.update((state) => {
         const next = syncOpsStateWithTeams(publicContent, state);
+        const existingCalls = next.complianceByTeam[team.id].coachCalls ?? [];
+        if (existingCalls.length >= tournamentConfig.coachCalls.maxCount) {
+          throw new HttpError(400, "Coach call count exceeds the rule limit.");
+        }
         next.complianceByTeam[team.id].coachCalls.push(nextCall);
         next.complianceByTeam[team.id].updatedAt = timestamp();
         next.updatedAt = next.complianceByTeam[team.id].updatedAt;

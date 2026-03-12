@@ -66,7 +66,7 @@ function expectBoolean(value, name) {
   return value;
 }
 
-function expectNumber(value, name, { integer = false, min } = {}) {
+function expectNumber(value, name, { integer = false, min, max } = {}) {
   const nextValue = Number(value);
   if (!Number.isFinite(nextValue)) {
     throw new Error(`${name} must be a finite number.`);
@@ -78,6 +78,10 @@ function expectNumber(value, name, { integer = false, min } = {}) {
 
   if (min !== undefined && nextValue < min) {
     throw new Error(`${name} must be >= ${min}.`);
+  }
+
+  if (max !== undefined && nextValue > max) {
+    throw new Error(`${name} must be <= ${max}.`);
   }
 
   return nextValue;
@@ -554,9 +558,9 @@ export function validateCompliancePatch(payload) {
       next.pressureMemberId = expectString(object.pressureMemberId, "compliancePatch.pressureMemberId");
     }
   }
-  if ("openingIngots" in object) next.openingIngots = expectNumber(object.openingIngots, "compliancePatch.openingIngots", { min: 0 });
-  if ("currentIngots" in object) next.currentIngots = expectNumber(object.currentIngots, "compliancePatch.currentIngots", { min: 0 });
-  if ("overtimeMinutes" in object) next.overtimeMinutes = expectNumber(object.overtimeMinutes, "compliancePatch.overtimeMinutes", { min: 0 });
+  if ("openingIngots" in object) next.openingIngots = expectNumber(object.openingIngots, "compliancePatch.openingIngots", { integer: true, min: 0 });
+  if ("currentIngots" in object) next.currentIngots = expectNumber(object.currentIngots, "compliancePatch.currentIngots", { integer: true, min: 0 });
+  if ("overtimeMinutes" in object) next.overtimeMinutes = expectNumber(object.overtimeMinutes, "compliancePatch.overtimeMinutes", { integer: true, min: 0 });
   if ("notes" in object) next.notes = expectStringArray(object.notes, "compliancePatch.notes", { allowEmpty: true });
 
   return next;
@@ -585,7 +589,7 @@ export function validateCoachCallPayload(payload) {
   return {
     requestedByMemberId: expectString(object.requestedByMemberId, "coachCall.requestedByMemberId"),
     targetMemberId: expectString(object.targetMemberId, "coachCall.targetMemberId"),
-    durationMinutes: expectNumber(object.durationMinutes, "coachCall.durationMinutes", { min: 0.01 }),
+    durationMinutes: expectNumber(object.durationMinutes, "coachCall.durationMinutes", { min: 0.01, max: 3 }),
     note: object.note === undefined ? "" : expectString(object.note, "coachCall.note", { allowEmpty: true }),
   };
 }
