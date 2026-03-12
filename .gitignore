@@ -23,3 +23,13 @@ _frame_test.png
 _motion_frames/
 _motion_frames_detail/
 _motion_frames_transition/
+
+# Non-website workspace metadata and source duplicates
+.agents/
+.claude/
+.vscode/
+???#2????/
+_agents
+????.mp4
+??.js
+
