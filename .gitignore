@@ -5,3 +5,21 @@ dist
 *.tsbuildinfo
 vite.config.js
 vite.config.d.ts
+
+# Local environment files
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Local runtime/output artifacts
+output/
+chrome-headless-profile/
+arkproject-deploy.zip
+
+# Local review/debug assets
+ui-*.png
+_frame_test.png
+_motion_frames/
+_motion_frames_detail/
+_motion_frames_transition/
