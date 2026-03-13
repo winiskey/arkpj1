@@ -65,7 +65,7 @@ function ScheduleEntry({ slot, teamName, compact = false }: ScheduleEntryProps) 
 
   return (
     <div
-      className={`group relative flex h-full flex-col justify-between overflow-hidden rounded-[24px] border transition-all duration-300 ${densityClasses} ${tone.shell}`}
+      className={`group relative flex h-full flex-col justify-between overflow-hidden rounded-[24px] border transition-[border-color,background-color] duration-300 ${densityClasses} ${tone.shell}`}
     >
       <div className={`absolute inset-y-3 left-0 w-px bg-gradient-to-b from-transparent ${tone.strip} to-transparent opacity-90`} />
       <div className="relative z-10 flex items-start justify-between gap-3">
@@ -252,7 +252,7 @@ export const EventScheduleBoard = memo(function EventScheduleBoard({ days, teamN
       {needsCollapse ? (
         <div className="relative z-10 border-t border-white/5 px-6 py-5 md:px-8">
           <button
-            className="flex w-full items-center justify-center gap-2 rounded-[20px] border border-white/5 bg-white/[0.02] py-4 font-display text-xs tracking-[0.2em] text-white/50 transition-all hover:border-brand/30 hover:bg-brand/5 hover:text-brand"
+            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-[20px] border border-white/5 bg-white/[0.02] py-4 font-display text-xs tracking-[0.2em] text-white/50 transition-[border-color,background-color,color] duration-300 hover:border-brand/30 hover:bg-brand/5 hover:text-brand"
             onClick={() => setExpanded(!expanded)}
             type="button"
           >

@@ -105,7 +105,7 @@ export function RulesPage() {
     <PageFrame className="gap-6 md:gap-8 lg:gap-10">
       <SectionHeader
         cnTitle="赛事规章与细则"
-        description="把原本偏堆叠的黑卡阅读方式改造成更像赛事手册的页面：保持战术台气质，但让检索、切换与长文阅读更顺畅。"
+        description="荆楚歌 #2 赛事的完整规则手册，包含赛制说明、通用规则、各主题计分细则与系数计算公式。"
         enTitle="TOURNAMENT ARCHIVE"
       />
 

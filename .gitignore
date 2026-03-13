@@ -25,11 +25,15 @@ _motion_frames_detail/
 _motion_frames_transition/
 
 # Non-website workspace metadata and source duplicates
+.agent/
 .agents/
 .claude/
+.gemini/
 .vscode/
-???#2????/
-_agents
-????.mp4
-??.js
+_agents/
 
+# Temp analysis files
+tmp_*.md
+tmp_*.txt
+*.pyc
+__pycache__/

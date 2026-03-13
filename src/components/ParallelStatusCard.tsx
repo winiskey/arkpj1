@@ -28,7 +28,7 @@ export function ParallelStatusCard({ teamName, status, members, totalScore }: Pa
   const otherMembers = members.filter((member) => member.id !== currentMember.id);
 
   return (
-    <SpotlightCard glowBorder spotlightColor="rgba(255,255,255,0.06)" className="group relative overflow-hidden rounded-[32px] border border-brand/20 bg-white/[0.02] p-6 shadow-[0_20px_40px_-20px_rgba(0,0,0,0.5)] backdrop-blur-3xl transition-all duration-500 hover:border-brand/30 md:p-8">
+    <SpotlightCard glowBorder spotlightColor="rgba(255,255,255,0.06)" className="group relative overflow-hidden rounded-[32px] border border-brand/20 bg-white/[0.02] p-6 shadow-[0_20px_40px_-20px_rgba(0,0,0,0.5)] backdrop-blur-3xl transition-[border-color] duration-300 hover:border-brand/30 md:p-8">
       {/* Reduced background glare, more elegant glass reflection */}
       <div className="pointer-events-none absolute right-0 top-0 h-[150%] w-[150%] -translate-y-1/4 translate-x-1/4 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(214,192,138,0.06),transparent_50%)] opacity-70 mix-blend-screen" />
 

@@ -19,20 +19,19 @@ export function SpotlightCard({
     const [isFocused, setIsFocused] = useState(false);
     const [position, setPosition] = useState({ x: 0, y: 0 });
     const [opacity, setOpacity] = useState(0);
-    const [borderAngle, setBorderAngle] = useState(0);
-    const rafRef = useRef<number | null>(null);
-    const isHoveredRef = useRef(false);
 
-    // Animate the sweeping border glow
+    // Animate the sweeping border glow using direct DOM manipulation
+    // instead of setState per frame, to avoid re-renders every animation frame.
     useEffect(() => {
-        if (!glowBorder) return;
+        if (!glowBorder || !borderRef.current) return;
 
         let angle = 0;
         let animFrameId: number;
+        const el = borderRef.current;
 
         const tick = () => {
             angle = (angle + 0.8) % 360;
-            setBorderAngle(angle);
+            el.style.background = `conic-gradient(from ${angle}deg at 50% 50%, transparent 0deg, rgba(214,192,138,0.6) 40deg, transparent 90deg, transparent 360deg)`;
             animFrameId = requestAnimationFrame(tick);
         };
 
@@ -61,12 +60,10 @@ export function SpotlightCard({
 
     const handleMouseEnter = () => {
         setOpacity(1);
-        isHoveredRef.current = true;
     };
 
     const handleMouseLeave = () => {
         setOpacity(0);
-        isHoveredRef.current = false;
     };
 
     return (
@@ -83,9 +80,9 @@ export function SpotlightCard({
             {/* Flowing conic-gradient border glow */}
             {glowBorder && (
                 <div
+                    ref={borderRef}
                     className="pointer-events-none absolute -inset-[1px] rounded-[inherit] opacity-60 transition-opacity duration-700"
                     style={{
-                        background: `conic-gradient(from ${borderAngle}deg at 50% 50%, transparent 0deg, rgba(214,192,138,0.6) 40deg, transparent 90deg, transparent 360deg)`,
                         WebkitMask: "linear-gradient(#000, #000) content-box, linear-gradient(#000, #000)",
                         WebkitMaskComposite: "xor",
                         maskComposite: "exclude",

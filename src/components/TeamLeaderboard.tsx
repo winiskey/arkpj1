@@ -31,7 +31,7 @@ export function TeamLeaderboard({ teams }: TeamLeaderboardProps) {
         <SpotlightCard
           key={team.teamId}
           spotlightColor="rgba(255,255,255,0.04)"
-          className={`group flex flex-col gap-4 rounded-[32px] border px-5 py-5 backdrop-blur-2xl transition-all duration-500 hover:-translate-y-1 hover:border-white/10 md:flex-row md:items-center md:justify-between md:px-6 md:py-5 ${rowTone[team.teamStatus ?? "PENDING"]}`}
+          className={`group flex cursor-pointer flex-col gap-4 rounded-[32px] border px-5 py-5 backdrop-blur-2xl transition-[transform,border-color] duration-300 hover:-translate-y-1 hover:border-white/10 md:flex-row md:items-center md:justify-between md:px-6 md:py-5 ${rowTone[team.teamStatus ?? "PENDING"]}`}
         >
           <div className="flex min-w-0 items-center gap-4">
             <div

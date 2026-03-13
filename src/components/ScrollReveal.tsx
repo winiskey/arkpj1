@@ -2,6 +2,7 @@ import { useRef, type ReactNode } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { prefersReducedMotion } from "../lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -16,14 +17,6 @@ interface ScrollRevealProps {
   staggerChildren?: boolean;
   childSelector?: string;
   start?: string;
-}
-
-function prefersReducedMotion() {
-  if (typeof window === "undefined") {
-    return false;
-  }
-
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 function getFallbackChildren(container: HTMLDivElement) {
@@ -53,8 +46,8 @@ export function ScrollReveal({
       const container = containerRef.current;
       const targets = staggerChildren
         ? Array.from(
-            container.querySelectorAll<HTMLElement>(childSelector ?? "[data-reveal-item], .gsap-stagger-item"),
-          )
+          container.querySelectorAll<HTMLElement>(childSelector ?? "[data-reveal-item], .gsap-stagger-item"),
+        )
         : [];
       const revealTargets = targets.length > 0 ? targets : staggerChildren ? getFallbackChildren(container) : [];
 

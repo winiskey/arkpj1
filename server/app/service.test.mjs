@@ -138,12 +138,12 @@ test("upsertScoreSheet ignores tampered client totals and recalculates from snap
     calculatorVersion: "jingchuge-html-v1",
   });
 
-  assert.equal(result.sheet.previewScore, 180);
-  assert.equal(result.sheet.formulaText, "(150.00 x 1.20)");
+  assert.equal(result.sheet.previewScore, 220);
+  assert.equal(result.sheet.formulaText, "(220.00)");
 
   const stored = await scoreSheetsStore.read();
-  assert.equal(stored.sheets[0].previewScore, 180);
-  assert.equal(stored.sheets[0].formulaText, "(150.00 x 1.20)");
+  assert.equal(stored.sheets[0].previewScore, 220);
+  assert.equal(stored.sheets[0].formulaText, "(220.00)");
 });
 
 test("publishTeam rejects blocking compliance states even when every sheet is final", async (t) => {

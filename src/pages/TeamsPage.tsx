@@ -1,13 +1,13 @@
-import { useEffect, useMemo, useState, useRef } from "react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
+import { useEffect, useMemo, useState } from "react";
 import { RadarChart } from "../components/RadarChart";
 import { CountUp } from "../components/CountUp";
 import { PageFrame } from "../components/PageFrame";
+import { PageBackground } from "../components/PageBackground";
 import { SectionHeader } from "../components/SectionHeader";
 import { useSiteData } from "../context/SiteDataContext";
 import { SpotlightCard } from "../components/SpotlightCard";
 import { MagneticWrapper } from "../components/MagneticWrapper";
+import { useParallaxLogo } from "../lib/useParallaxLogo";
 
 export function TeamsPage() {
   const {
@@ -15,31 +15,7 @@ export function TeamsPage() {
   } = useSiteData();
   const [selectedTeamId, setSelectedTeamId] = useState(teams[0]?.id ?? "");
 
-  const logoRef = useRef<HTMLImageElement>(null);
-
-  useGSAP(
-    () => {
-      const logo = logoRef.current;
-      if (!logo) return;
-
-      const xTo = gsap.quickTo(logo, "x", { duration: 1.2, ease: "power3.out" });
-      const yTo = gsap.quickTo(logo, "y", { duration: 1.2, ease: "power3.out" });
-
-      const handleMouseMove = (e: MouseEvent) => {
-        const { clientX, clientY } = e;
-        const { innerWidth, innerHeight } = window;
-        const xOffset = ((clientX / innerWidth) - 0.5) * -240;
-        const yOffset = ((clientY / innerHeight) - 0.5) * -240;
-        xTo(xOffset);
-        yTo(yOffset);
-      };
-
-      window.addEventListener("mousemove", handleMouseMove);
-      return () => {
-        window.removeEventListener("mousemove", handleMouseMove);
-      };
-    }
-  );
+  const logoRef = useParallaxLogo();
 
   const selectedTeam = useMemo(() => teams.find((team) => team.id === selectedTeamId) ?? teams[0], [selectedTeamId, teams]);
 
@@ -55,16 +31,12 @@ export function TeamsPage() {
 
   return (
     <div className="relative min-h-[100dvh] w-full overflow-hidden selection:bg-brand/90 selection:text-black">
-      {/* Global Parallax Matrix Background */}
-      <div className="pointer-events-none absolute left-[75%] top-[15%] -z-30 flex h-[160vw] w-[160vw] max-w-[1600px] -translate-x-1/2 -translate-y-1/2 items-center justify-center opacity-[0.06] mix-blend-screen md:left-[80%] md:top-[20%] xl:left-[85%]">
-        <img ref={logoRef} src="/logo.svg" alt="Core Matrix" className="animate-spin-slower animate-float-subtle h-full w-full object-contain brightness-75 drop-shadow-[0_0_40px_rgba(214,192,138,0.15)]" />
-      </div>
-      <div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_70%_25%,rgba(214,192,138,0.06),transparent_75%)] animate-pulse-subtle" />
+      <PageBackground logoRef={logoRef} />
 
       <PageFrame className="relative z-10 gap-8 md:gap-10 lg:gap-14">
         <SectionHeader
           cnTitle="队伍战术情报"
-          description="把战队切换、画像、能力雷达与成员资料收束到同一页，形成更像情报中枢而不是散乱列表的阅读体验。"
+          description="参赛队伍档案与成员信息总览，点击队伍可查看详细赛和画像。"
           enTitle="TEAM INTELLIGENCE"
         />
 
@@ -78,13 +50,13 @@ export function TeamsPage() {
                 <SpotlightCard
                   key={team.id}
                   spotlightColor={active ? "rgba(214,192,138,0.15)" : "rgba(255,255,255,0.05)"}
-                  className={`group relative overflow-hidden rounded-[32px] border transition-all duration-500 hover:-translate-y-1 ${active
+                  className={`group relative cursor-pointer overflow-hidden rounded-[32px] border transition-[transform,border-color,background-color,box-shadow] duration-300 hover:-translate-y-1 ${active
                     ? "border-brand/40 bg-brand/10 shadow-[0_20px_40px_-15px_rgba(214,192,138,0.25)] backdrop-blur-3xl"
                     : "border-white/5 bg-white/[0.02] text-white/40 backdrop-blur-2xl hover:border-white/10 hover:bg-white/[0.04] hover:text-white/80"
                     }`}
                 >
                   <button
-                    className="w-full p-5 text-left md:p-6"
+                    className="w-full cursor-pointer p-5 text-left md:p-6"
                     onClick={() => {
                       if (!active) setSelectedTeamId(team.id);
                     }}
@@ -156,7 +128,7 @@ export function TeamsPage() {
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2">
                     {selectedTeam.radarStats.map((metric) => (
-                      <div key={metric.label} className="rounded-[24px] border border-white/5 bg-white/[0.03] px-5 py-5 transition-all hover:bg-white/[0.05]">
+                      <div key={metric.label} className="rounded-[24px] border border-white/5 bg-white/[0.03] px-5 py-5 transition-[background-color] duration-300 hover:bg-white/[0.05]">
                         <div className="font-display text-[11px] uppercase tracking-[0.16em] text-white/40">{metric.label}</div>
                         <div className="mt-3 font-display text-3xl font-black tracking-[0.03em] text-brand">
                           <CountUp end={metric.value} />
@@ -173,12 +145,12 @@ export function TeamsPage() {
                 const avatarSrc = member.avatar ? encodeURI(member.avatar) : undefined;
 
                 return (
-                  <SpotlightCard key={member.id} className="rounded-[32px] border border-white/5 bg-white/[0.02] p-6 backdrop-blur-2xl transition-all duration-500 hover:-translate-y-1 hover:border-white/10" spotlightColor="rgba(255,255,255,0.05)">
+                  <SpotlightCard key={member.id} className="rounded-[32px] border border-white/5 bg-white/[0.02] p-6 backdrop-blur-2xl transition-[transform,border-color] duration-300 hover:-translate-y-1 hover:border-white/10" spotlightColor="rgba(255,255,255,0.05)">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex min-w-0 items-center gap-5">
                         <div className="h-16 w-16 shrink-0 overflow-hidden rounded-[20px] border border-white/10 bg-black/40 shadow-innerGlow">
                           {avatarSrc ? (
-                            <img alt={`${member.name} avatar`} className="h-full w-full object-cover grayscale-[0.2] transition-all group-hover:grayscale-0" loading="lazy" src={avatarSrc} />
+                            <img alt={`${member.name} avatar`} className="h-full w-full object-cover grayscale-[0.2] transition-[filter] duration-300 group-hover:grayscale-0" loading="lazy" src={avatarSrc} />
                           ) : (
                             <div className="flex h-full w-full items-center justify-center font-display text-[11px] uppercase tracking-[0.16em] text-white/30">
                               {member.id}
@@ -198,9 +170,9 @@ export function TeamsPage() {
                     <div className="mt-8 space-y-4 border-t border-white/5 pt-6">
                       {[
                         { label: "主题", value: member.theme },
-                        { label: "招牌", value: member.signatureOp },
-                        { label: "分队", value: member.squad },
-                        { label: "备注", value: member.note },
+                        ...(member.signatureOp && member.signatureOp !== "待补充" ? [{ label: "招牌", value: member.signatureOp }] : []),
+                        ...(member.squad && !["主攻分队", "推进分队", "运营分队", "终局分队"].includes(member.squad) ? [{ label: "分队", value: member.squad }] : []),
+                        ...(member.note && member.note !== "选手资料已同步，详细战术信息待补充。" ? [{ label: "备注", value: member.note }] : []),
                       ].map((item) => (
                         <div key={item.label} className="flex text-sm leading-6">
                           <span className="w-16 shrink-0 font-display text-[11px] uppercase tracking-[0.1em] text-white/30">{item.label}</span>

@@ -93,8 +93,8 @@ export const ScheduleBoard = memo(function ScheduleBoard({ matches, teamNameById
         const leadLabel = match.status === "PENDING" ? "首位待命" : "收官选段";
 
         return (
-          <SpotlightCard key={match.id} spotlightColor="rgba(255,255,255,0.05)" className={`group overflow-hidden rounded-[32px] border p-5 transition-all duration-500 hover:-translate-y-1 hover:border-white/10 hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.5)] md:p-6 backdrop-blur-2xl ${tone}`}>
-            <div className="absolute inset-0 bg-gradient-to-r from-white/[0.02] to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+          <SpotlightCard key={match.id} spotlightColor="rgba(255,255,255,0.05)" className={`group cursor-pointer overflow-hidden rounded-[32px] border p-5 transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-white/10 hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.5)] md:p-6 backdrop-blur-2xl ${tone}`}>
+            <div className="absolute inset-0 bg-gradient-to-r from-white/[0.02] to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
             <div className="relative z-10 flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
               <div className="flex flex-col gap-5 md:flex-row md:items-start">
                 <div className="flex min-w-[100px] items-center gap-3 rounded-[20px] border border-white/5 bg-white/[0.02] px-4 py-3 font-display text-lg tracking-[0.05em] text-white/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.02)]">

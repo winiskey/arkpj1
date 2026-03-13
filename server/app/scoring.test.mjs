@@ -17,10 +17,10 @@ test("calculateSamiScore applies ending bonuses and final multiplier", () => {
     "sa-gift": true,
   });
 
-  assert.equal(result.rawScore, 425);
-  assert.equal(result.multiplier, 1.2);
-  assert.equal(result.previewScore, 510);
-  assert.equal(result.formulaText, "(425.00 x 1.20)");
+  assert.equal(result.rawScore, 495);
+  assert.equal(result.multiplier, 1);
+  assert.equal(result.previewScore, 495);
+  assert.equal(result.formulaText, "(495.00)");
 });
 
 test("calculateSamiScore adds no-leak bonuses on top of ending stages", () => {

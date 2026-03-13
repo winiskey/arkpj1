@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { LOGO_IMAGE_SRC } from "../lib/logo";
+import { prefersReducedMotion } from "../lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -28,14 +29,6 @@ function getDirection(fromPath: string, toPath: string): TransitionDirection {
 
 function getRouteLabel(pathname: string) {
   return ROUTE_LABELS[pathname] ?? "界面切换";
-}
-
-function getReducedMotionPreference() {
-  if (typeof window === "undefined") {
-    return false;
-  }
-
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 export function GSAPRouterTransition({ children }: { children: ReactNode }) {
@@ -67,7 +60,7 @@ export function GSAPRouterTransition({ children }: { children: ReactNode }) {
     const nextLabel = getRouteLabel(location.pathname);
     setTransitionLabel(nextLabel);
 
-    if (getReducedMotionPreference()) {
+    if (prefersReducedMotion()) {
       setDisplayChildren(children);
       currentPathRef.current = location.pathname;
       window.scrollTo(0, 0);
@@ -254,7 +247,7 @@ export function GSAPRouterTransition({ children }: { children: ReactNode }) {
   }, [children, direction, location.pathname]);
 
   useEffect(() => {
-    if (getReducedMotionPreference()) {
+    if (prefersReducedMotion()) {
       return;
     }
 

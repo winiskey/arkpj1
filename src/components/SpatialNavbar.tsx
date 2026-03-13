@@ -1,6 +1,5 @@
-import { NavLink, useLocation } from "react-router-dom";
-import { useLayoutEffect, useRef, useState, useEffect } from "react";
-import gsap from "gsap";
+import { NavLink } from "react-router-dom";
+import { useState } from "react";
 
 interface NavItem {
     to: string;
@@ -12,80 +11,42 @@ interface SpatialNavbarProps {
 }
 
 export function SpatialNavbar({ items }: SpatialNavbarProps) {
-    const location = useLocation();
-    const containerRef = useRef<HTMLDivElement>(null);
-    const indicatorRef = useRef<HTMLDivElement>(null);
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-    const updateIndicator = () => {
-        if (!containerRef.current || !indicatorRef.current) return;
-
-        // Find the active NavLink in the DOM
-        const activeLink = containerRef.current.querySelector(".active") as HTMLElement;
-
-        if (activeLink) {
-            gsap.to(indicatorRef.current, {
-                x: activeLink.offsetLeft,
-                width: activeLink.offsetWidth,
-                opacity: 1,
-                duration: 0.6,
-                ease: "expo.out",
-            });
-        } else {
-            gsap.to(indicatorRef.current, {
-                opacity: 0,
-                duration: 0.3,
-            });
-        }
-    };
-
-    useLayoutEffect(() => {
-        // Initial mount and location changes
-        updateIndicator();
-
-        // Also update on window resize
-        window.addEventListener("resize", updateIndicator);
-        return () => window.removeEventListener("resize", updateIndicator);
-    }, [location.pathname, items]);
-
     return (
-        <nav
-            ref={containerRef}
-            className="relative flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] p-1.5 backdrop-blur-3xl shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)]"
-        >
-            {/* Floating Active Indicator (Glass Microcrystalline Material) */}
-            <div
-                ref={indicatorRef}
-                className="absolute bottom-1.5 left-0 top-1.5 z-0 rounded-full border border-white/20 bg-white/[0.08] shadow-[0_4px_12px_rgba(255,255,255,0.06),inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-2xl opacity-0"
-                style={{ pointerEvents: "none" }}
-            >
-                {/* Internal Glow for Active Item */}
-                <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-brand/5 via-white/5 to-purple-500/5 opacity-50" />
-            </div>
-
+        <nav className="relative flex items-center gap-1.5 p-2">
             {items.map((item, index) => (
                 <NavLink
                     key={item.to}
                     to={item.to}
                     className={({ isActive }) =>
-                        `relative z-10 flex h-11 items-center rounded-full px-5 font-display text-[13px] font-bold uppercase tracking-[0.18em] transition-all duration-300 ${isActive ? "text-text1" : "text-text2 hover:text-text1 focus-visible:text-text1"
+                        `group relative z-10 flex h-12 items-center px-6 font-display text-[15px] font-bold uppercase tracking-[0.18em] transition-all duration-300 ${isActive
+                            ? "text-brand drop-shadow-[0_0_8px_rgba(214,192,138,0.5)]"
+                            : "text-white/40 hover:text-white focus-visible:text-white"
                         }`
                     }
                     onMouseEnter={() => setHoveredIndex(index)}
                     onMouseLeave={() => setHoveredIndex(null)}
                 >
-                    <span className="relative">
-                        {item.label}
+                    {({ isActive }) => (
+                        <span className="relative">
+                            {item.label}
 
-                        {/* Prismatic Internal Flow (Rainbow Syphon on Hover) */}
-                        <div
-                            className={`rainbow-flow absolute -inset-x-4 -inset-y-2 z-[-1] rounded-full opacity-0 blur-md transition-opacity duration-700 pointer-events-none ${hoveredIndex === index ? "opacity-100" : ""
-                                }`}
-                            style={{
-                                background: "conic-gradient(from var(--nav-angle), transparent, rgba(214,192,138,0.12), rgba(255,100,255,0.12), rgba(100,200,255,0.12), transparent)",
-                            }}
-                        />
-                    </span>
+                            {/* Active Static Indicator (Underline) */}
+                            {isActive && (
+                                <div className="absolute -bottom-2 left-1/2 h-[2px] w-6 -translate-x-1/2 bg-brand drop-shadow-[0_0_6px_rgba(214,192,138,0.8)] rounded-full" />
+                            )}
+
+                            {/* Prismatic Internal Flow (Rainbow Syphon on Hover) */}
+                            <div
+                                className={`rainbow-flow absolute -inset-x-4 -inset-y-3 z-[-1] rounded-full opacity-0 blur-xl transition-opacity duration-700 pointer-events-none ${hoveredIndex === index && !isActive ? "opacity-60" : ""
+                                    }`}
+                                style={{
+                                    background: "conic-gradient(from var(--nav-angle), transparent, rgba(214,192,138,0.2), rgba(255,100,255,0.15), rgba(100,200,255,0.2), transparent)",
+                                }}
+                            />
+                        </span>
+                    )}
                 </NavLink>
             ))}
         </nav>

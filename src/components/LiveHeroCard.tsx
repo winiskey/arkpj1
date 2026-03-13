@@ -53,19 +53,19 @@ export function LiveHeroCard({ broadcast, featuredMatch, teamName }: LiveHeroCar
           </div>
 
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="flex flex-col justify-center rounded-[24px] border border-white/5 bg-white/[0.02] px-5 py-5 transition-all group-hover:bg-white/[0.03]">
+            <div className="flex flex-col justify-center rounded-[24px] border border-white/5 bg-white/[0.02] px-5 py-5 transition-[background-color] duration-300 group-hover:bg-white/[0.03]">
               <div className="font-display text-[11px] uppercase tracking-[0.16em] text-white/40">主追踪队伍</div>
               <div className="mt-4 font-title text-3xl font-black tracking-[0.03em] text-white/90">{teamName ?? "待切入"}</div>
               <div className="mt-3 text-sm text-white/30">当前镜头焦点与队伍总状态。</div>
             </div>
-            <div className="flex flex-col justify-center rounded-[24px] border border-white/5 bg-white/[0.02] px-5 py-5 transition-all group-hover:bg-white/[0.03]">
+            <div className="flex flex-col justify-center rounded-[24px] border border-white/5 bg-white/[0.02] px-5 py-5 transition-[background-color] duration-300 group-hover:bg-white/[0.03]">
               <div className="font-display text-[11px] uppercase tracking-[0.16em] text-white/40">当前成员</div>
               <div className="mt-4 font-title text-3xl font-black tracking-[0.03em] text-white/90">
                 {currentMember?.name ?? featuredMatch?.currentMemberName ?? "待命"}
               </div>
               <div className="mt-3 text-sm text-white/30">{currentMember?.theme ?? "等待赛事数据同步"}</div>
             </div>
-            <div className="flex flex-col justify-center rounded-[24px] border border-white/5 bg-white/[0.02] px-5 py-5 transition-all group-hover:bg-white/[0.03]">
+            <div className="flex flex-col justify-center rounded-[24px] border border-white/5 bg-white/[0.02] px-5 py-5 transition-[background-color] duration-300 group-hover:bg-white/[0.03]">
               <div className="font-display text-[11px] uppercase tracking-[0.16em] text-white/40">接力进度</div>
               <div className="mt-4 font-display text-3xl font-black tracking-[0.03em] text-brand">
                 {finishedMembers} / 4

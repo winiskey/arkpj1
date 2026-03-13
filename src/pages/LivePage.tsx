@@ -1,47 +1,23 @@
-﻿import { useMemo, useRef } from "react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
+﻿import { useMemo } from "react";
 import { CalendarDays, ChevronDown, Clock3, Radio, ShieldAlert } from "lucide-react";
 import { ScrollReveal } from "../components/ScrollReveal";
 import { EventScheduleBoard } from "../components/EventScheduleBoard";
 import { LiveHeroCard } from "../components/LiveHeroCard";
 import { PageFrame } from "../components/PageFrame";
+import { PageBackground } from "../components/PageBackground";
 import { ScheduleBoard } from "../components/ScheduleBoard";
 import { SectionHeader } from "../components/SectionHeader";
 import { TeamLeaderboard } from "../components/TeamLeaderboard";
 import { useSiteData } from "../context/SiteDataContext";
 import { SpotlightCard } from "../components/SpotlightCard";
+import { useParallaxLogo } from "../lib/useParallaxLogo";
 
 export function LivePage() {
   const {
     data: { eventSchedule, judgeNotices, leaderboard, liveBroadcast, matches, teams },
   } = useSiteData();
 
-  const logoRef = useRef<HTMLImageElement>(null);
-
-  useGSAP(
-    () => {
-      const logo = logoRef.current;
-      if (!logo) return;
-
-      const xTo = gsap.quickTo(logo, "x", { duration: 1.2, ease: "power3.out" });
-      const yTo = gsap.quickTo(logo, "y", { duration: 1.2, ease: "power3.out" });
-
-      const handleMouseMove = (e: MouseEvent) => {
-        const { clientX, clientY } = e;
-        const { innerWidth, innerHeight } = window;
-        const xOffset = ((clientX / innerWidth) - 0.5) * -240;
-        const yOffset = ((clientY / innerHeight) - 0.5) * -240;
-        xTo(xOffset);
-        yTo(yOffset);
-      };
-
-      window.addEventListener("mousemove", handleMouseMove);
-      return () => {
-        window.removeEventListener("mousemove", handleMouseMove);
-      };
-    }
-  );
+  const logoRef = useParallaxLogo();
 
   const teamNameById = useMemo(() => Object.fromEntries(teams.map((team) => [team.id, team.name])), [teams]);
   const featuredMatch = useMemo(
@@ -85,12 +61,7 @@ export function LivePage() {
 
   return (
     <div className="relative min-h-[100dvh] w-full overflow-hidden selection:bg-brand/90 selection:text-black">
-      {/* Global Parallax Matrix Background */}
-      <div className="pointer-events-none absolute left-[75%] top-[15%] -z-30 flex h-[160vw] w-[160vw] max-w-[1600px] -translate-x-1/2 -translate-y-1/2 items-center justify-center opacity-[0.06] mix-blend-screen md:left-[80%] md:top-[20%] xl:left-[85%]">
-        <img ref={logoRef} src="/logo.svg" alt="Core Matrix" className="animate-spin-slower animate-float-subtle h-full w-full object-contain brightness-75 drop-shadow-[0_0_40px_rgba(214,192,138,0.15)]" />
-      </div>
-      {/* Ambient breathing pulse */}
-      <div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_70%_25%,rgba(214,192,138,0.06),transparent_75%)] animate-pulse-subtle" />
+      <PageBackground logoRef={logoRef} />
 
       <PageFrame className="relative z-10 gap-10 md:gap-14 lg:gap-20">
         <div className="gsap-stagger-item">
@@ -102,7 +73,7 @@ export function LivePage() {
             const Icon = card.icon;
 
             return (
-              <SpotlightCard key={card.label} glowBorder spotlightColor="rgba(255,255,255,0.06)" className="group flex flex-col justify-between rounded-[32px] border border-white/5 bg-white/[0.02] p-6 backdrop-blur-3xl transition-all duration-500 hover:-translate-y-1 hover:bg-white/[0.04] hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.5)] md:p-8">
+              <SpotlightCard key={card.label} glowBorder spotlightColor="rgba(255,255,255,0.06)" className="group flex cursor-pointer flex-col justify-between rounded-[32px] border border-white/5 bg-white/[0.02] p-6 backdrop-blur-3xl transition-[transform,border-color,background-color,box-shadow] duration-300 hover:-translate-y-1 hover:bg-white/[0.04] hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.5)] md:p-8">
                 <div className="flex items-start justify-between gap-4">
                   <div className="space-y-3">
                     <div className="font-display text-[11px] uppercase tracking-[0.16em] text-white/40 transition-colors group-hover:text-white/60">{card.label}</div>
@@ -125,7 +96,7 @@ export function LivePage() {
             <section className="space-y-4">
               <SectionHeader
                 cnTitle="队伍总榜"
-                description="让观众先看到当前强弱关系，再进入主会场实时追踪，形成更完整的观赛上下文。"
+                description="实时汇总各队累计得分，排名按最终结算动态更新。"
                 enTitle="TEAM RANKING"
               />
               <TeamLeaderboard teams={leaderboard} />
@@ -134,7 +105,7 @@ export function LivePage() {
             <section className="space-y-4" id="live-schedule">
               <SectionHeader
                 cnTitle="主会场实时追踪"
-                description="主会场使用更集中的信息框架：进行中的比赛优先展示，待开赛与已结束比赛则降为补充层级。"
+                description="当前进行中与待开赛的比赛一览；比赛结束后将自动归档。"
                 enTitle="LIVE COMMAND BOARD"
               />
               <ScheduleBoard matches={matches} teamNameById={teamNameById} />
@@ -146,7 +117,7 @@ export function LivePage() {
           <section className="space-y-6">
             <SectionHeader
               cnTitle="比赛赛程安排"
-              description="桌面端保留指挥板式横向时间格，移动端自动切换为更易扫读的日程卡片。"
+              description="查看所有选手的比赛时段安排，了解每日赛程节奏。"
               enTitle="MATCH CALENDAR"
               eyebrow="3.9 - 3.20 / 早 9:00 · 中 14:00 · 晚 19:00"
             />

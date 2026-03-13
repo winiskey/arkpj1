@@ -129,16 +129,11 @@ export function calculateSamiScore(snapshot) {
   if (getBoolean(snapshot, "sa-combo")) raw += 50;
   if (getBoolean(snapshot, "sa-gardener-nl")) raw += 50;
   if (getBoolean(snapshot, "sa-sentinel-nl")) raw += 100;
+  if (getBoolean(snapshot, "sa-gift")) raw += 70;
 
-  const multiplier = getBoolean(snapshot, "sa-gift") ? 1.2 : 1;
-  const total = raw * multiplier;
-  const formula = multiplier === 1
-    ? `(${formatNumber(raw)})`
-    : `(${formatNumber(raw)} x ${formatNumber(multiplier)})`;
-
-  return buildResult(total, formula, {
+  return buildResult(raw, `(${formatNumber(raw)})`, {
     rawScore: roundScore(raw),
-    multiplier,
+    multiplier: 1,
   });
 }
 

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 
 interface CountUpProps {
@@ -10,18 +10,21 @@ interface CountUpProps {
 
 export function CountUp({ end, duration = 1.5, decimals = 0, className = "" }: CountUpProps) {
     const nodeRef = useRef<HTMLSpanElement>(null);
-    const [hasStarted, setHasStarted] = useState(false);
+    const hasStartedRef = useRef(false);
 
     useEffect(() => {
-        if (!nodeRef.current) return;
+        const node = nodeRef.current;
+        if (!node) return;
+
+        // Reset when `end` changes so the animation can replay
+        hasStartedRef.current = false;
 
         const target = { val: 0 };
 
-        // Create an Intersection Observer to start animation when visible
         const observer = new IntersectionObserver(
             (entries) => {
-                if (entries[0].isIntersecting && !hasStarted) {
-                    setHasStarted(true);
+                if (entries[0].isIntersecting && !hasStartedRef.current) {
+                    hasStartedRef.current = true;
 
                     const numericEnd = typeof end === "string" ? parseFloat(end.replace(/,/g, "")) : end;
 
@@ -39,15 +42,15 @@ export function CountUp({ end, duration = 1.5, decimals = 0, className = "" }: C
                     observer.disconnect();
                 }
             },
-            { threshold: 0.1 }
+            { threshold: 0.1 },
         );
 
-        observer.observe(nodeRef.current);
+        observer.observe(node);
 
         return () => {
             observer.disconnect();
         };
-    }, [end, duration, decimals, hasStarted]);
+    }, [end, duration, decimals]);
 
     return <span ref={nodeRef} className={className}>0</span>;
 }
