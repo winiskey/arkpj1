@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>荆楚歌 #2 计分终端</title>
+    <title>荆楚歌 #2 后台计分终端</title>
     <style>
-        :root {
+:root {
             --primary: #FFD60A;
             --bg-color: #000;
             --card-bg: #1C1C1E;
@@ -329,53 +329,312 @@
             color: #ff6f67;
             border: 1px solid rgba(255, 69, 58, 0.45);
         }
+
+        .header-subtitle {
+            margin-top: 8px;
+            color: var(--text-sub);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .meta-grid {
+            margin-top: 14px;
+        }
+
+        .toolbar-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 14px;
+        }
+
+        .form-grow {
+            flex: 1 1 320px;
+            min-width: 220px;
+        }
+
+        .identity-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 220px;
+        }
+
+        .toolbar-kicker {
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-sub);
+        }
+
+        .identity-text {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .toolbar-message {
+            font-size: 12px;
+            color: var(--text-sub);
+            line-height: 1.5;
+        }
+
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 36px;
+            padding: 0 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: #252527;
+            color: var(--text-main);
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .status-chip[data-status="draft"] {
+            color: #ffd76b;
+            border-color: rgba(255, 214, 10, 0.28);
+        }
+
+        .status-chip[data-status="final"] {
+            color: #7dd3fc;
+            border-color: rgba(125, 211, 252, 0.28);
+        }
+
+        .status-chip[data-status="published"] {
+            color: #86efac;
+            border-color: rgba(134, 239, 172, 0.28);
+        }
+
+        .action-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .action-btn {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #2d2d30;
+            color: var(--text-main);
+            padding: 10px 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .action-btn.primary {
+            color: var(--primary);
+            border-color: rgba(255, 214, 10, 0.28);
+            background: rgba(255, 214, 10, 0.08);
+        }
+
+        .action-btn.success {
+            color: #86efac;
+            border-color: rgba(134, 239, 172, 0.28);
+            background: rgba(134, 239, 172, 0.08);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+        }
+
+        .stat-card {
+            background: #2d2d30;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 12px 14px;
+        }
+
+        .stat-value {
+            margin-top: 6px;
+            color: var(--text-main);
+            font-size: 21px;
+            font-weight: 700;
+        }
+
+        .summary-stack {
+            display: grid;
+            gap: 10px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 14px;
+            background: #2d2d30;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+        }
+
+        .summary-main {
+            min-width: 0;
+        }
+
+        .summary-main strong {
+            display: block;
+            margin-bottom: 4px;
+            color: var(--text-main);
+        }
+
+        .summary-meta {
+            font-size: 12px;
+            color: var(--text-sub);
+            line-height: 1.5;
+        }
+
+        .summary-value {
+            flex-shrink: 0;
+            text-align: right;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        @media (max-width: 760px) {
+            .toolbar-row {
+                align-items: stretch;
+            }
+
+            .identity-stack,
+            .form-grow,
+            .status-chip {
+                width: 100%;
+            }
+
+            .action-group {
+                width: 100%;
+                justify-content: stretch;
+            }
+
+            .action-btn {
+                flex: 1 1 140px;
+            }
+
+            .summary-row {
+                flex-direction: column;
+            }
+
+            .summary-value {
+                text-align: left;
+            }
+        }
+
     </style>
 </head>
 
 <body>
     <div class="header">
-        <div class="header-title"><b>荆楚歌#2 计分终端</b></div>
-        <div class="grid-row" style="margin-top:10px; margin-bottom:0;">
-            <div class="form-item"><label>选手ID</label><input type="text" placeholder="可选"></div>
-            <div class="form-item"><label>战队</label><input type="text" placeholder="可选"></div>
-            <div class="form-item"><label>备注</label><input type="text" placeholder="可选"></div>
+        <div class="header-title"><b>荆楚歌 #2 后台计分终端</b></div>
+        <div class="header-subtitle">选择战队与选手后即可录入单人快照数据，保存后会直接写入后台成绩单。</div>
+        <div class="grid-row meta-grid">
+            <div class="form-item">
+                <label>战队</label>
+                <select id="meta-team" onchange="handleTeamChange()">
+                    <option value="">请选择战队</option>
+                </select>
+            </div>
+            <div class="form-item">
+                <label>选手</label>
+                <select id="meta-member" onchange="handleMemberChange()">
+                    <option value="">请选择选手</option>
+                </select>
+            </div>
+            <div class="form-item">
+                <label>场次</label>
+                <select id="meta-match" onchange="handleIdentityChange()">
+                    <option value="">不限场次</option>
+                </select>
+            </div>
+        </div>
+        <div class="toolbar-row">
+            <div class="form-item form-grow">
+                <label>备注</label>
+                <input type="text" id="meta-note" placeholder="可选，保存时会写入成绩单备注">
+            </div>
+            <div class="identity-stack">
+                <div class="toolbar-kicker">当前对象</div>
+                <div id="identity-text" class="identity-text">请选择战队与选手</div>
+            </div>
+            <div id="sheet-status-chip" class="status-chip" data-status="draft">待录入</div>
+        </div>
+        <div class="toolbar-row">
+            <div id="toolbar-message" class="toolbar-message">等待加载后台数据...</div>
+            <div class="action-group">
+                <button id="save-btn" class="action-btn" type="button" onclick="saveDraft()" disabled>保存草稿</button>
+                <button id="final-btn" class="action-btn primary" type="button" onclick="finalizeSheet()" disabled>锁定成绩</button>
+                <button id="publish-btn" class="action-btn success" type="button" onclick="publishTeam()" disabled>发布整队</button>
+            </div>
         </div>
     </div>
 
     <div class="tab-control">
-        <button class="tab-btn active" onclick="switchTab('team', this)">团队总分</button>
-        <button class="tab-btn" onclick="switchTab('sami', this)">探索者的银淞止境</button>
+        <button class="tab-btn active" onclick="switchTab('team', this)">战队总览</button>
+        <button class="tab-btn" onclick="switchTab('sami', this)">探索者的银凇止境</button>
         <button class="tab-btn" onclick="switchTab('sarkaz', this)">萨卡兹的无终奇语</button>
         <button class="tab-btn" onclick="switchTab('sui', this)">岁的界园志异</button>
     </div>
 
     <div id="team" class="content-area active">
         <div class="section-card">
-            <div class="section-title">四人分数输入<button class="section-reset-btn" onclick="resetSection(this)">重置</button>
+            <div class="section-title">战队聚合<button class="section-reset-btn" onclick="resetSection(this)">刷新</button></div>
+            <div class="summary-grid">
+                <div class="stat-card">
+                    <div class="score-label">状态</div>
+                    <div id="team-status" class="stat-value">待录入</div>
+                </div>
+                <div class="stat-card">
+                    <div class="score-label">已录入</div>
+                    <div id="team-progress" class="stat-value">0 / 0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="score-label">原始总分</div>
+                    <div id="team-raw-total" class="stat-value">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="score-label">抗压加成</div>
+                    <div id="team-pressure-bonus" class="stat-value">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="score-label">最终总分</div>
+                    <div id="team-final-total" class="stat-value">0</div>
+                </div>
             </div>
-            <div class="grid-row">
-                <div class="form-item"><label>选手1最终分</label><input type="number" id="team-p1" value="0"
-                        oninput="calc()"></div>
-                <div class="form-item"><label>选手2最终分</label><input type="number" id="team-p2" value="0"
-                        oninput="calc()"></div>
-                <div class="form-item"><label>选手3最终分</label><input type="number" id="team-p3" value="0"
-                        oninput="calc()"></div>
-                <div class="form-item"><label>选手4最终分</label><input type="number" id="team-p4" value="0"
-                        oninput="calc()"></div>
-            </div>
-            <div class="highlight-box">
-                <div class="form-item"><label>抗压位（该选手最终分 ×120%）</label></div>
-                <select id="team-pressure" onchange="calc()">
-                    <option value="0">不启用</option>
-                    <option value="1">选手1</option>
-                    <option value="2">选手2</option>
-                    <option value="3">选手3</option>
-                    <option value="4">选手4</option>
-                </select>
+            <div id="sync-text" class="tips-text">等待加载后台数据...</div>
+        </div>
+        <div class="section-card">
+            <div class="section-title">队员分数概览</div>
+            <div id="team-members-board" class="summary-stack">
+                <div class="tips-text">请选择战队后查看队员录分与汇总结果。</div>
             </div>
         </div>
-
-
+        <div class="section-card">
+            <div class="section-title">合规与系数</div>
+            <div id="team-compliance-board" class="summary-stack">
+                <div class="tips-text">请选择战队后查看合规与系数信息。</div>
+            </div>
+        </div>
     </div>
 
     <div id="sami" class="content-area">
@@ -736,7 +995,6 @@
                     <span class="score-badge">+30</span></label>
             </div>
         </div>
-    </div>
 
     <div class="bottom-dock">
         <div>
@@ -745,161 +1003,12 @@
         </div>
         <div>
             <div id="formula-text" class="score-formula">等待输入</div>
-            <button class="dock-btn copy-btn" onclick="copyScore()">复制</button>
-            <button class="dock-btn reset-btn" onclick="resetForm()">重置全部</button>
+            <button class="dock-btn copy-btn" type="button" onclick="copyScore()">复制分数</button>
+            <button class="dock-btn reset-btn" type="button" onclick="resetForm()">重置当前主题</button>
         </div>
     </div>
 
-    <script>
-        let currentTab = 'team';
-        function switchTab(id, btn) {
-            currentTab = id;
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.content-area').forEach(c => c.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-            document.getElementById(id).classList.add('active');
-            calc();
-        }
-        const gv = (id) => parseFloat(document.getElementById(id)?.value || 0) || 0;
-        const gc = (id) => !!document.getElementById(id)?.checked;
-        const sumChecked = (selector) => {
-            let s = 0;
-            document.querySelectorAll(selector).forEach(el => s += parseFloat(el.value) || 0);
-            return s;
-        };
-        function resetSection(btn) {
-            const card = btn.closest('.section-card');
-            if (!card) return;
-            card.querySelectorAll('input,select').forEach(el => {
-                if (el.type === 'checkbox') el.checked = false;
-                else if (el.type === 'number') el.value = 0;
-                else if (el.tagName === 'SELECT') el.selectedIndex = 0;
-                else el.value = '';
-            });
-            calc();
-        }
-        function calcTeam() {
-            let p = [gv('team-p1'), gv('team-p2'), gv('team-p3'), gv('team-p4')];
-            const pressure = parseInt(document.getElementById('team-pressure').value || '0', 10);
-            if (pressure >= 1 && pressure <= 4) p[pressure - 1] *= 1.2;
-            const sum = p.reduce((a, b) => a + b, 0);
-            return { total: sum, formula: `团队总分 = 四人分数和 = ${sum.toFixed(2)}` };
-        }
-        function calcSami() {
-            let raw = gv('sa-score') + gv('sa-items') * 10 + gv('sa-plates') * 5 + gv('sa-6s') * 50 + gv('sa-5s') * 20 + gv('sa-4s') * 10;
-            raw += sumChecked('.sa-stage:checked');
-            if (gc('sa-combo')) raw += 50;
-            if (gc('sa-gardener-nl')) raw += 50;
-            if (gc('sa-sentinel-nl')) raw += 100;
-            raw += gv('sa-end-link');
-            if (gc('sa-gift')) raw += 70;
-            return { total: raw, formula: `(${raw.toFixed(2)})` };
-        }
-        function calcSarkaz() {
-            let raw = gv('sk-score') + gv('sk-items') * 5 + gv('sk-6s') * 50 + gv('sk-5s') * 20 + gv('sk-4s') * 10;
-            if (gc('sk-memory-violate')) raw -= 17.5;
-            if (gc('sk-babel-miss')) raw -= 500;
-            raw += sumChecked('.sk-stage:checked');
-            const hasKarma = gc('sk-karma');
-            let ending = 0;
-            if (gc('sk-n1-done')) {
-                let v = hasKarma ? 120 : 50;
-                if (gc('sk-n1-conf')) v += hasKarma ? 50 : 20;
-                if (hasKarma && gc('sk-n1-perf')) v += 80;
-                ending += v;
-            }
-            if (gc('sk-n2-done')) {
-                let v = hasKarma ? 200 : 50;
-                if (gc('sk-n2-conf')) v += hasKarma ? 50 : 20;
-                ending += v;
-            }
-            if (gc('sk-n3-done')) {
-                let v = hasKarma ? 300 : 100;
-                if (gc('sk-n3-conf')) v += hasKarma ? 50 : 20;
-                ending += v;
-            }
-            if (gc('sk-n5-done')) {
-                let v = 500;
-                if (gc('sk-n5-conf')) v += 100;
-                if (gc('sk-boss')) v += 300;
-                ending += v;
-            }
-            if (gc('sk-n4-done')) {
-                let v = 400;
-                if (gc('sk-n4-conf')) v += 200;
-                const relic = document.getElementById('sk-end-relic').value;
-                if (hasKarma) {
-                    if (relic === 'bone') { if (gc('sk-n4-perf')) v += 100; }
-                    if (relic === 'body') { if (gc('sk-n4-perf')) v += 100; v *= 1.1; }
-                    if (relic === 'reality') { if (gc('sk-n4-perf')) v += 150; v *= 1.5; }
-                } else {
-                    if (relic === 'bone') v *= 0.6;
-                    if (relic === 'body') v *= 0.8;
-                }
-                ending += v;
-            }
-            if (gc('sk-roll')) ending *= 1.2;
-            raw += ending;
-            return { total: raw * 0.75, formula: `(${raw.toFixed(2)} × 0.75)` };
-        }
-        function calcSui() {
-            const items = Math.max(0, gv('sui-items'));
-            const steps = Math.max(0, gv('sui-steps'));
-            if (gc('sui-rule-violate') || steps > 150) return { total: 0, formula: '违规判定：本主题0分' };
-            let raw = gv('sui-score') + Math.min(items, 120) * 5 + gv('sui-6s') * 50 + gv('sui-5s') * 20 + gv('sui-4s') * 10;
-            raw += sumChecked('.sui-stage:checked');
-            const hasXM = gc('sui-it-xm'), hasWS = gc('sui-it-ws'), hasYYQ = gc('sui-it-yyq'), hasWF = gc('sui-it-wf');
-            if (gc('sui-stage-posz')) { if (hasXM) raw += 50; if (hasWS) raw += 30; if (hasYYQ) raw += 30; if (hasWF) raw += 50; }
-            if (gc('sui-stage-xzry')) { if (hasXM) raw += 100; if (hasWS) raw += 50; if (hasYYQ) raw += 50; if (hasWF) raw += 50; }
-            if (gc('sui-stage-tsjy')) { if (hasXM) raw += 50; if (hasWS) raw += 30; }
-            if (gc('sui-stage-wxny')) { if (hasXM) raw += 100; if (hasWS) raw += 50; }
-            if (gc('sui-stage-msz')) { if (hasXM) raw += 50; if (hasWF) raw += 50; }
-            if (gc('sui-stage-ms')) { if (hasXM) raw += 50; if (hasWS) raw += 50; }
-            const endMap = {
-                dqk: { base: 400, perf: 200 }, dqk_dby: { base: 800, perf: 200 }, zb_hzf: { base: 800, perf: 250 },
-                zb_scx: { base: 900, perf: 300 }, zb_gdy: { base: 800, perf: 250 }, zb_sjl: { base: 700, perf: 200 }, zb_yqs: { base: 1200, perf: 0 }
-            };
-            const ending = document.getElementById('sui-ending').value;
-            if (ending !== 'none') {
-                raw += endMap[ending].base;
-                if (ending === 'zb_yqs') raw += gv('sui-beast-loss');
-                else if (gc('sui-end-perf')) raw += endMap[ending].perf;
-                if (hasWS) raw += 100;
-                if (hasYYQ) raw += 100;
-                if (hasWF) raw += 50;
-            }
-            raw -= Math.max(0, steps - 100) * 1.5;
-            raw -= Math.max(0, items - 120) * 7.5;
-            let mult = 0.4 * (1 + (gc('sui-item-a') ? 0.2 : 0) + (gc('sui-item-b') ? 0.2 : 0));
-            if (gc('sui-pen-1')) mult *= 0.5;
-            if (gc('sui-pen-2')) mult *= 0.5;
-            return { total: raw * mult, formula: `(${raw.toFixed(2)} × ${mult.toFixed(2)})` };
-        }
-        function calc() {
-            let r = { total: 0, formula: '等待输入' };
-            if (currentTab === 'team') r = calcTeam();
-            if (currentTab === 'sami') r = calcSami();
-            if (currentTab === 'sarkaz') r = calcSarkaz();
-            if (currentTab === 'sui') r = calcSui();
-            document.getElementById('total-score').innerText = r.total.toFixed(2);
-            document.getElementById('formula-text').innerText = r.formula;
-        }
-        function copyScore() {
-            const score = document.getElementById('total-score').innerText;
-            navigator.clipboard.writeText(score).then(() => alert('分数已复制: ' + score));
-        }
-        function resetForm() {
-            if (!confirm('确定要重置所有数据吗？')) return;
-            document.querySelectorAll('input').forEach(el => {
-                if (el.type === 'checkbox') el.checked = false;
-                else if (el.type === 'number') el.value = 0;
-                else el.value = '';
-            });
-            document.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
-            calc();
-        }
-        calc();
-    </script>
+    <script src="/admin/calculator.js"></script>
 </body>
 
 </html>

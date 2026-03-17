@@ -3,19 +3,20 @@ let calculatorBootstrap = { teams: [], matches: [], scoreSheets: [], aggregates:
 let activeSheetId = null;
 let activeSheetStatus = "draft";
 let teamAggregateCache = null;
+const TOKEN_KEY = "adminToken";
 
 const THEME_LABELS = {
-    team: "????",
-    sami: "????????",
-    sarkaz: "????????",
-    sui: "??????",
+    team: "战队总览",
+    sami: "探索者的银凇止境",
+    sarkaz: "萨卡兹的无终奇语",
+    sui: "岁的界园志异",
 };
 
 const STATUS_LABELS = {
-    draft: "??",
-    final: "???",
-    published: "???",
-    empty: "???",
+    draft: "待审",
+    final: "已锁定",
+    published: "已发布",
+    empty: "待录入",
 };
 
 const gv = (id) => parseFloat(document.getElementById(id)?.value || 0) || 0;
@@ -50,12 +51,15 @@ function inferThemeCodeFromMember(member) {
     if (!member?.theme) {
         return null;
     }
-    if (member.theme.includes("???")) {
+
+    if (member.theme.includes("萨卡兹")) {
         return "sarkaz";
     }
-    if (member.theme.includes("??") || member.theme.includes("?")) {
+
+    if (member.theme.includes("界园") || member.theme.includes("岁")) {
         return "sui";
     }
+
     return "sami";
 }
 
@@ -74,20 +78,37 @@ function getCurrentThemeCode() {
     return currentTab === "team" ? null : currentTab;
 }
 
+function getAdminToken() {
+    return window.localStorage.getItem(TOKEN_KEY);
+}
+
 async function apiFetch(path, options = {}) {
+    const token = getAdminToken();
+    if (!token) {
+        throw new Error("未登录：缺少管理员令牌，请重新登录后台。");
+    }
+
     const response = await fetch(path, {
         headers: {
-            "Content-Type": "application/json",
+            ...(options.body ? { "Content-Type": "application/json" } : {}),
+            Authorization: `Bearer ${token}`,
             ...(options.headers || {}),
         },
         ...options,
     });
 
     const rawText = await response.text();
-    const data = rawText ? JSON.parse(rawText) : {};
+    let data = {};
+    if (rawText) {
+        try {
+            data = JSON.parse(rawText);
+        } catch {
+            data = { message: rawText };
+        }
+    }
 
     if (!response.ok) {
-        throw new Error(data?.error?.message || `???? (${response.status})`);
+        throw new Error(data?.error || data?.message || `请求失败 (${response.status})`);
     }
 
     return data;
@@ -120,7 +141,7 @@ function setSheetStatus(status, customLabel) {
 function updateIdentityText() {
     const team = getSelectedTeam();
     const member = getSelectedMember();
-    const themeLabel = THEME_LABELS[currentTab] || "???";
+    const themeLabel = THEME_LABELS[currentTab] || "未知主题";
     const parts = [];
     if (team) {
         parts.push(team.name);
@@ -129,13 +150,13 @@ function updateIdentityText() {
         parts.push(member.name);
     }
     parts.push(themeLabel);
-    document.getElementById("identity-text").textContent = team ? parts.join(" / ") : "????????";
+    document.getElementById("identity-text").textContent = team ? parts.join(" / ") : "请选择战队与选手";
 }
 
 function populateTeamOptions() {
     const select = document.getElementById("meta-team");
     const currentValue = select.value;
-    const options = ['<option value="">?????</option>'];
+    const options = ['<option value="">请选择战队</option>'];
 
     calculatorBootstrap.teams.forEach((team) => {
         options.push(`<option value="${escapeHtml(team.id)}">${escapeHtml(team.name)}</option>`);
@@ -153,7 +174,7 @@ function populateMemberOptions(teamId) {
     const select = document.getElementById("meta-member");
     const currentValue = select.value;
     const team = calculatorBootstrap.teams.find((entry) => entry.id === teamId);
-    const options = ['<option value="">?????</option>'];
+    const options = ['<option value="">请选择选手</option>'];
 
     (team?.members || []).forEach((member) => {
         options.push(`<option value="${escapeHtml(member.id)}">${escapeHtml(member.name)}</option>`);
@@ -171,10 +192,10 @@ function populateMatchOptions(teamId) {
     const select = document.getElementById("meta-match");
     const currentValue = select.value;
     const teamMatches = calculatorBootstrap.matches.filter((match) => match.teamId === teamId);
-    const options = ['<option value="">?????</option>'];
+    const options = ['<option value="">不限场次</option>'];
 
     teamMatches.forEach((match) => {
-        const label = `${match.id} ? ${match.phase} ? ${match.startTime}`;
+        const label = `${match.id} · ${match.phase} · ${match.startTime}`;
         options.push(`<option value="${escapeHtml(match.id)}">${escapeHtml(label)}</option>`);
     });
 
@@ -247,23 +268,23 @@ function restoreCurrentSnapshot(snapshot) {
 function renderComplianceBoard(summary) {
     const host = document.getElementById("team-compliance-board");
     if (!summary) {
-        host.innerHTML = '<div class="tips-text">??????</div>';
+        host.innerHTML = '<div class="tips-text">请选择战队后查看合规与系数信息。</div>';
         return;
     }
 
     const sections = [
-        `<div class="summary-row"><div class="summary-main"><strong>???</strong><div class="summary-meta">${escapeHtml(summary.roster.pressureMemberName || "???")}</div></div><div class="summary-value">${summary.roster.pressureRoleValid ? "???" : "???"}</div></div>`,
-        `<div class="summary-row"><div class="summary-main"><strong>??????</strong><div class="summary-meta">?? ${summary.sharedIngots.limit} ? / ??? ${summary.sharedIngots.spent}</div></div><div class="summary-value">${summary.coefficientBreakdown.extraShopSpend.excess}</div></div>`,
-        `<div class="summary-row"><div class="summary-main"><strong>????</strong><div class="summary-meta">?? ${summary.coachCalls.maxCount} ???? ${summary.coachCalls.maxMinutesPerCall} ??</div></div><div class="summary-value">${summary.coachCalls.totalCount}</div></div>`,
-        `<div class="summary-row"><div class="summary-main"><strong>??</strong><div class="summary-meta">?? ${formatScore(summary.coefficientBreakdown.totalDelta)}</div></div><div class="summary-value">${formatScore(summary.coefficient)}</div></div>`,
-        `<div class="summary-row"><div class="summary-main"><strong>????</strong><div class="summary-meta">?? ${summary.blockingIssues.length} ? / ?? ${summary.warnings.length} ?</div></div><div class="summary-value">${summary.blockingIssues.length > 0 ? "???" : "??"}</div></div>`,
+        `<div class="summary-row"><div class="summary-main"><strong>抗压位</strong><div class="summary-meta">${escapeHtml(summary.roster.pressureMemberName || "未指定")}</div></div><div class="summary-value">${summary.roster.pressureRoleValid ? "已设置" : "待补充"}</div></div>`,
+        `<div class="summary-row"><div class="summary-main"><strong>共享源石锭</strong><div class="summary-meta">上限 ${summary.sharedIngots.limit} / 已用 ${summary.sharedIngots.spent}</div></div><div class="summary-value">超支 ${summary.coefficientBreakdown.extraShopSpend.excess}</div></div>`,
+        `<div class="summary-row"><div class="summary-main"><strong>教练通话</strong><div class="summary-meta">最多 ${summary.coachCalls.maxCount} 次，每次 ${summary.coachCalls.maxMinutesPerCall} 分钟</div></div><div class="summary-value">${summary.coachCalls.totalCount} 次</div></div>`,
+        `<div class="summary-row"><div class="summary-main"><strong>战队系数</strong><div class="summary-meta">累计修正 ${formatScore(summary.coefficientBreakdown.totalDelta)}</div></div><div class="summary-value">${formatScore(summary.coefficient)}</div></div>`,
+        `<div class="summary-row"><div class="summary-main"><strong>发布检查</strong><div class="summary-meta">阻塞 ${summary.blockingIssues.length} 项 / 警告 ${summary.warnings.length} 项</div></div><div class="summary-value">${summary.blockingIssues.length > 0 ? "有阻塞" : "可发布"}</div></div>`,
     ];
 
     if (summary.blockingIssues.length) {
-        sections.push(`<div class="warning-box">${summary.blockingIssues.map((item) => `? ${escapeHtml(item)}`).join("<br>")}</div>`);
+        sections.push(`<div class="warning-box">${summary.blockingIssues.map((item) => `• ${escapeHtml(item)}`).join("<br>")}</div>`);
     }
     if (summary.warnings.length) {
-        sections.push(`<div class="highlight-box">${summary.warnings.map((item) => `? ${escapeHtml(item)}`).join("<br>")}</div>`);
+        sections.push(`<div class="highlight-box">${summary.warnings.map((item) => `• ${escapeHtml(item)}`).join("<br>")}</div>`);
     }
 
     host.innerHTML = sections.join("");
@@ -271,7 +292,7 @@ function renderComplianceBoard(summary) {
 
 function renderTeamAggregate(aggregate) {
     teamAggregateCache = aggregate;
-    document.getElementById("team-status").textContent = aggregate?.status?.label || "?????";
+    document.getElementById("team-status").textContent = aggregate?.status?.label || "待录入";
     document.getElementById("team-progress").textContent = aggregate ? `${aggregate.scoredCount} / ${aggregate.memberCount}` : "0 / 0";
     document.getElementById("team-raw-total").textContent = aggregate?.formatted?.rawTotal || "0";
     document.getElementById("team-pressure-bonus").textContent = aggregate?.formatted?.pressureBonus || "0";
@@ -279,24 +300,24 @@ function renderTeamAggregate(aggregate) {
 
     const membersBoard = document.getElementById("team-members-board");
     if (!aggregate) {
-        membersBoard.innerHTML = '<div class="tips-text">??????????????????????</div>';
+        membersBoard.innerHTML = '<div class="tips-text">请选择战队后查看队员录分与汇总结果。</div>';
         renderComplianceBoard(null);
         return;
     }
 
     membersBoard.innerHTML = aggregate.members.map((member) => {
-        const statusLabel = member.sheet ? (STATUS_LABELS[member.sheet.status] || member.sheet.status) : "???";
-        const note = member.sheet?.note ? `<div class="summary-meta">???${escapeHtml(member.sheet.note)}</div>` : "";
+        const statusLabel = member.sheet ? (STATUS_LABELS[member.sheet.status] || member.sheet.status) : STATUS_LABELS.empty;
+        const note = member.sheet?.note ? `<div class="summary-meta">备注：${escapeHtml(member.sheet.note)}</div>` : "";
         return `
             <div class="summary-row">
                 <div class="summary-main">
                     <strong>${escapeHtml(member.name)}</strong>
-                    <div class="summary-meta">${escapeHtml(member.expectedTheme)} / ${escapeHtml(statusLabel)}${member.pressureApplied ? " / ???" : ""}</div>
+                    <div class="summary-meta">${escapeHtml(member.expectedTheme)} / ${escapeHtml(statusLabel)}${member.pressureApplied ? " / 抗压位" : ""}</div>
                     ${note}
                 </div>
                 <div class="summary-value">
                     <div>${formatScore(member.adjustedScore)}</div>
-                    <div class="summary-meta">?? ${formatScore(member.score)}</div>
+                    <div class="summary-meta">原分 ${formatScore(member.score)}</div>
                 </div>
             </div>
         `;
@@ -317,7 +338,7 @@ async function refreshTeamAggregate(showMessage = true) {
     const aggregate = await apiFetch(`/api/admin/teams/${team.id}/aggregate`);
     renderTeamAggregate(aggregate);
     if (showMessage && currentTab === "team") {
-        setToolbarMessage("??????????");
+        setToolbarMessage("已同步战队聚合结果");
     }
     calc();
     syncActionButtons();
@@ -325,11 +346,11 @@ async function refreshTeamAggregate(showMessage = true) {
 
 function calcTeam() {
     if (!teamAggregateCache) {
-        return { total: 0, formula: "?????????????" };
+        return { total: 0, formula: "请选择战队后查看汇总" };
     }
     return {
         total: teamAggregateCache.finalTotal ?? teamAggregateCache.teamTotal,
-        formula: `???? = (${teamAggregateCache.formatted.preCoefficientTotal} x ${teamAggregateCache.formatted.coefficient})`,
+        formula: `总分 = (${teamAggregateCache.formatted.preCoefficientTotal} x ${teamAggregateCache.formatted.coefficient})`,
     };
 }
 
@@ -407,7 +428,7 @@ function calcSui() {
     const items = Math.max(0, gv("sui-items"));
     const steps = Math.max(0, gv("sui-steps"));
     if (gc("sui-rule-violate") || steps > 150) {
-        return { total: 0, formula: "????????0?" };
+        return { total: 0, formula: "违规判定：本主题 0 分" };
     }
 
     let raw = gv("sui-score") + Math.min(items, 120) * 5 + gv("sui-6s") * 50 + gv("sui-5s") * 20 + gv("sui-4s") * 10;
@@ -460,7 +481,7 @@ function calculateCurrentResult() {
     if (currentTab === "sami") return calcSami();
     if (currentTab === "sarkaz") return calcSarkaz();
     if (currentTab === "sui") return calcSui();
-    return { total: 0, formula: "????" };
+    return { total: 0, formula: "等待输入" };
 }
 
 function calc() {
@@ -513,8 +534,8 @@ async function loadSheetForCurrentSelection() {
     if (!team || !member) {
         activeSheetId = null;
         clearCurrentThemeForm();
-        setSheetStatus("draft", "?????");
-        setToolbarMessage("?????????????", true);
+        setSheetStatus("draft", "待录入");
+        setToolbarMessage("请选择战队和选手后再录分", true);
         syncActionButtons();
         return;
     }
@@ -523,8 +544,8 @@ async function loadSheetForCurrentSelection() {
     if (expectedTheme !== currentTab) {
         activeSheetId = null;
         clearCurrentThemeForm();
-        setSheetStatus("draft", `??? ${THEME_LABELS[expectedTheme]}`);
-        setToolbarMessage(`???? ${member.name} ?????? ${THEME_LABELS[expectedTheme]}?`, true);
+        setSheetStatus("draft", `应填 ${THEME_LABELS[expectedTheme]}`);
+        setToolbarMessage(`当前选手 ${member.name} 只能录入 ${THEME_LABELS[expectedTheme]}`, true);
         syncActionButtons();
         return;
     }
@@ -545,13 +566,13 @@ async function loadSheetForCurrentSelection() {
         document.getElementById("meta-note").value = data.sheet.note || "";
         restoreCurrentSnapshot(data.sheet.snapshot || {});
         setSheetStatus(data.sheet.status);
-        setToolbarMessage("????????");
+        setToolbarMessage("已加载已有成绩单");
     } else {
         activeSheetId = null;
         document.getElementById("meta-note").value = "";
         clearCurrentThemeForm();
-        setSheetStatus("draft", "???");
-        setToolbarMessage("???????????????");
+        setSheetStatus("draft", "待录入");
+        setToolbarMessage("当前主题暂无成绩单，可直接录入");
     }
 
     await refreshTeamAggregate(false);
@@ -567,13 +588,13 @@ async function saveSheetWithStatus(nextStatus) {
     const team = getSelectedTeam();
     const member = getSelectedMember();
     if (!team || !member) {
-        setToolbarMessage("??????????", true);
+        setToolbarMessage("请先选择战队与选手", true);
         return;
     }
 
     const expectedTheme = inferThemeCodeFromMember(member);
     if (expectedTheme !== currentTab) {
-        setToolbarMessage(`???? ${member.name} ???? ${THEME_LABELS[currentTab]}?`, true);
+        setToolbarMessage(`当前选手 ${member.name} 不能录入 ${THEME_LABELS[currentTab]}`, true);
         return;
     }
 
@@ -589,7 +610,7 @@ async function saveSheetWithStatus(nextStatus) {
         formulaText: result.formula,
         note: document.getElementById("meta-note").value.trim(),
         status: nextStatus,
-        calculatorVersion: "jingchuge-html-v1",
+        calculatorVersion: "jingchuge-admin-api-v1",
     };
 
     const data = await apiFetch("/api/admin/score-sheets/upsert", {
@@ -602,7 +623,7 @@ async function saveSheetWithStatus(nextStatus) {
     renderTeamAggregate(data.aggregate);
     calc();
     syncActionButtons();
-    setToolbarMessage(nextStatus === "final" ? "?????????" : "?????????");
+    setToolbarMessage(nextStatus === "final" ? "成绩单已锁定" : "草稿已保存");
 }
 
 async function saveDraft() {
@@ -616,7 +637,7 @@ async function finalizeSheet() {
 async function publishTeam() {
     const team = getSelectedTeam();
     if (!team) {
-        setToolbarMessage("???????", true);
+        setToolbarMessage("请先选择战队", true);
         return;
     }
 
@@ -625,7 +646,7 @@ async function publishTeam() {
     });
 
     renderTeamAggregate(data.aggregate);
-    setToolbarMessage("???????????");
+    setToolbarMessage("整队成绩已发布");
     if (currentTab !== "team") {
         await loadSheetForCurrentSelection();
     } else {
@@ -671,7 +692,7 @@ async function handleMemberChange() {
 function copyScore() {
     const score = document.getElementById("total-score").innerText;
     navigator.clipboard.writeText(score).then(() => {
-        setToolbarMessage("??????????");
+        setToolbarMessage("当前分数已复制");
     });
 }
 
@@ -680,14 +701,14 @@ function resetForm() {
         refreshTeamAggregate();
         return;
     }
-    if (!confirm("????????????????")) {
+    if (!confirm("确定要清空当前主题的录分内容吗？")) {
         return;
     }
     activeSheetId = null;
     document.getElementById("meta-note").value = "";
     clearCurrentThemeForm();
-    setSheetStatus("draft", "???");
-    setToolbarMessage("?????????????????????????");
+    setSheetStatus("draft", "待录入");
+    setToolbarMessage("当前主题表单已清空，未保存的改动已丢弃");
     syncActionButtons();
 }
 
@@ -705,10 +726,10 @@ async function loadBootstrap() {
         } else {
             calc();
         }
-        setToolbarMessage("????????????");
+        setToolbarMessage("后台数据已就绪");
     } catch (error) {
         console.error(error);
-        setToolbarMessage(error instanceof Error ? error.message : "?????", true);
+        setToolbarMessage(error instanceof Error ? error.message : "加载失败", true);
     }
     syncActionButtons();
 }
