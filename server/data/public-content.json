@@ -38,17 +38,17 @@
     {
       "title": "赛制核心",
       "label": "FORMAT",
-      "content": "四名选手分别挑战不同集成战略主题，以修正后的个人得分汇总为队伍总分。"
+      "content": "四名选手分别挑战不同肉鸽主题，以修正后的个人结算分汇总为战队总分。"
     },
     {
       "title": "判定逻辑",
       "label": "COEFFICIENT",
-      "content": "队伍最终系数从 1.0 起算，每超时 20 分钟、重复六星或额外取钱都会造成扣减。"
+      "content": "战队最终系数从 1.0 起算，每超时 20 分钟、重复抓六星或额外取源石锭都会造成扣减。"
     },
     {
       "title": "赛事节奏",
       "label": "TIMELINE",
-      "content": "2026 年 3 月 8 日开赛，是否设置决赛将视报名队伍数量决定。"
+      "content": "2026 年 3 月 8 日开赛，是否设置决赛将视报名战队数量决定。"
     }
   ],
   "liveBroadcast": {
@@ -65,29 +65,27 @@
     {
       "id": "M1",
       "phase": "ROUND 1",
-      "startTime": "19:00",
-      "status": "IN_PROGRESS",
+      "startTime": "",
+      "status": "PENDING",
       "teamId": "mygo",
-      "totalScore": "5,680",
-      "currentMemberId": "P2",
-      "currentMemberName": "红白、",
+      "totalScore": "0",
       "members": [
         {
           "id": "P1",
-          "name": "吃豆腐蘸酱",
-          "theme": "探索者的银凇止境",
-          "score": 1680,
+          "name": "吃豆腐蕁酱",
+          "theme": "探索者的銀凇止境",
+          "score": 0,
           "multiplier": 1,
-          "status": "FINISHED",
+          "status": "PENDING",
           "queueOrder": 1
         },
         {
           "id": "P2",
           "name": "红白、",
           "theme": "萨卡兹的无终奇语",
-          "score": 4000,
-          "multiplier": 0.92,
-          "status": "LIVE",
+          "score": 0,
+          "multiplier": 1,
+          "status": "PENDING",
           "queueOrder": 2
         },
         {
@@ -95,36 +93,33 @@
           "name": "若亭",
           "theme": "岁的界园志异",
           "score": 0,
-          "multiplier": 0.7,
+          "multiplier": 1,
           "status": "PENDING",
           "queueOrder": 3
         },
         {
           "id": "P4",
           "name": "雪月花",
-          "theme": "探索者的银凇止境",
+          "theme": "探索者的銀凇止境",
           "score": 0,
-          "multiplier": 1.05,
+          "multiplier": 1,
           "status": "PENDING",
           "queueOrder": 4
         }
-      ],
-      "note": "主会场当前追踪 mygo：红白、。吃豆腐蘸酱已完成首棒，后两位成员待命。"
+      ]
     },
     {
       "id": "M2",
       "phase": "ROUND 1",
-      "startTime": "20:30",
+      "startTime": "",
       "status": "PENDING",
       "teamId": "tianqi-siqushi",
       "totalScore": "0",
-      "currentMemberId": "P1",
-      "currentMemberName": "某大叔速水好",
       "members": [
         {
           "id": "P1",
           "name": "某大叔速水好",
-          "theme": "探索者的银凇止境",
+          "theme": "探索者的銀凇止境",
           "score": 0,
           "multiplier": 1,
           "status": "PENDING",
@@ -151,7 +146,7 @@
         {
           "id": "P4",
           "name": "拾壹月的鹤主",
-          "theme": "探索者的银凇止境",
+          "theme": "探索者的銀凇止境",
           "score": 0,
           "multiplier": 1,
           "status": "PENDING",
@@ -163,23 +158,20 @@
         "起步之志",
         "忍野忍不下去",
         "拾壹月的鹤主"
-      ],
-      "note": "赛前检查中，首位待命成员为某大叔速水好。"
+      ]
     },
     {
       "id": "M3",
       "phase": "ROUND 1",
-      "startTime": "22:00",
+      "startTime": "",
       "status": "PENDING",
       "teamId": "siqu-brothers",
       "totalScore": "0",
-      "currentMemberId": "P1",
-      "currentMemberName": "Aimer",
       "members": [
         {
           "id": "P1",
           "name": "Aimer",
-          "theme": "探索者的银凇止境",
+          "theme": "探索者的銀凇止境",
           "score": 0,
           "multiplier": 1,
           "status": "PENDING",
@@ -206,7 +198,7 @@
         {
           "id": "P4",
           "name": "顾秦",
-          "theme": "探索者的银凇止境",
+          "theme": "探索者的銀凇止境",
           "score": 0,
           "multiplier": 1,
           "status": "PENDING",
@@ -218,53 +210,50 @@
         "朝霞",
         "洛齐克",
         "顾秦"
-      ],
-      "note": "待开赛，四驱兄弟想队名全员已完成上场登记。"
+      ]
     },
     {
-      "id": "M0",
-      "phase": "QUALIFIER",
-      "startTime": "17:00",
-      "status": "FINISHED",
+      "id": "M4",
+      "phase": "ROUND 1",
+      "startTime": "",
+      "status": "PENDING",
       "teamId": "strawberry-no1",
-      "totalScore": "15,200",
-      "currentMemberId": "P4",
-      "currentMemberName": "言",
+      "totalScore": "0",
       "members": [
         {
           "id": "P1",
           "name": "归零",
-          "theme": "探索者的银凇止境",
-          "score": 4100,
+          "theme": "探索者的銀凇止境",
+          "score": 0,
           "multiplier": 1,
-          "status": "FINISHED",
+          "status": "PENDING",
           "queueOrder": 1
         },
         {
           "id": "P2",
           "name": "浪淘沙尽天涯",
           "theme": "萨卡兹的无终奇语",
-          "score": 3900,
+          "score": 0,
           "multiplier": 1,
-          "status": "FINISHED",
+          "status": "PENDING",
           "queueOrder": 2
         },
         {
           "id": "P3",
           "name": "糖该葡萄糖",
           "theme": "岁的界园志异",
-          "score": 3200,
+          "score": 0,
           "multiplier": 1,
-          "status": "FINISHED",
+          "status": "PENDING",
           "queueOrder": 3
         },
         {
           "id": "P4",
           "name": "言",
-          "theme": "探索者的银凇止境",
-          "score": 4000,
+          "theme": "探索者的銀凇止境",
+          "score": 0,
           "multiplier": 1,
-          "status": "FINISHED",
+          "status": "PENDING",
           "queueOrder": 4
         }
       ],
@@ -273,8 +262,163 @@
         "浪淘沙尽天涯",
         "糖该葡萄糖",
         "言"
+      ]
+    },
+    {
+      "id": "M5",
+      "phase": "ROUND 1",
+      "startTime": "",
+      "status": "PENDING",
+      "teamId": "feirenzai",
+      "totalScore": "0",
+      "members": [
+        {
+          "id": "P1",
+          "name": "呃呃啊啊",
+          "theme": "探索者的銀凇止境",
+          "score": 0,
+          "multiplier": 1,
+          "status": "PENDING",
+          "queueOrder": 1
+        },
+        {
+          "id": "P2",
+          "name": "last要樂奈丶",
+          "theme": "萨卡兹的无终奇语",
+          "score": 0,
+          "multiplier": 1,
+          "status": "PENDING",
+          "queueOrder": 2
+        },
+        {
+          "id": "P3",
+          "name": "圣人又土",
+          "theme": "岁的界园志异",
+          "score": 0,
+          "multiplier": 1,
+          "status": "PENDING",
+          "queueOrder": 3
+        },
+        {
+          "id": "P4",
+          "name": "海嗣",
+          "theme": "探索者的銀凇止境",
+          "score": 0,
+          "multiplier": 1,
+          "status": "PENDING",
+          "queueOrder": 4
+        }
       ],
-      "note": "草莓天下第一已完成裁判复核，无额外扣罚。"
+      "playersList": [
+        "呃呃啊啊",
+        "last要樂奈丶",
+        "圣人又土",
+        "海嗣"
+      ]
+    },
+    {
+      "id": "M6",
+      "phase": "ROUND 1",
+      "startTime": "",
+      "status": "PENDING",
+      "teamId": "feixing-xuerong",
+      "totalScore": "0",
+      "members": [
+        {
+          "id": "P1",
+          "name": "幻尘",
+          "theme": "探索者的銀凇止境",
+          "score": 0,
+          "multiplier": 1,
+          "status": "PENDING",
+          "queueOrder": 1
+        },
+        {
+          "id": "P2",
+          "name": "快晴",
+          "theme": "萨卡兹的无终奇语",
+          "score": 0,
+          "multiplier": 1,
+          "status": "PENDING",
+          "queueOrder": 2
+        },
+        {
+          "id": "P3",
+          "name": "白身鱼",
+          "theme": "岁的界园志异",
+          "score": 0,
+          "multiplier": 1,
+          "status": "PENDING",
+          "queueOrder": 3
+        },
+        {
+          "id": "P4",
+          "name": "魔法蜘蛛",
+          "theme": "探索者的銀凇止境",
+          "score": 0,
+          "multiplier": 1,
+          "status": "PENDING",
+          "queueOrder": 4
+        }
+      ],
+      "playersList": [
+        "幻尘",
+        "快晴",
+        "白身鱼",
+        "魔法蜘蛛"
+      ]
+    },
+    {
+      "id": "M7",
+      "phase": "ROUND 1",
+      "startTime": "",
+      "status": "PENDING",
+      "teamId": "mofa-strategy",
+      "totalScore": "0",
+      "members": [
+        {
+          "id": "P1",
+          "name": "兔头无权为我授勋",
+          "theme": "探索者的銀凇止境",
+          "score": 0,
+          "multiplier": 1,
+          "status": "PENDING",
+          "queueOrder": 1
+        },
+        {
+          "id": "P2",
+          "name": "布兰卡",
+          "theme": "萨卡兹的无终奇语",
+          "score": 0,
+          "multiplier": 1,
+          "status": "PENDING",
+          "queueOrder": 2
+        },
+        {
+          "id": "P3",
+          "name": "淮南牛肉汤",
+          "theme": "岁的界园志异",
+          "score": 0,
+          "multiplier": 1,
+          "status": "PENDING",
+          "queueOrder": 3
+        },
+        {
+          "id": "P4",
+          "name": "酱香企鹅",
+          "theme": "探索者的銀凇止境",
+          "score": 0,
+          "multiplier": 1,
+          "status": "PENDING",
+          "queueOrder": 4
+        }
+      ],
+      "playersList": [
+        "兔头无权为我授勋",
+        "布兰卡",
+        "淮南牛肉汤",
+        "酱香企鹅"
+      ]
     }
   ],
   "eventSchedule": [
@@ -401,7 +545,7 @@
         {
           "period": "早",
           "time": "9:00",
-          "player": "兔头无权为我授"
+          "player": "兔头无权为我授勋"
         },
         {
           "period": "中",
@@ -495,36 +639,32 @@
     {
       "teamId": "strawberry-no1",
       "name": "草莓天下第一",
-      "details": "预选已结束 / 复核完成",
-      "total": "15,200",
-      "currentMember": "言",
-      "currentStatus": "FINISHED",
-      "teamStatus": "FINISHED"
+      "details": "轮次待排 / 已提交名单",
+      "total": "0",
+      "currentStatus": "PENDING",
+      "teamStatus": "PENDING"
     },
     {
       "teamId": "mygo",
       "name": "mygo",
-      "details": "M1 进行中 / 主会场追踪",
-      "total": "5,680",
-      "currentMember": "红白、",
-      "currentStatus": "LIVE",
-      "teamStatus": "IN_PROGRESS"
+      "details": "轮次待排 / 已提交名单",
+      "total": "0",
+      "currentStatus": "PENDING",
+      "teamStatus": "PENDING"
     },
     {
       "teamId": "tianqi-siqushi",
       "name": "天启四区士",
-      "details": "20:30 待开赛",
+      "details": "轮次待排 / 已提交名单",
       "total": "0",
-      "currentMember": "某大叔速水好",
       "currentStatus": "PENDING",
       "teamStatus": "PENDING"
     },
     {
       "teamId": "siqu-brothers",
       "name": "四驱兄弟想队名",
-      "details": "22:00 待开赛",
+      "details": "轮次待排 / 已提交名单",
       "total": "0",
-      "currentMember": "Aimer",
       "currentStatus": "PENDING",
       "teamStatus": "PENDING"
     },
@@ -533,7 +673,6 @@
       "name": "非人哉",
       "details": "轮次待排 / 已提交名单",
       "total": "0",
-      "currentMember": "呃呃啊啊",
       "currentStatus": "PENDING",
       "teamStatus": "PENDING"
     },
@@ -542,7 +681,6 @@
       "name": "飞行雪绒",
       "details": "轮次待排 / 已提交名单",
       "total": "0",
-      "currentMember": "幻尘",
       "currentStatus": "PENDING",
       "teamStatus": "PENDING"
     },
@@ -551,7 +689,6 @@
       "name": "魔法战略的集成审判",
       "details": "轮次待排 / 已提交名单",
       "total": "0",
-      "currentMember": "兔头无权为我授勋",
       "currentStatus": "PENDING",
       "teamStatus": "PENDING"
     }
@@ -560,8 +697,8 @@
     "本站提供主会场导览与赛程信息，实际观看请前往哔哩哔哩直播间。",
     "总分 = 四人分数和 × 系数。系数初始为 1.0。",
     "每超时 20 分钟，系数 -0.05。",
-    "每有一名重复选择的六星干员，系数 -0.1。",
-    "商店取钱每超出 1 块，系数 -0.01。",
+    "每有一名重复招募的六星干员，系数 -0.1。",
+    "商店取钱每超出 1 源石锭，系数 -0.01。",
     "比赛最终结果以系统实时数据加裁判人工核分共同确认。"
   ],
   "teams": [
@@ -573,7 +710,7 @@
       "status": "LIVE TRACKING",
       "totalScore": "0",
       "rank": 1,
-      "manifesto": "以稳定推进为第一优先，四人轮转配合，确保每一场都打出完整执行。",
+      "manifesto": "以稳定推进为第一优先，四人轮转配合，确保每局都打出完整执行。",
       "radarStats": [
         {
           "label": "执行力",
@@ -588,7 +725,7 @@
           "value": 89
         },
         {
-          "label": "资源控",
+          "label": "经济运营",
           "value": 84
         },
         {
@@ -596,7 +733,7 @@
           "value": 90
         },
         {
-          "label": "终局力",
+          "label": "终局收束",
           "value": 88
         }
       ],
@@ -604,22 +741,24 @@
         {
           "id": "P1",
           "name": "吃豆腐蘸酱",
-          "role": "先锋位",
+          "role": "开局位",
           "theme": "探索者的银凇止境",
           "signatureOp": "待补充",
           "squad": "主攻分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/mygo/吃豆腐蘸酱.jpg"
+          "avatar": "/contestants/mygo/吃豆腐蘸酱.jpg",
+          "operatorPicks": []
         },
         {
           "id": "P2",
           "name": "红白、",
-          "role": "执行位",
+          "role": "推进位",
           "theme": "萨卡兹的无终奇语",
           "signatureOp": "待补充",
           "squad": "推进分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/mygo/红白、.jpg"
+          "avatar": "/contestants/mygo/红白、.jpg",
+          "operatorPicks": []
         },
         {
           "id": "P3",
@@ -629,17 +768,19 @@
           "signatureOp": "待补充",
           "squad": "运营分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/mygo/若亭.jpg"
+          "avatar": "/contestants/mygo/若亭.jpg",
+          "operatorPicks": []
         },
         {
           "id": "P4",
           "name": "雪月花",
-          "role": "收束位",
+          "role": "终局位",
           "theme": "探索者的银凇止境",
           "signatureOp": "待补充",
           "squad": "终局分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/mygo/雪月花.jpg"
+          "avatar": "/contestants/mygo/雪月花.jpg",
+          "operatorPicks": []
         }
       ]
     },
@@ -651,7 +792,7 @@
       "status": "READY",
       "totalScore": "0",
       "rank": 2,
-      "manifesto": "稳中求快，尽量把每一次资源消耗都换成稳定分数。",
+      "manifesto": "稳中求快，尽量把每一次希望和源石锭消耗都换成稳定分数。",
       "radarStats": [
         {
           "label": "执行力",
@@ -666,7 +807,7 @@
           "value": 87
         },
         {
-          "label": "资源控",
+          "label": "经济运营",
           "value": 83
         },
         {
@@ -674,7 +815,7 @@
           "value": 86
         },
         {
-          "label": "终局力",
+          "label": "终局收束",
           "value": 85
         }
       ],
@@ -682,22 +823,24 @@
         {
           "id": "P1",
           "name": "某大叔速水好",
-          "role": "先锋位",
+          "role": "开局位",
           "theme": "探索者的银凇止境",
           "signatureOp": "待补充",
           "squad": "主攻分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/天启四区士/某大叔速水好.jpg"
+          "avatar": "/contestants/天启四区士/某大叔速水好.jpg",
+          "operatorPicks": []
         },
         {
           "id": "P2",
           "name": "起步之志",
-          "role": "执行位",
+          "role": "推进位",
           "theme": "萨卡兹的无终奇语",
           "signatureOp": "待补充",
           "squad": "推进分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/天启四区士/起步之志.jpg"
+          "avatar": "/contestants/天启四区士/起步之志.jpg",
+          "operatorPicks": []
         },
         {
           "id": "P3",
@@ -707,17 +850,19 @@
           "signatureOp": "待补充",
           "squad": "运营分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/天启四区士/忍野忍不下去.jpg"
+          "avatar": "/contestants/天启四区士/忍野忍不下去.jpg",
+          "operatorPicks": []
         },
         {
           "id": "P4",
           "name": "拾壹月的鹤主",
-          "role": "收束位",
+          "role": "终局位",
           "theme": "探索者的银凇止境",
           "signatureOp": "待补充",
           "squad": "终局分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/天启四区士/拾壹月的鹤主.jpg"
+          "avatar": "/contestants/天启四区士/拾壹月的鹤主.jpg",
+          "operatorPicks": []
         }
       ]
     },
@@ -744,7 +889,7 @@
           "value": 84
         },
         {
-          "label": "资源控",
+          "label": "经济运营",
           "value": 82
         },
         {
@@ -752,7 +897,7 @@
           "value": 88
         },
         {
-          "label": "终局力",
+          "label": "终局收束",
           "value": 84
         }
       ],
@@ -760,22 +905,24 @@
         {
           "id": "P1",
           "name": "Aimer",
-          "role": "先锋位",
+          "role": "开局位",
           "theme": "探索者的银凇止境",
           "signatureOp": "待补充",
           "squad": "主攻分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/四驱兄弟想队名/Aimer.jpg"
+          "avatar": "/contestants/四驱兄弟想队名/Aimer.jpg",
+          "operatorPicks": []
         },
         {
           "id": "P2",
           "name": "朝霞",
-          "role": "执行位",
+          "role": "推进位",
           "theme": "萨卡兹的无终奇语",
           "signatureOp": "待补充",
           "squad": "推进分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/四驱兄弟想队名/朝霞.jpg"
+          "avatar": "/contestants/四驱兄弟想队名/朝霞.jpg",
+          "operatorPicks": []
         },
         {
           "id": "P3",
@@ -785,17 +932,19 @@
           "signatureOp": "待补充",
           "squad": "运营分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/四驱兄弟想队名/洛齐克.jpg"
+          "avatar": "/contestants/四驱兄弟想队名/洛齐克.jpg",
+          "operatorPicks": []
         },
         {
           "id": "P4",
           "name": "顾秦",
-          "role": "收束位",
+          "role": "终局位",
           "theme": "探索者的银凇止境",
           "signatureOp": "待补充",
           "squad": "终局分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/四驱兄弟想队名/顾秦.jpg"
+          "avatar": "/contestants/四驱兄弟想队名/顾秦.jpg",
+          "operatorPicks": []
         }
       ]
     },
@@ -807,7 +956,7 @@
       "status": "READY",
       "totalScore": "0",
       "rank": 4,
-      "manifesto": "保持稳定节奏，先拿到确定分，再冲击高收益路线。",
+      "manifesto": "保持稳定节奏，先拿到确定分，再冲击紧急作战高收益路线。",
       "radarStats": [
         {
           "label": "执行力",
@@ -822,7 +971,7 @@
           "value": 86
         },
         {
-          "label": "资源控",
+          "label": "经济运营",
           "value": 85
         },
         {
@@ -830,7 +979,7 @@
           "value": 83
         },
         {
-          "label": "终局力",
+          "label": "终局收束",
           "value": 82
         }
       ],
@@ -838,22 +987,24 @@
         {
           "id": "P1",
           "name": "归零",
-          "role": "先锋位",
+          "role": "开局位",
           "theme": "探索者的银凇止境",
           "signatureOp": "待补充",
           "squad": "主攻分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/草莓天下第一/归零.jpg"
+          "avatar": "/contestants/草莓天下第一/归零.jpg",
+          "operatorPicks": []
         },
         {
           "id": "P2",
           "name": "浪淘沙尽天涯",
-          "role": "执行位",
+          "role": "推进位",
           "theme": "萨卡兹的无终奇语",
           "signatureOp": "待补充",
           "squad": "推进分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/草莓天下第一/浪淘沙尽天涯.jpg"
+          "avatar": "/contestants/草莓天下第一/浪淘沙尽天涯.jpg",
+          "operatorPicks": []
         },
         {
           "id": "P3",
@@ -863,17 +1014,19 @@
           "signatureOp": "待补充",
           "squad": "运营分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/草莓天下第一/糖该葡萄糖.jpg"
+          "avatar": "/contestants/草莓天下第一/糖该葡萄糖.jpg",
+          "operatorPicks": []
         },
         {
           "id": "P4",
           "name": "言",
-          "role": "收束位",
+          "role": "终局位",
           "theme": "探索者的银凇止境",
           "signatureOp": "待补充",
           "squad": "终局分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/草莓天下第一/言.jpg"
+          "avatar": "/contestants/草莓天下第一/言.jpg",
+          "operatorPicks": []
         }
       ]
     },
@@ -885,7 +1038,7 @@
       "status": "READY",
       "totalScore": "0",
       "rank": 5,
-      "manifesto": "打法灵活但不失稳健，核心目标是每棒都打出下限保障。",
+      "manifesto": "打法灵活但不失稳健，核心目标是每棒都打出分数下限保障。",
       "radarStats": [
         {
           "label": "执行力",
@@ -900,7 +1053,7 @@
           "value": 88
         },
         {
-          "label": "资源控",
+          "label": "经济运营",
           "value": 80
         },
         {
@@ -908,7 +1061,7 @@
           "value": 85
         },
         {
-          "label": "终局力",
+          "label": "终局收束",
           "value": 84
         }
       ],
@@ -916,22 +1069,24 @@
         {
           "id": "P1",
           "name": "呃呃啊啊",
-          "role": "先锋位",
+          "role": "开局位",
           "theme": "探索者的银凇止境",
           "signatureOp": "待补充",
           "squad": "主攻分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/非人哉/呃呃啊啊.jpg"
+          "avatar": "/contestants/非人哉/呃呃啊啊.jpg",
+          "operatorPicks": []
         },
         {
           "id": "P2",
           "name": "last要楽奈丶",
-          "role": "执行位",
+          "role": "推进位",
           "theme": "萨卡兹的无终奇语",
           "signatureOp": "待补充",
           "squad": "推进分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/非人哉/last要楽奈丶.jpg"
+          "avatar": "/contestants/非人哉/last要楽奈丶.jpg",
+          "operatorPicks": []
         },
         {
           "id": "P3",
@@ -941,17 +1096,19 @@
           "signatureOp": "待补充",
           "squad": "运营分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/非人哉/圣人又土.jpg"
+          "avatar": "/contestants/非人哉/圣人又土.jpg",
+          "operatorPicks": []
         },
         {
           "id": "P4",
           "name": "海嗣",
-          "role": "收束位",
+          "role": "终局位",
           "theme": "探索者的银凇止境",
           "signatureOp": "待补充",
           "squad": "终局分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/非人哉/海嗣.jpg"
+          "avatar": "/contestants/非人哉/海嗣.jpg",
+          "operatorPicks": []
         }
       ]
     },
@@ -963,7 +1120,7 @@
       "status": "READY",
       "totalScore": "0",
       "rank": 6,
-      "manifesto": "以精确运营为主轴，确保关键节点的容错和收益最大化。",
+      "manifesto": "以精确运营为主轴，确保关键节点的容错和藏品收益最大化。",
       "radarStats": [
         {
           "label": "执行力",
@@ -978,7 +1135,7 @@
           "value": 82
         },
         {
-          "label": "资源控",
+          "label": "经济运营",
           "value": 86
         },
         {
@@ -986,7 +1143,7 @@
           "value": 84
         },
         {
-          "label": "终局力",
+          "label": "终局收束",
           "value": 83
         }
       ],
@@ -994,22 +1151,24 @@
         {
           "id": "P1",
           "name": "幻尘",
-          "role": "先锋位",
+          "role": "开局位",
           "theme": "探索者的银凇止境",
           "signatureOp": "待补充",
           "squad": "主攻分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/飞行雪绒/幻尘.jpg"
+          "avatar": "/contestants/飞行雪绒/幻尘.jpg",
+          "operatorPicks": []
         },
         {
           "id": "P2",
           "name": "快晴",
-          "role": "执行位",
+          "role": "推进位",
           "theme": "萨卡兹的无终奇语",
           "signatureOp": "待补充",
           "squad": "推进分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/飞行雪绒/快晴.jpg"
+          "avatar": "/contestants/飞行雪绒/快晴.jpg",
+          "operatorPicks": []
         },
         {
           "id": "P3",
@@ -1019,17 +1178,19 @@
           "signatureOp": "待补充",
           "squad": "运营分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/飞行雪绒/白身鱼.jpg"
+          "avatar": "/contestants/飞行雪绒/白身鱼.jpg",
+          "operatorPicks": []
         },
         {
           "id": "P4",
           "name": "魔法蜘蛛",
-          "role": "收束位",
+          "role": "终局位",
           "theme": "探索者的银凇止境",
           "signatureOp": "待补充",
           "squad": "终局分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/飞行雪绒/魔法蜘蛛.jpg"
+          "avatar": "/contestants/飞行雪绒/魔法蜘蛛.jpg",
+          "operatorPicks": []
         }
       ]
     },
@@ -1041,7 +1202,7 @@
       "status": "READY",
       "totalScore": "0",
       "rank": 7,
-      "manifesto": "以全局规划为先，强调路线决策、资源分配和终局收束协同。",
+      "manifesto": "以全局规划为先，强调路线决策、希望分配和终局收束协同。",
       "radarStats": [
         {
           "label": "执行力",
@@ -1056,7 +1217,7 @@
           "value": 84
         },
         {
-          "label": "资源控",
+          "label": "经济运营",
           "value": 89
         },
         {
@@ -1064,7 +1225,7 @@
           "value": 82
         },
         {
-          "label": "终局力",
+          "label": "终局收束",
           "value": 86
         }
       ],
@@ -1072,22 +1233,24 @@
         {
           "id": "P1",
           "name": "兔头无权为我授勋",
-          "role": "先锋位",
+          "role": "开局位",
           "theme": "探索者的银凇止境",
           "signatureOp": "待补充",
           "squad": "主攻分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/魔法战略的集成审判/兔头无权为我授勋.jpg"
+          "avatar": "/contestants/魔法战略的集成审判/兔头无权为我授勋.jpg",
+          "operatorPicks": []
         },
         {
           "id": "P2",
           "name": "布兰卡",
-          "role": "执行位",
+          "role": "推进位",
           "theme": "萨卡兹的无终奇语",
           "signatureOp": "待补充",
           "squad": "推进分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/魔法战略的集成审判/布兰卡.jpg"
+          "avatar": "/contestants/魔法战略的集成审判/布兰卡.jpg",
+          "operatorPicks": []
         },
         {
           "id": "P3",
@@ -1097,17 +1260,19 @@
           "signatureOp": "待补充",
           "squad": "运营分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/魔法战略的集成审判/淮南牛肉汤.jpg"
+          "avatar": "/contestants/魔法战略的集成审判/淮南牛肉汤.jpg",
+          "operatorPicks": []
         },
         {
           "id": "P4",
           "name": "酱香企鹅",
-          "role": "收束位",
+          "role": "终局位",
           "theme": "探索者的银凇止境",
           "signatureOp": "待补充",
           "squad": "终局分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/魔法战略的集成审判/酱香企鹅.jpg"
+          "avatar": "/contestants/魔法战略的集成审判/酱香企鹅.jpg",
+          "operatorPicks": []
         }
       ]
     }
@@ -1117,19 +1282,19 @@
       "id": "section-format",
       "slug": "format",
       "title": "赛制总览",
-      "intro": "本次比赛围绕铁人三项式的并行积分赛制展开，每队四人同时推进不同主题挑战。",
+      "intro": "本次比赛围绕铁人三项式的并行积分赛制展开，每队四人同时推进不同集成战略主题挑战。",
       "blocks": [
         {
           "title": "赛制说明",
           "paragraphs": [
-            "本次比赛采用铁人三项赛制，同队四位选手分别进行萨米、萨卡兹（“美愿”“死仇”）与界园主题的最高难度集成战略对局。",
-            "每队最终得分为所有选手结算分数之和，再乘上队伍总系数。"
+            "本次比赛采用铁人三项赛制，同队四位选手分别进行萨米、萨卡兹与界园主题的最高难度集成战略对局。",
+            "每队最终得分为所有选手结算分数之和，再乘上战队总系数。"
           ]
         },
         {
           "title": "作战窗口",
           "items": [
-            "每队共 14 小时作战时间，从每个选手最后一次烧水后开始计算，到进入结局关卡前为止。",
+            "每队共 14 小时作战时间，从每个选手最后一次烧水后开始计算，到进入结局关前为止。",
             "比赛将于 2026 年 3 月 8 日开赛，是否安排决赛视报名人数决定。"
           ]
         },
@@ -1150,19 +1315,18 @@
       "intro": "这些规则适用于所有队伍和全部主题，是首版赛事站必须完整公开的判定基础。",
       "blocks": [
         {
-          "title": "资源与协作限制",
+          "title": "希望与协作限制",
           "items": [
-            "每位六星干员在同一队伍的所有选手比赛中仅能被抓取一次，临时招募不计入次数。",
-            "商店取钱时全队共享余额，同队所有选手比赛前后减少的源石锭存款数量之和不得超过 200 点。",
-            "比赛期间可以存钱以增加余额。",
+            "每位六星干员在同一战队的所有选手比赛中仅能被招募一次，临时招募不计入次数。",
+            "商店取源石锭时全队共享余额，同队所有选手比赛前后减少的源石锭存款数量之和不得超过 200 点。",
             "比赛期间选手与队友之间可申请连麦，每场比赛总次数为 3 次，每次至多 3 分钟。",
-            "队内需指定一名抗压位，其最终得分 ×120%。"
+            "队内需指定一名抗压位，其最终结算分 ×120%。"
           ]
         },
         {
-          "title": "开局与重开",
+          "title": "开局与烧水",
           "items": [
-            "开局时不允许选择“获得额外收藏品”的开局奖励。",
+            "开局时不允许选择「获得额外藏品」的开局奖励。",
             "不允许使用部分分队与随心所欲组合开局，包括蓝图、神人队、roll 效果等分队。",
             "二层行动前可主动重开一次，萨米主题为三层行动前；可烧水至满意或更换账号重新开始，萨米职业队仅能更换账号。"
           ]
@@ -1181,27 +1345,27 @@
       "id": "section-theme-scoring",
       "slug": "theme-scoring",
       "title": "主题计分",
-      "intro": "三个主题各有独立的限制条件、关卡加分与最终倍率，请按分主题细读。",
+      "intro": "三个集成战略主题各有独立的限制条件、关卡加分与最终倍率，请按分主题细读。",
       "blocks": []
     },
     {
       "id": "section-coefficient",
       "slug": "coefficient",
       "title": "总分系数",
-      "intro": "所有主题分数汇总后，还会再经过队伍级系数修正。",
+      "intro": "所有主题分数汇总后，还会再经过战队级系数修正。",
       "blocks": [
         {
           "title": "计算公式",
           "paragraphs": [
-            "总分 = 四人分数和 × 系数。系数初始值为 1。"
+            "总分 = 四人结算分之和 × 系数。系数初始值为 1。"
           ]
         },
         {
           "title": "扣减项",
           "items": [
             "每超时 20 分钟，系数 -0.05。",
-            "每有一名重复选择的六星干员，系数 -0.1。",
-            "商店取钱每超出 1 块，系数 -0.01。"
+            "每有一名重复招募的六星干员，系数 -0.1。",
+            "商店取源石锭每超出 1 块，系数 -0.01。"
           ]
         }
       ]
@@ -1260,10 +1424,10 @@
           ]
         }
       ],
-      "finalMultiplier": "携带藏品“无垠赠礼”且至少通过五层 boss 时，本主题最终得分 ×120%。",
+      "finalMultiplier": "携带藏品「无垠赠礼」且至少通过五层 boss 时，本主题最终结算分 +70 分。",
       "notes": [
-        "同时持有“坍缩之种”“空间碎片”“深度灼痕”并通过 <时光之沙> 或 <迈入永恒> 后，额外 +50 分。",
-        "同时通过【直至冬夜降临】与【自深处的一瞥】的结局关卡时 +50 分；“234 连打”时改为 +150 分。"
+        "同时持有「坍缩之种」「空间碎片」「深度灼痕」并通过 <时光之沙> 或 <迈入永恒> 后，额外 +50 分。",
+        "同时通过【直至冬夜降临】与【自深处的一瞥】的结局关时 +50 分；234 连打时改为 +150 分。"
       ],
       "penalties": []
     },
@@ -1271,14 +1435,14 @@
       "id": "sarkaz",
       "name": "萨卡兹的无终奇语",
       "restrictions": [
-        "不允许选取藏品“无主的回忆”；违反时需丢弃以此法获得的思绪，且结算分 -17.5。",
-        "禁止在失与得节点选择“一个方盒”选项。",
-        "结算时藏品池中必须有“巴别塔誓言”，违反时 -500 分。"
+        "不允许选取藏品「无主的回忆」；违反时需丢弃以此法获得的思绪，且结算分 -17.5。",
+        "禁止在失与得节点选择「一个方盒」选项。",
+        "结算时藏品池中必须有「巴别塔誓言」，违反时 -500 分。"
       ],
       "baseScoring": [
         "临招 +50 / +20 / +10 分。",
-        "收藏品 +5 分 / 个。",
-        "本主题最终得分 ×75%。"
+        "藏品 +5 分 / 个。",
+        "本主题最终结算分 ×75%。"
       ],
       "scoreGroups": [
         {
@@ -1301,8 +1465,8 @@
         {
           "title": "五层 boss",
           "items": [
-            "未携带“阿纳萨羯磨”时：<思维矫正> +50 分，<朝谒> +50 分，<魂灵朝谒> +100 分；思绪混乱时额外 +20 分。",
-            "持有“阿纳萨羯磨”时：<思维矫正> +120 分且无漏 +80 分；<朝谒> +200 分；<魂灵朝谒> +300 分；思绪混乱时额外 +50 分。"
+            "未携带「阿纳萨羯磨」时：<思维矫正> +50 分，<朝谒> +50 分，<魂灵朝谒> +100 分；思绪混乱时额外 +20 分。",
+            "持有「阿纳萨羯磨」时：<思维矫正> +120 分且无漏 +80 分；<朝谒> +200 分；<魂灵朝谒> +300 分；思绪混乱时额外 +50 分。"
           ]
         },
         {
@@ -1316,17 +1480,17 @@
         {
           "title": "藏品联动修正",
           "items": [
-            "未持有阿纳萨羯磨时：携带“终结的骨架”则该关卡最终得分 ×60%；携带“终结的躯体”则该关卡最终得分 ×80%。",
-            "持有阿纳萨羯磨时：携带“终结的骨架”并无漏 +100 分；携带“终结的躯体”则最终得分 ×110%，无漏 +100 分；携带“终结的实相”则最终得分 ×150%，无漏 +150 分。",
-            "携带“滚动先祖”时，所有结局关卡最终得分 ×120%。"
+            "未持有阿纳萨羯磨时：携带「终结的骨架」则该关最终结算分 ×60%；携带「终结的躯体」则该关最终结算分 ×80%。",
+            "持有阿纳萨羯磨时：携带「终结的骨架」并无漏 +100 分；携带「终结的躯体」则最终结算分 ×110%，无漏 +100 分；携带「终结的实相」则最终结算分 ×150%，无漏 +150 分。",
+            "携带「滚动先祖」时，所有结局关最终结算分 ×120%。"
           ]
         }
       ],
       "finalMultiplier": "主题结算先应用关卡修正，再应用主题最终倍率 ×75%。",
       "notes": [],
       "penalties": [
-        "违反“无主的回忆”限制时，丢弃获得的思绪并在结算分中扣除 17.5 分。",
-        "缺少“巴别塔誓言”时，额外 -500 分。"
+        "违反「无主的回忆」限制时，丢弃获得的思绪并在结算分中扣除 17.5 分。",
+        "缺少「巴别塔誓言」时，额外 -500 分。"
       ]
     },
     {
@@ -1339,27 +1503,27 @@
         "结算时步数不得超过 150 步；违反任一条直接记为 0 分。"
       ],
       "baseScoring": [
-        "临时招募后：六星 +50 分，五星 +20 分，四星 +10 分。",
+        "临招后：六星 +50 分，五星 +20 分，四星 +10 分。",
         "每个藏品 +5 分，最多计算 120 个藏品，即 600 分。",
-        "持有“不息”得分 +20%，持有“不赦”得分 +20%，二者加算。"
+        "持有「不息」结算分 +20%，持有「不赦」结算分 +20%，二者加算。"
       ],
       "scoreGroups": [
         {
           "title": "常规关卡加分",
           "items": [
             "<夕娥忆> +30 分，<求道> +70 分，<仁·义·武> +50 分。",
-            "<破岁阵祀> +0 分；“小磨叽” +50 分；“忘生珍珑” +30 分；“云与漆” +30 分；“无封长盒” +50 分。",
-            "<昔字如烟> +150 分；“小磨叽” +100 分；“忘生珍珑” +50 分；“云与漆” +50 分；“无封长盒” +50 分。",
-            "<天数将易> +50 分；“小磨叽” +50 分；“忘生珍珑” +30 分。",
-            "<往昔难忆> +200 分；“小磨叽” +100 分；“忘生珍珑” +50 分。",
-            "<谋岁者> +200 分；“小磨叽” +50 分；“无封长盒” +50 分。",
-            "<末狩> +200 分；“小磨叽” +50 分；“忘生珍珑” +50 分。"
+            "<破岁阵祀> +0 分；「小磨叽」 +50 分；「忘生珍珑」 +30 分；「云与漆」 +30 分；「无封长盒」 +50 分。",
+            "<昔字如烟> +150 分；「小磨叽」 +100 分；「忘生珍珑」 +50 分；「云与漆」 +50 分；「无封长盒」 +50 分。",
+            "<天数将易> +50 分；「小磨叽」 +50 分；「忘生珍珑」 +30 分。",
+            "<往昔难忆> +200 分；「小磨叽」 +100 分；「忘生珍珑」 +50 分。",
+            "<谋岁者> +200 分；「小磨叽」 +50 分；「无封长盒」 +50 分。",
+            "<末狩> +200 分；「小磨叽」 +50 分；「忘生珍珑」 +50 分。"
           ]
         },
         {
           "title": "五结局作战加分",
           "items": [
-            "通关时持有“忘生珍珑” +100 分；持有“云与漆” +100 分；持有“无封长盒” +50 分。",
+            "通关时持有「忘生珍珑」 +100 分；持有「云与漆」 +100 分；持有「无封长盒」 +50 分。",
             "<定乾坤> +400 分，无漏额外 +200 分。",
             "（定本源）<定乾坤> +800 分，无漏额外 +200 分。",
             "（化镇抚）<止变> +800 分，无漏额外 +250 分。",
@@ -1367,7 +1531,7 @@
             "（改对弈）<止变> +800 分，无漏额外 +250 分。",
             "（塑旧历）<止变> +700 分，无漏额外 +200 分。",
             "（役群兽）<止变> +1200 分。",
-            "仅“役群兽”：无漏额外 +500 分；损失生命值在 (0, 5] 时 +300 分，在 (5, 50] 时 +200 分。"
+            "仅役群兽：无漏额外 +500 分；损失生命值在 (0, 5] 时 +300 分，在 (5, 50] 时 +200 分。"
           ]
         },
         {
@@ -1381,10 +1545,10 @@
           ]
         }
       ],
-      "finalMultiplier": "本主题最终得分 ×40%。",
+      "finalMultiplier": "本主题最终结算分 ×40%。",
       "notes": [
-        "若整局都未获得“追忆仪”，得分 -50%。",
-        "若整局都未获得“云与漆”与“无墨长卷”，得分 -50%。"
+        "若整局都未获得「追忆仪」，结算分 -50%。",
+        "若整局都未获得「云与漆」与「无墨长卷」，结算分 -50%。"
       ],
       "penalties": [
         "结算分需扣除超出 120 藏和 100 步在结算中的额外分数。",

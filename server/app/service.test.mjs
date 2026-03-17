@@ -1,7 +1,13 @@
 ﻿import test from "node:test";
 import assert from "node:assert/strict";
 import { createBackendService } from "./service.mjs";
-import { createEmptyPublicContent, createDefaultOpsState, createDefaultScoreSheetsState, buildTeamAggregate } from "./domain.mjs";
+import {
+  createEmptyPublicContent,
+  createDefaultOpsState,
+  createDefaultScoreSheetsState,
+  buildTeamAggregate,
+  tournamentConfig,
+} from "./domain.mjs";
 
 function createMemoryStore(initialValue) {
   let state = structuredClone(initialValue);
@@ -264,4 +270,109 @@ test("createCoachCall rejects over-limit duration and total count before mutatin
     const state = await opsStateStore.read();
     assert.equal(state.complianceByTeam["team-1"].coachCalls.length, 3);
   });
+});
+
+test("getPublicBootstrap keeps planned picks from public content and does not leak actual operator drafts", async () => {
+  const team = createTeam();
+  team.members[0].operatorPicks = [
+    {
+      id: "plan-1",
+      operatorName: "Plan-A",
+      rarity: 6,
+      createdAt: "2026-03-12T00:00:00.000Z",
+    },
+  ];
+  const operatorDrafts = Array.from({ length: 3 }, (_, index) => ({
+    id: `draft-${index + 1}`,
+    memberId: "m1",
+    operatorName: `Actual-${index + 1}`,
+    rarity: 6,
+    isTemporaryRecruit: false,
+    note: "",
+    createdAt: `2026-03-12T00:00:${String(index).padStart(2, "0")}.000Z`,
+  }));
+  const { service } = createServiceWithStores({
+    team,
+    compliance: { operatorDrafts },
+  });
+
+  const bootstrap = await service.getPublicBootstrap();
+  const member = bootstrap.teams[0].members.find((entry) => entry.id === "m1");
+
+  assert.ok(member);
+  assert.deepEqual(member.operatorPicks, team.members[0].operatorPicks);
+  assert.equal(member.operatorPicks[0].operatorName, "Plan-A");
+});
+
+test("createOperatorDraft rejects a 14th six-star on the same member", async () => {
+  const operatorDrafts = Array.from({ length: tournamentConfig.operatorDrafts.maxSixStarsPerMember }, (_, index) => ({
+    id: `draft-${index + 1}`,
+    memberId: "m1",
+    operatorName: `Op-${index + 1}`,
+    rarity: 6,
+    isTemporaryRecruit: false,
+    note: "",
+    createdAt: `2026-03-12T00:00:${String(index).padStart(2, "0")}.000Z`,
+  }));
+  const { service, opsStateStore } = createServiceWithStores({
+    compliance: { operatorDrafts },
+  });
+
+  await assert.rejects(
+    () => service.createOperatorDraft("team-1", {
+      memberId: "m1",
+      operatorName: "Overflow",
+      rarity: 6,
+      isTemporaryRecruit: false,
+      note: "",
+    }),
+    /already reached the 13 six-star operator limit/,
+  );
+
+  const state = await opsStateStore.read();
+  assert.equal(state.complianceByTeam["team-1"].operatorDrafts.length, tournamentConfig.operatorDrafts.maxSixStarsPerMember);
+});
+
+test("createPlannedPick stores a member's planned six-stars in public content only", async () => {
+  const team = createTeam();
+  const { service, publicContentStore, opsStateStore } = createServiceWithStores({ team });
+
+  const result = await service.createPlannedPick("team-1", "m1", {
+    operatorName: "能天使",
+    rarity: 6,
+  });
+
+  assert.equal(result.created.operatorName, "能天使");
+
+  const publicContent = await publicContentStore.read();
+  const member = publicContent.teams[0].members.find((entry) => entry.id === "m1");
+  assert.ok(member);
+  assert.equal(member.operatorPicks.length, 1);
+  assert.equal(member.operatorPicks[0].operatorName, "能天使");
+
+  const opsState = await opsStateStore.read();
+  assert.equal(opsState.complianceByTeam["team-1"].operatorDrafts.length, 0);
+});
+
+test("createPlannedPick rejects a 14th planned six-star on the same member", async () => {
+  const team = createTeam();
+  team.members[0].operatorPicks = Array.from({ length: tournamentConfig.operatorDrafts.maxSixStarsPerMember }, (_, index) => ({
+    id: `plan-${index + 1}`,
+    operatorName: `Plan-${index + 1}`,
+    rarity: 6,
+    createdAt: `2026-03-12T00:00:${String(index).padStart(2, "0")}.000Z`,
+  }));
+  const { service, publicContentStore } = createServiceWithStores({ team });
+
+  await assert.rejects(
+    () => service.createPlannedPick("team-1", "m1", {
+      operatorName: "Overflow",
+      rarity: 6,
+    }),
+    /already reached the 13 planned six-star operator limit/,
+  );
+
+  const publicContent = await publicContentStore.read();
+  const member = publicContent.teams[0].members.find((entry) => entry.id === "m1");
+  assert.equal(member.operatorPicks.length, tournamentConfig.operatorDrafts.maxSixStarsPerMember);
 });

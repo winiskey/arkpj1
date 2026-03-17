@@ -8,10 +8,19 @@ import { GSAPRouterTransition } from "./components/GSAPRouterTransition";
 import { MobileMenu } from "./components/MobileMenu";
 import { useSiteData } from "./context/SiteDataContext";
 import { SpatialNavbar } from "./components/SpatialNavbar";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const LivePage = lazy(() => import("./pages/LivePage").then((module) => ({ default: module.LivePage })));
 const RulesPage = lazy(() => import("./pages/RulesPage").then((module) => ({ default: module.RulesPage })));
 const TeamsPage = lazy(() => import("./pages/TeamsPage").then((module) => ({ default: module.TeamsPage })));
+
+const AdminLogin = lazy(() => import("./pages/admin/AdminLogin").then((m) => ({ default: m.AdminLogin })));
+const AdminLayout = lazy(() => import("./pages/admin/AdminLayout").then((m) => ({ default: m.AdminLayout })));
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard").then((m) => ({ default: m.AdminDashboard })));
+const ScoreManagement = lazy(() => import("./pages/admin/ScoreManagement").then((m) => ({ default: m.ScoreManagement })));
+const TeamManagement = lazy(() => import("./pages/admin/TeamManagement").then((m) => ({ default: m.TeamManagement })));
+const BroadcastControl = lazy(() => import("./pages/admin/BroadcastControl").then((m) => ({ default: m.BroadcastControl })));
+const ScoreCalculator = lazy(() => import("./pages/admin/ScoreCalculator").then((m) => ({ default: m.ScoreCalculator })));
 
 const navItems = [
   { to: "/", label: "首页" },
@@ -123,6 +132,14 @@ function AppShell() {
               <Route element={<LivePage />} path="/live" />
               <Route element={<TeamsPage />} path="/teams" />
               <Route element={<RulesPage />} path="/rules" />
+              <Route element={<AdminLogin />} path="/admin/login" />
+              <Route element={<ProtectedRoute><AdminLayout /></ProtectedRoute>} path="/admin">
+                <Route element={<AdminDashboard />} path="dashboard" />
+                <Route element={<ScoreManagement />} path="scores" />
+                <Route element={<TeamManagement />} path="teams" />
+                <Route element={<BroadcastControl />} path="broadcast" />
+                <Route element={<ScoreCalculator />} path="calculator" />
+              </Route>
             </Routes>
           </GSAPRouterTransition>
         </Suspense>

@@ -1,0 +1,26 @@
+import rawCatalog from "./operatorCatalog.json";
+import type { OperatorCatalogEntry } from "./types";
+
+const catalog = rawCatalog as OperatorCatalogEntry[];
+const collator = new Intl.Collator("zh-Hans-CN");
+
+export function normalizeOperatorName(value: string | null | undefined) {
+  return String(value ?? "")
+    .trim()
+    .replace(/\s+/g, "")
+    .toLowerCase();
+}
+
+export const operatorCatalog = [...catalog].sort(
+  (left, right) => right.rarity - left.rarity || collator.compare(left.name, right.name),
+);
+
+export const sixStarOperatorCatalog = operatorCatalog.filter((entry) => entry.rarity === 6);
+
+const catalogByName = new Map(
+  operatorCatalog.map((entry) => [normalizeOperatorName(entry.name), entry]),
+);
+
+export function findOperatorCatalogEntry(name: string | null | undefined) {
+  return catalogByName.get(normalizeOperatorName(name)) ?? null;
+}

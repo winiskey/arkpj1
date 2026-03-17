@@ -21,6 +21,9 @@ export const tournamentConfig = Object.freeze({
     requiredPressureRoleCount: 1,
     totalBattleHours: 14,
   },
+  operatorDrafts: {
+    maxSixStarsPerMember: 13,
+  },
   sharedIngots: {
     maxNetSpend: 200,
   },

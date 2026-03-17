@@ -46,6 +46,10 @@ function requireMember(team, memberId, label = "member") {
   return member;
 }
 
+function normalizeOperatorName(value) {
+  return String(value ?? "").trim().toLowerCase();
+}
+
 function applyCompliancePatch(team, compliance, patch) {
   if ("pressureMemberId" in patch) {
     if (patch.pressureMemberId !== null) {
@@ -347,6 +351,15 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
 
       const nextOpsState = await opsStateStore.update((state) => {
         const next = syncOpsStateWithTeams(publicContent, state);
+        const memberSixStarCount = next.complianceByTeam[team.id].operatorDrafts.filter(
+          (entry) => entry.memberId === payload.memberId && entry.rarity === 6,
+        ).length;
+        if (payload.rarity === 6 && memberSixStarCount >= tournamentConfig.operatorDrafts.maxSixStarsPerMember) {
+          throw new HttpError(
+            400,
+            `Member ${payload.memberId} already reached the ${tournamentConfig.operatorDrafts.maxSixStarsPerMember} six-star operator limit.`,
+          );
+        }
         next.complianceByTeam[team.id].operatorDrafts.push(nextDraft);
         next.complianceByTeam[team.id].updatedAt = timestamp();
         next.updatedAt = next.complianceByTeam[team.id].updatedAt;
@@ -357,6 +370,66 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
       return {
         created: nextDraft,
         summary: buildTeamComplianceSummary(team, rawCompliance),
+      };
+    },
+
+    async createPlannedPick(teamId, memberId, payload) {
+      const nextPick = {
+        id: randomUUID(),
+        operatorName: payload.operatorName.trim(),
+        rarity: payload.rarity,
+        createdAt: timestamp(),
+      };
+
+      const nextPublicContent = await publicContentStore.update((current) => {
+        const next = structuredClone(current ?? createEmptyPublicContent());
+        const team = requireTeam(next, teamId);
+        const member = requireMember(team, memberId, "planned pick member");
+        const existingPicks = Array.isArray(member.operatorPicks) ? member.operatorPicks : [];
+
+        if (existingPicks.some((entry) => normalizeOperatorName(entry.operatorName) === normalizeOperatorName(nextPick.operatorName))) {
+          throw new HttpError(400, `Member ${memberId} already planned ${nextPick.operatorName}.`);
+        }
+
+        const sixStarCount = existingPicks.filter((entry) => Number(entry.rarity) === 6).length;
+        if (nextPick.rarity === 6 && sixStarCount >= tournamentConfig.operatorDrafts.maxSixStarsPerMember) {
+          throw new HttpError(
+            400,
+            `Member ${memberId} already reached the ${tournamentConfig.operatorDrafts.maxSixStarsPerMember} planned six-star operator limit.`,
+          );
+        }
+
+        member.operatorPicks = [...existingPicks, nextPick];
+        return next;
+      });
+
+      const team = requireTeam(nextPublicContent, teamId);
+      const member = requireMember(team, memberId, "planned pick member");
+
+      return {
+        created: nextPick,
+        member,
+        team,
+      };
+    },
+
+    async deletePlannedPick(teamId, memberId, pickId) {
+      const nextPublicContent = await publicContentStore.update((current) => {
+        const next = structuredClone(current ?? createEmptyPublicContent());
+        const team = requireTeam(next, teamId);
+        const member = requireMember(team, memberId, "planned pick member");
+        const existingPicks = Array.isArray(member.operatorPicks) ? member.operatorPicks : [];
+        member.operatorPicks = existingPicks.filter((entry) => entry.id !== pickId);
+        return next;
+      });
+
+      const team = requireTeam(nextPublicContent, teamId);
+      const member = requireMember(team, memberId, "planned pick member");
+
+      return {
+        deletedId: pickId,
+        member,
+        team,
       };
     },
 

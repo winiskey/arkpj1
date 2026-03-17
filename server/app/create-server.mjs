@@ -17,6 +17,7 @@ import {
   validateLiveBroadcastPatch,
   validateMatchPatch,
   validateOperatorDraftPayload,
+  validatePlannedPickPayload,
   validatePublicContentPayload,
   validateScoreSheetQueryFilters,
   validateScoreSheetStatusPayload,
@@ -73,6 +74,25 @@ export function createApp(config) {
 
   router.register("GET", "/api/admin/calculator/bootstrap", withAdmin(async (context) => {
     context.sendJson(200, await service.getCalculatorBootstrap());
+  }));
+
+  router.register("POST", "/api/admin/calculator/solo", withAdmin(async (context) => {
+    const body = expectPlainObject(await context.readJson(), "soloCalcPayload");
+    const theme = body.theme;
+    const snapshot = body.snapshot;
+
+    if (typeof theme !== "string" || !["team", "sami", "sarkaz", "sui"].includes(theme)) {
+      context.sendError(400, `Invalid theme: ${theme}. Must be one of: team, sami, sarkaz, sui.`);
+      return;
+    }
+
+    if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) {
+      context.sendError(400, "snapshot must be a plain object.");
+      return;
+    }
+
+    const { calculateThemeScore } = await import("./scoring.mjs");
+    context.sendJson(200, calculateThemeScore(theme, snapshot));
   }));
 
   router.register("GET", "/api/admin/public-content", withAdmin(async (context) => {
@@ -140,6 +160,15 @@ export function createApp(config) {
   router.register("POST", "/api/admin/teams/:teamId/operators", withAdmin(async (context) => {
     const payload = validateOperatorDraftPayload(await context.readJson());
     context.sendJson(201, await service.createOperatorDraft(context.params.teamId, payload));
+  }));
+
+  router.register("POST", "/api/admin/teams/:teamId/members/:memberId/planned-picks", withAdmin(async (context) => {
+    const payload = validatePlannedPickPayload(await context.readJson());
+    context.sendJson(201, await service.createPlannedPick(context.params.teamId, context.params.memberId, payload));
+  }));
+
+  router.register("DELETE", "/api/admin/teams/:teamId/members/:memberId/planned-picks/:pickId", withAdmin(async (context) => {
+    context.sendJson(200, await service.deletePlannedPick(context.params.teamId, context.params.memberId, context.params.pickId));
   }));
 
   router.register("DELETE", "/api/admin/teams/:teamId/operators/:recordId", withAdmin(async (context) => {

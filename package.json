@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "api": "node server/index.mjs",
     "sync:content": "node scripts/export-content.mjs",
+    "sync:operators": "node scripts/sync-operator-catalog.mjs",
     "dev:all": "node scripts/dev-all.mjs"
   },
   "dependencies": {

@@ -339,7 +339,7 @@ function validateTeamMetric(value, name) {
 
 function validateTeamMember(value, name) {
   const object = expectPlainObject(value, name);
-  assertNoUnknownKeys(object, ["id", "name", "role", "theme", "signatureOp", "squad", "note", "avatar"], name);
+  assertNoUnknownKeys(object, ["id", "name", "role", "theme", "signatureOp", "squad", "note", "avatar", "operatorPicks"], name);
 
   const next = {
     id: expectString(object.id, `${name}.id`),
@@ -354,6 +354,20 @@ function validateTeamMember(value, name) {
   const avatar = expectOptionalString(object.avatar, `${name}.avatar`, { allowEmpty: true });
   if (avatar !== undefined) {
     next.avatar = avatar ? validateUrl(avatar, `${name}.avatar`, { allowRelative: true, allowEmpty: true }) : avatar;
+  }
+
+  if (object.operatorPicks !== undefined) {
+    next.operatorPicks = expectArray(object.operatorPicks, `${name}.operatorPicks`).map((entry, index) => {
+      const pick = expectPlainObject(entry, `${name}.operatorPicks[${index}]`);
+      assertNoUnknownKeys(pick, ["id", "operatorName", "rarity", "createdAt"], `${name}.operatorPicks[${index}]`);
+
+      return {
+        id: expectString(pick.id, `${name}.operatorPicks[${index}].id`),
+        operatorName: expectString(pick.operatorName, `${name}.operatorPicks[${index}].operatorName`, { allowEmpty: true }),
+        rarity: expectNumber(pick.rarity, `${name}.operatorPicks[${index}].rarity`, { integer: true, min: 0 }),
+        createdAt: expectString(pick.createdAt, `${name}.operatorPicks[${index}].createdAt`, { allowEmpty: true }),
+      };
+    });
   }
 
   return next;
@@ -579,6 +593,21 @@ export function validateOperatorDraftPayload(payload) {
         ? false
         : expectBoolean(object.isTemporaryRecruit, "operatorDraft.isTemporaryRecruit"),
     note: object.note === undefined ? "" : expectString(object.note, "operatorDraft.note", { allowEmpty: true }),
+  };
+}
+
+export function validatePlannedPickPayload(payload) {
+  const object = expectPlainObject(payload, "plannedPick");
+  assertNoUnknownKeys(object, ["operatorName", "rarity"], "plannedPick");
+
+  const rarity = object.rarity === undefined ? 6 : expectNumber(object.rarity, "plannedPick.rarity", { integer: true, min: 1 });
+  if (rarity !== 6) {
+    throw new Error("plannedPick.rarity must be 6.");
+  }
+
+  return {
+    operatorName: expectString(object.operatorName, "plannedPick.operatorName"),
+    rarity,
   };
 }
 

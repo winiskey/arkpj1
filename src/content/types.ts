@@ -96,6 +96,13 @@ export interface TeamMetric {
   value: number;
 }
 
+export interface TeamMemberOperatorPick {
+  id: string;
+  operatorName: string;
+  rarity: number;
+  createdAt: string;
+}
+
 export interface TeamMemberProfile {
   id: string;
   name: string;
@@ -105,6 +112,7 @@ export interface TeamMemberProfile {
   squad: string;
   note: string;
   avatar?: string;
+  operatorPicks?: TeamMemberOperatorPick[];
 }
 
 export interface Team {
