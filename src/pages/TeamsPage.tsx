@@ -74,6 +74,7 @@ export function TeamsPage() {
     data: { teams },
   } = useSiteData();
   const [selectedTeamId, setSelectedTeamId] = useState(teams[0]?.id ?? "");
+  const [expandedMemberId, setExpandedMemberId] = useState<string | null>(null);
 
   const logoRef = useParallaxLogo();
 
@@ -110,6 +111,11 @@ export function TeamsPage() {
       setSelectedTeamId(teams[0]?.id ?? "");
     }
   }, [selectedTeamId, teams]);
+
+  // 切换队伍时重置展开的选手
+  useEffect(() => {
+    setExpandedMemberId(null);
+  }, [selectedTeamId]);
 
   if (!selectedTeam) {
     return null;
@@ -232,52 +238,84 @@ export function TeamsPage() {
                     </div>
                   </div>
 
-                  <div className="mt-8 grid gap-4">
+                  <div className="mt-8 grid gap-3">
                     {selectedTeam.members.map((member) => {
                       const picks = (member.operatorPicks ?? []).slice(0, MAX_MEMBER_SIX_STAR_PICKS);
                       const duplicateCount = picks.filter((pick) => selectedTeamDuplicatePickNames.has(normalizeOperatorName(pick.operatorName))).length;
+                      const isExpanded = expandedMemberId === member.id;
 
                       return (
-                        <div key={`${member.id}-pick-board`} className="rounded-[28px] border border-white/6 bg-white/[0.03] p-4 md:p-5">
-                          <div className="flex flex-wrap items-start justify-between gap-3">
-                            <div>
-                              <div className="font-title text-2xl font-black tracking-[0.03em] text-white/88">{member.name}</div>
-                              <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.16em]">
-                                <span className="rounded-full border border-brand/20 bg-brand/10 px-3 py-1 text-brand">{member.role}</span>
-                                <span className="rounded-full border border-white/8 bg-white/[0.04] px-3 py-1 text-white/40">{member.theme}</span>
-                                {duplicateCount ? (
-                                  <span className="rounded-full border border-live/30 bg-live/15 px-3 py-1 text-live">重复 {duplicateCount}</span>
-                                ) : null}
+                        <div key={`${member.id}-pick-board`} className={[
+                          "rounded-[28px] border transition-[border-color,background-color] duration-300",
+                          isExpanded
+                            ? "border-brand/25 bg-brand/5"
+                            : "border-white/6 bg-white/[0.03] hover:border-white/12 hover:bg-white/[0.05]",
+                        ].join(" ")}>
+                          {/* 可点击 Header */}
+                          <button
+                            type="button"
+                            className="w-full cursor-pointer p-4 md:p-5 text-left"
+                            onClick={() => setExpandedMemberId(isExpanded ? null : member.id)}
+                          >
+                            <div className="flex flex-wrap items-center justify-between gap-3">
+                              <div className="flex flex-wrap items-center gap-3">
+                                <div className="font-title text-2xl font-black tracking-[0.03em] text-white/88">{member.name}</div>
+                                <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.16em]">
+                                  <span className="rounded-full border border-brand/20 bg-brand/10 px-3 py-1 text-brand">{member.role}</span>
+                                  <span className="rounded-full border border-white/8 bg-white/[0.04] px-3 py-1 text-white/40">{member.theme}</span>
+                                  {duplicateCount ? (
+                                    <span className="rounded-full border border-live/30 bg-live/15 px-3 py-1 text-live">重复 {duplicateCount}</span>
+                                  ) : null}
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-3">
+                                <div className="rounded-[20px] border border-white/8 bg-black/20 px-4 py-3 text-right">
+                                  <div className="font-display text-[10px] uppercase tracking-[0.16em] text-white/30">规划进度</div>
+                                  <div className={`mt-1 font-display text-2xl font-black tracking-[0.03em] ${isExpanded ? "text-brand" : "text-white/60"}`}>
+                                    {picks.length}/{MAX_MEMBER_SIX_STAR_PICKS}
+                                  </div>
+                                </div>
+                                {/* 展开/折叠箭头 */}
+                                <div className={[
+                                  "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition-[transform,border-color,background-color] duration-300",
+                                  isExpanded
+                                    ? "rotate-180 border-brand/30 bg-brand/15 text-brand"
+                                    : "border-white/10 bg-white/[0.04] text-white/40",
+                                ].join(" ")}>
+                                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2 4L6 8L10 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                                  </svg>
+                                </div>
                               </div>
                             </div>
+                          </button>
 
-                            <div className="rounded-[20px] border border-white/8 bg-black/20 px-4 py-3 text-right">
-                              <div className="font-display text-[10px] uppercase tracking-[0.16em] text-white/30">规划进度</div>
-                              <div className="mt-1 font-display text-2xl font-black tracking-[0.03em] text-brand">
-                                {picks.length}/{MAX_MEMBER_SIX_STAR_PICKS}
+                          {/* 可折叠的抓位格区域 */}
+                          {isExpanded && (
+                            <div className="px-4 pb-4 md:px-5 md:pb-5">
+                              <div className="border-t border-white/8 pt-4">
+                                <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 lg:grid-cols-7">
+                                  {Array.from({ length: MAX_MEMBER_SIX_STAR_PICKS }, (_, index) => {
+                                    const pick = picks[index];
+                                    return (
+                                      <OperatorPickSlot
+                                        duplicate={pick ? selectedTeamDuplicatePickNames.has(normalizeOperatorName(pick.operatorName)) : false}
+                                        key={`${member.id}-pick-slot-${index}`}
+                                        operatorName={pick?.operatorName}
+                                        order={index + 1}
+                                      />
+                                    );
+                                  })}
+                                </div>
+                                <div className="mt-3 text-[11px] text-white/35">
+                                  {picks.length
+                                    ? `已规划 ${picks.length} 位六星${duplicateCount ? `，其中 ${duplicateCount} 位触发同队重复提醒` : "，当前无同队重复"}。`
+                                    : "当前还没有公开的赛前抓位规划。"}
+                                </div>
                               </div>
                             </div>
-                          </div>
-
-                          <div className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-5 lg:grid-cols-7">
-                            {Array.from({ length: MAX_MEMBER_SIX_STAR_PICKS }, (_, index) => {
-                              const pick = picks[index];
-                              return (
-                                <OperatorPickSlot
-                                  duplicate={pick ? selectedTeamDuplicatePickNames.has(normalizeOperatorName(pick.operatorName)) : false}
-                                  key={`${member.id}-pick-slot-${index}`}
-                                  operatorName={pick?.operatorName}
-                                  order={index + 1}
-                                />
-                              );
-                            })}
-                          </div>
-
-                          <div className="mt-3 text-[11px] text-white/35">
-                            {picks.length
-                              ? `已规划 ${picks.length} 位六星${duplicateCount ? `，其中 ${duplicateCount} 位触发同队重复提醒` : "，当前无同队重复"}。`
-                              : "当前还没有公开的赛前抓位规划。"}
-                          </div>
+                          )}
                         </div>
                       );
                     })}

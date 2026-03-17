@@ -12,11 +12,11 @@ import { ToastProvider } from "./ToastContext";
 import { clearAdminToken } from "./useAdminApi";
 
 const navItems = [
-  { to: "/admin/dashboard", label: "数据总览", icon: LayoutDashboard },
-  { to: "/admin/scores", label: "成绩录入", icon: FileText },
+  { to: "/admin/dashboard", label: "赛事总览", icon: LayoutDashboard },
+  { to: "/admin/scores", label: "成绩审核", icon: FileText },
   { to: "/admin/teams", label: "战队管理", icon: Users },
   { to: "/admin/broadcast", label: "直播控制", icon: Radio },
-  { to: "/admin/calculator", label: "单人算分", icon: Calculator },
+  { to: "/admin/calculator", label: "单人计分器", icon: Calculator },
 ];
 
 export function AdminLayout() {
@@ -35,7 +35,7 @@ export function AdminLayout() {
           <aside className="relative flex w-64 flex-col border-r border-strokeSoft bg-surface1">
             {/* Brand */}
             <div className="p-6">
-              <h1 className="font-title text-xl font-bold text-brand">管理后台</h1>
+              <h1 className="font-title text-xl font-bold text-brand">赛事管控台</h1>
               <p className="mt-1 text-xs text-text3">荆楚歌 #2</p>
             </div>
 

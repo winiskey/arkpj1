@@ -7,7 +7,7 @@ import type { BroadcastStatus } from "./types";
 const STATUS_OPTIONS: { value: BroadcastStatus; label: string }[] = [
   { value: "LIVE", label: "直播中" },
   { value: "UPCOMING", label: "即将开始" },
-  { value: "OFFLINE", label: "已离线" },
+  { value: "OFFLINE", label: "已结束" },
 ];
 
 export function BroadcastControl() {
@@ -56,7 +56,7 @@ export function BroadcastControl() {
         notice: formNotice,
       });
       await refresh();
-      setSaveMsg({ type: "ok", text: "直播状态已更新" });
+      setSaveMsg({ type: "ok", text: "已同步到前端，刷新首页可预览效果" });
     } catch (err) {
       setSaveMsg({ type: "err", text: err instanceof Error ? err.message : "保存失败" });
     } finally {
@@ -75,8 +75,8 @@ export function BroadcastControl() {
             <Radio className="h-6 w-6 text-live" />
           </div>
           <div>
-            <h2 className="font-semibold text-text1">直播状态管理</h2>
-            <p className="text-sm text-text3">更新赛事直播信息</p>
+            <h2 className="font-semibold text-text1">推流状态</h2>
+            <p className="text-sm text-text3">下方信息将实时同步至前端首页的直播入口卡片</p>
           </div>
         </div>
 
@@ -84,13 +84,15 @@ export function BroadcastControl() {
         <div className="mb-4">
           <label className="mb-2 block text-sm font-medium text-text2">状态</label>
           <select
+            title="直播状态"
+            aria-label="直播状态"
             value={formStatus}
             onChange={(e) => setFormStatus(e.target.value as BroadcastStatus)}
             className="w-full rounded-lg border border-strokeSoft bg-surface3 px-4 py-3 text-text1 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
           >
             {STATUS_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
-                {opt.label} ({opt.value})
+                {opt.label}
               </option>
             ))}
           </select>
@@ -104,7 +106,7 @@ export function BroadcastControl() {
             value={formTitle}
             onChange={(e) => setFormTitle(e.target.value)}
             className="w-full rounded-lg border border-strokeSoft bg-surface3 px-4 py-3 text-text1 focus:border-brand focus:outline-none"
-            placeholder="直播标题"
+            placeholder="例：荆楚歌 #2 决赛日直播"
           />
         </div>
 
@@ -116,7 +118,7 @@ export function BroadcastControl() {
             value={formSubtitle}
             onChange={(e) => setFormSubtitle(e.target.value)}
             className="w-full rounded-lg border border-strokeSoft bg-surface3 px-4 py-3 text-text1 focus:border-brand focus:outline-none"
-            placeholder="副标题"
+            placeholder="例：A组 vs B组 半决赛"
           />
         </div>
 
@@ -128,15 +130,18 @@ export function BroadcastControl() {
             value={formHref}
             onChange={(e) => setFormHref(e.target.value)}
             className="w-full rounded-lg border border-strokeSoft bg-surface3 px-4 py-3 text-text1 focus:border-brand focus:outline-none"
-            placeholder="https://..."
+            placeholder="例：https://live.bilibili.com/123456"
           />
         </div>
 
         {/* Room Label */}
         <div className="mb-4">
-          <label className="mb-2 block text-sm font-medium text-text2">房间号 / 标签</label>
+          <label className="mb-2 block text-sm font-medium text-text2">平台标签</label>
           <input
             type="text"
+            title="平台标签"
+            aria-label="平台标签"
+            placeholder="例：直播间名称或ID"
             value={formRoomLabel}
             onChange={(e) => setFormRoomLabel(e.target.value)}
             className="w-full rounded-lg border border-strokeSoft bg-surface3 px-4 py-3 text-text1 focus:border-brand focus:outline-none"
@@ -145,8 +150,11 @@ export function BroadcastControl() {
 
         {/* Notice */}
         <div className="mb-4">
-          <label className="mb-2 block text-sm font-medium text-text2">公告 / 通知</label>
+          <label className="mb-2 block text-sm font-medium text-text2">首页横幅公告</label>
           <textarea
+            title="首页横幅公告"
+            aria-label="首页横幅公告"
+            placeholder="输入可以在首页轮播展示的公告信息…"
             value={formNotice}
             onChange={(e) => setFormNotice(e.target.value)}
             rows={2}
@@ -158,8 +166,8 @@ export function BroadcastControl() {
         {saveMsg && (
           <div
             className={`mb-4 rounded-lg border px-4 py-3 text-sm ${saveMsg.type === "ok"
-                ? "border-brand/20 bg-brand/10 text-brand"
-                : "border-live/20 bg-live/10 text-live"
+              ? "border-brand/20 bg-brand/10 text-brand"
+              : "border-live/20 bg-live/10 text-live"
               }`}
           >
             {saveMsg.text}
@@ -171,7 +179,7 @@ export function BroadcastControl() {
           disabled={saving}
           className="w-full rounded-lg bg-brand px-4 py-3 font-medium text-canvas transition-all hover:bg-brandStrong disabled:opacity-50"
         >
-          {saving ? "更新中..." : "更新状态"}
+          {saving ? "同步中…" : "保存并同步到前端"}
         </button>
       </form>
     </div>

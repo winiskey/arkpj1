@@ -28,9 +28,9 @@ export function TeamManagement() {
     <div className="p-8">
       <div className="mb-6 flex items-start justify-between">
         <div>
-          <h1 className="font-title text-3xl font-bold text-text1">战队与合规管理</h1>
+          <h1 className="font-title text-3xl font-bold text-text1">战队管理</h1>
           <p className="mt-1 text-sm text-text3">
-            共 {teams.length} 支队伍 · {teams.filter(t => t.status !== "PENDING").length} 已发布
+            共 {teams.length} 支队伍 · {teams.filter(t => t.status !== "PENDING").length} 支已发布成绩
           </p>
         </div>
       </div>
@@ -55,14 +55,14 @@ export function TeamManagement() {
                       {team.id}
                     </span>
                     {team.sample && (
-                      <span className="rounded border border-brand/30 bg-brand/10 px-2 py-0.5 text-xs text-brand">测试</span>
+                      <span className="rounded border border-brand/30 bg-brand/10 px-2 py-0.5 text-xs text-brand">样本队伍</span>
                     )}
                   </div>
                   {aggregate && (
                     <div className="mt-1.5 flex items-center gap-4 text-sm">
-                      <span className="text-text2">基础分: {Math.round(aggregate.rawTotal)}</span>
+                      <span className="text-text2">基础总分: {Math.round(aggregate.rawTotal)}</span>
                       <span className="text-text2">合规系数: {(aggregate.coefficient * 100).toFixed(1)}%</span>
-                      <span className="font-bold text-brand">最终结算: {Math.round(aggregate.finalTotal)}</span>
+                      <span className="font-bold text-brand">最终得分: {Math.round(aggregate.finalTotal)}</span>
                     </div>
                   )}
                 </div>
@@ -71,15 +71,15 @@ export function TeamManagement() {
                   {/* Status Indicator */}
                   {aggregate && aggregate.publishBlockingIssues.length > 0 ? (
                     <span className="flex items-center gap-1.5 text-sm text-live">
-                      <ShieldAlert className="h-4 w-4" /> 有 {aggregate.publishBlockingIssues.length} 项前置阻拦
+                      <ShieldAlert className="h-4 w-4" /> 有 {aggregate.publishBlockingIssues.length} 项必须解决的问题
                     </span>
                   ) : aggregate && aggregate.warnings.length > 0 ? (
                     <span className="flex items-center gap-1.5 text-sm text-brand">
-                      <AlertTriangle className="h-4 w-4" /> 存在警告
+                      <AlertTriangle className="h-4 w-4" /> 有 {aggregate.warnings.length} 项提醒
                     </span>
                   ) : (
                     <span className="flex items-center gap-1.5 text-sm text-green-400">
-                      <CheckCircle className="h-4 w-4" /> 数据就绪
+                      <CheckCircle className="h-4 w-4" /> 可以发布
                     </span>
                   )}
 
@@ -134,7 +134,7 @@ function TeamCompliancePanel({
   const toast = useToast();
 
   const handlePublish = async () => {
-    if (!confirm(`确定要发布或重新计算 ${team.name} 的最终成绩吗？`)) return;
+    if (!confirm(`将为「${team.name}」计算最终成绩并发布到前端排行榜，确定继续吗？`)) return;
     setPublishing(true);
     try {
       await publishTeam(team.id);
@@ -160,24 +160,24 @@ function TeamCompliancePanel({
     <div className="grid gap-8 lg:grid-cols-12">
       {/* LEFT COLUMN: Settings & Forms */}
       <div className="lg:col-span-8">
-        <h4 className="mb-4 text-sm font-semibold text-text1">规则数据录入</h4>
+        <h4 className="mb-4 text-sm font-semibold text-text1">合规参数</h4>
 
         <div className="grid gap-4 md:grid-cols-2">
           {/* Card: Pressure Role & Overtime */}
           <div className="rounded-xl border border-strokeSoft bg-surface2 p-4">
             <div className="mb-4 flex items-center gap-2 font-medium text-brand">
-              <Users className="h-4 w-4" /> 队伍参数
+              <Users className="h-4 w-4" /> 比赛基本参数
             </div>
 
             <div className="mb-3">
-              <label className="mb-1.5 block text-xs text-text2">抗压位 (Pressure Role)</label>
+              <label className="mb-1.5 block text-xs text-text2">抗压位选手</label>
               <select
                 aria-label="抗压位选择"
                 className="w-full rounded border border-strokeSoft bg-surface3 px-3 py-1.5 text-sm outline-none focus:border-brand"
                 value={compliance.roster.pressureMemberId ?? ""}
                 onChange={(e) => handlePatch("pressureMemberId", e.target.value || null)}
               >
-                <option value="">-- 未设置 --</option>
+                <option value="">未指定抗压位</option>
                 {team.members.map(m => (
                   <option key={m.id} value={m.id}>{m.name}</option>
                 ))}
@@ -185,7 +185,7 @@ function TeamCompliancePanel({
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs text-text2">赛事总超时 (分钟)</label>
+              <label className="mb-1.5 block text-xs text-text2">全队总超时时长（分钟）</label>
               <input
                 type="number"
                 aria-label="赛事超时分钟数"
@@ -193,18 +193,18 @@ function TeamCompliancePanel({
                 value={compliance.overtime.minutes}
                 onChange={(e) => handlePatch("overtimeMinutes", parseInt(e.target.value) || 0)}
               />
-              <div className="mt-1 text-[10px] text-text3">目前扣除: {compliance.coefficientBreakdown.overtime.delta * 100}%</div>
+              <div className="mt-1 text-[10px] text-text3">当前超时扣分系数：{compliance.coefficientBreakdown.overtime.delta * 100}%</div>
             </div>
           </div>
 
           {/* Card: Ingots */}
           <div className="rounded-xl border border-strokeSoft bg-surface2 p-4">
             <div className="mb-4 flex items-center gap-2 font-medium text-brand">
-              <Coins className="h-4 w-4" /> 共享源石锭商店
+              <Coins className="h-4 w-4" /> 源石锭使用情况
             </div>
 
             <div className="mb-3">
-              <label className="mb-1.5 block text-xs text-text2">初始源石锭总额</label>
+              <label className="mb-1.5 block text-xs text-text2">初始额度</label>
               <input
                 type="number"
                 aria-label="初始源石锭总额"
@@ -215,7 +215,7 @@ function TeamCompliancePanel({
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs text-text2">比赛结束剩余总额</label>
+              <label className="mb-1.5 block text-xs text-text2">赛后余额</label>
               <input
                 type="number"
                 aria-label="剩余源石锭总额"
@@ -225,9 +225,9 @@ function TeamCompliancePanel({
               />
             </div>
             <div className="mt-1 flex justify-between text-[10px]">
-              <span className="text-text3">实际消耗: {compliance.sharedIngots.spent} 锭</span>
+              <span className="text-text3">已消耗：{compliance.sharedIngots.spent}</span>
               <span className={compliance.sharedIngots.withinLimit ? "text-green-400" : "text-live"}>
-                目前扣除: {compliance.coefficientBreakdown.extraShopSpend.delta * 100}%
+                超额消费扣分系数: {compliance.coefficientBreakdown.extraShopSpend.delta * 100}%
               </span>
             </div>
           </div>
@@ -235,7 +235,7 @@ function TeamCompliancePanel({
           {/* Card: Coach Calls */}
           <div className="rounded-xl border border-strokeSoft bg-surface2 p-4 md:col-span-2">
             <div className="mb-4 flex items-center gap-2 font-medium text-brand">
-              <PhoneCall className="h-4 w-4" /> 教练连麦记录
+              <PhoneCall className="h-4 w-4" /> 教练连麦
             </div>
 
             <CoachCallManager team={team} compliance={compliance} refresh={refresh} />
@@ -244,7 +244,7 @@ function TeamCompliancePanel({
           {/* Card: Planned Picks */}
           <div className="rounded-xl border border-strokeSoft bg-surface2 p-4 md:col-span-2">
             <div className="mb-4 flex items-center gap-2 font-medium text-brand">
-              <ScrollText className="h-4 w-4" /> 赛前抓位规划 (前端展示)
+              <ScrollText className="h-4 w-4" /> 赛前公示计划（前端可见）
             </div>
 
             <PlannedPickManager team={team} refresh={refresh} />
@@ -253,7 +253,7 @@ function TeamCompliancePanel({
           {/* Card: Operator Drafts */}
           <div className="rounded-xl border border-strokeSoft bg-surface2 p-4 md:col-span-2">
             <div className="mb-4 flex items-center gap-2 font-medium text-brand">
-              <ScrollText className="h-4 w-4" /> 实际六星抓取记录 (后端记分)
+              <ScrollText className="h-4 w-4" /> 实际持有干员（参与积分计算）
             </div>
 
             <OperatorDraftManager team={team} compliance={compliance} refresh={refresh} />
@@ -263,20 +263,20 @@ function TeamCompliancePanel({
 
       {/* RIGHT COLUMN: Validation & Publish Workflow */}
       <div className="lg:col-span-4">
-        <h4 className="mb-4 text-sm font-semibold text-text1">发布前预检与总结</h4>
+        <h4 className="mb-4 text-sm font-semibold text-text1">发布检查</h4>
 
         <div className="mb-4 rounded-xl border border-strokeSoft bg-surface2 p-4">
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-text2">当前结果</div>
+          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-text2">成绩预览</div>
           <div className="flex items-center justify-between border-b border-strokeSoft pb-2 text-sm">
-            <span className="text-text2">总基础分:</span>
+            <span className="text-text2">基础总分:</span>
             <span className="font-mono text-text1">{aggregate.rawTotal.toFixed(2)}</span>
           </div>
           <div className="flex items-center justify-between border-b border-strokeSoft py-2 text-sm">
-            <span className="text-text2">最终合规系数:</span>
+            <span className="text-text2">合规系数:</span>
             <span className="font-mono text-brand">{(aggregate.coefficient * 100).toFixed(1)}%</span>
           </div>
           <div className="flex items-center justify-between pt-2 text-base font-bold">
-            <span className="text-text1">最终成绩:</span>
+            <span className="text-text1">最终得分:</span>
             <span className="font-mono text-brand">{aggregate.finalTotal.toFixed(2)}</span>
           </div>
         </div>
@@ -284,7 +284,7 @@ function TeamCompliancePanel({
         {aggregate.publishBlockingIssues.length > 0 && (
           <div className="mb-4 rounded-lg bg-live/10 p-4 border border-live/20">
             <div className="mb-2 flex items-center gap-2 text-sm font-bold text-live">
-              <ShieldAlert className="h-4 w-4" /> 阻断问题 (无法发布)
+              <ShieldAlert className="h-4 w-4" /> 🚫 以下问题阻止发布
             </div>
             <ul className="list-inside list-disc text-sm text-live/80 marker:text-live/50">
               {aggregate.publishBlockingIssues.map((iss, i) => (
@@ -297,7 +297,7 @@ function TeamCompliancePanel({
         {aggregate.warnings.length > 0 && (
           <div className="mb-6 rounded-lg bg-brand/10 p-4 border border-brand/20">
             <div className="mb-2 flex items-center gap-2 text-sm font-bold text-brand">
-              <AlertTriangle className="h-4 w-4" /> 警告信息
+              <AlertTriangle className="h-4 w-4" /> ⚠ 提醒事项
             </div>
             <ul className="list-inside list-disc text-sm text-brand/80 marker:text-brand/50">
               {aggregate.warnings.map((warn, i) => (
@@ -313,9 +313,9 @@ function TeamCompliancePanel({
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-4 py-3 font-medium text-canvas transition-colors hover:bg-brandStrong disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <UploadCloud className="h-5 w-5" />
-          {publishing ? "操作中..." : team.status === "PENDING" ? "确认发布成绩" : "重新计算并更新"}
+          {publishing ? "操作中..." : team.status === "PENDING" ? "确认发布到前端" : "重新计算并更新排行"}
         </button>
-        <p className="mt-2 text-center text-xs text-text3">发布后直接展示在公开前端排行榜。</p>
+        <p className="mt-2 text-center text-xs text-text3">发布后成绩将立即更新至前端排行榜，观众可即时看到。</p>
       </div>
     </div>
   );
@@ -356,21 +356,21 @@ function CoachCallManager({ team, compliance, refresh }: any) {
     <div>
       <div className="mb-3 flex items-end gap-2">
         <div className="flex-1">
-          <label className="mb-1 block text-[10px] text-text3">申请人</label>
+          <label className="mb-1 block text-[10px] text-text3">发起方</label>
           <select aria-label="连麦申请人" value={caller} onChange={e => setCaller(e.target.value)} className="w-full rounded border border-strokeSoft bg-surface3 px-2 py-1 text-xs outline-none focus:border-brand">
             <option value="">选择选手</option>
             {team.members.map((m: any) => <option key={m.id} value={m.id}>{m.name}</option>)}
           </select>
         </div>
         <div className="flex-1">
-          <label className="mb-1 block text-[10px] text-text3">目标选手</label>
+          <label className="mb-1 block text-[10px] text-text3">接听方</label>
           <select aria-label="连麦目标选手" value={target} onChange={e => setTarget(e.target.value)} className="w-full rounded border border-strokeSoft bg-surface3 px-2 py-1 text-xs outline-none focus:border-brand">
             <option value="">选择选手</option>
             {team.members.map((m: any) => <option key={m.id} value={m.id}>{m.name}</option>)}
           </select>
         </div>
         <div className="w-20">
-          <label className="mb-1 block text-[10px] text-text3">用时(分)</label>
+          <label className="mb-1 block text-[10px] text-text3">时长(分)</label>
           <input type="number" aria-label="连麦用时分钟" value={mins} onChange={e => setMins(parseInt(e.target.value) || 0)} className="w-full rounded border border-strokeSoft bg-surface3 px-2 py-1 text-xs outline-none focus:border-brand" />
         </div>
         <button onClick={handleAdd} className="rounded bg-surface3 px-3 py-1 text-xs font-semibold text-text1 hover:bg-strokeSoft">添加</button>
@@ -385,7 +385,7 @@ function CoachCallManager({ team, compliance, refresh }: any) {
           return (
             <div key={c.id} className="flex items-center justify-between rounded bg-surface3 px-2 py-1.5 text-xs">
               <span className={isOver ? "text-live" : "text-text2"}>
-                {m1}申请呼叫{m2} ({c.durationMinutes}分钟) {isOver && "(违规超长)"}
+                {m1} → {m2} 连麦 {c.durationMinutes} 分钟 {isOver && "⚠ 超时"}
               </span>
               <button onClick={() => handleRemove(c.id)} aria-label="删除连麦记录" className="text-text3 hover:text-live"><Trash2 className="h-3 w-3" /></button>
             </div>
@@ -581,7 +581,7 @@ function PlannedPickManager({
       </div>
 
       <div className="mb-3 rounded-xl border border-white/6 bg-canvas/40 px-3 py-2 text-[11px] text-text3">
-        这里维护的是前端展示用的赛前计划抓位，不会影响比赛中实际抓到的后端记录。
+        本区域管理展示给观众的赛前计划，不影响实际积分计算。如需修改参与计分的干员记录，请在下方「实际持有干员」区域操作。
       </div>
 
       <div className="mb-3 grid gap-2 sm:grid-cols-3">

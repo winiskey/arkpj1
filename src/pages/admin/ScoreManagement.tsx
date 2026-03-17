@@ -11,8 +11,8 @@ const THEME_LABELS: Record<ThemeCode, string> = {
 };
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  draft: { label: "草稿", color: "text-text3" },
-  final: { label: "终审", color: "text-brand" },
+  draft: { label: "待审", color: "text-text3" },
+  final: { label: "已锁定", color: "text-brand" },
   published: { label: "已发布", color: "text-green-400" },
 };
 
@@ -66,9 +66,9 @@ export function ScoreManagement() {
     <div className="p-8">
       <div className="mb-6 flex items-start justify-between">
         <div>
-          <h1 className="font-title text-3xl font-bold text-text1">成绩管理</h1>
+          <h1 className="font-title text-3xl font-bold text-text1">成绩审核</h1>
           <p className="mt-1 text-sm text-text3">
-            共 {sheets.length} 份成绩单 · {sheets.filter((s) => s.status === "final").length} 已终审 · {sheets.filter((s) => s.status === "draft").length} 草稿
+            共 {sheets.length} 份成绩单 · {sheets.filter((s) => s.status === "final").length} 已锁定 · {sheets.filter((s) => s.status === "draft").length} 待审核
           </p>
         </div>
 
@@ -78,14 +78,13 @@ export function ScoreManagement() {
           className="flex items-center gap-2 rounded-lg bg-brand/10 px-4 py-2.5 text-sm font-medium text-brand transition-colors hover:bg-brand/20"
         >
           <FileText className="h-4 w-4" />
-          打开计分终端录入成绩
+          前往单人计分器 →
         </a>
       </div>
 
       {/* Info banner */}
       <div className="mb-6 rounded-xl border border-brand/20 bg-brand/5 p-4 text-sm text-text2">
-        <strong className="text-brand">💡 工作流程：</strong>在「计分终端」中录入选手的详细成绩数据并提交
-        → 成绩单会出现在本页面 → 审核后将成绩单状态从「草稿」提升为「终审」→ 最后在「战队管理」页发布整队成绩。
+        <strong className="text-brand">💡 操作流程：</strong>① 在「单人计分器」中录入选手比赛数据 → ② 提交后成绩单出现在本页 → ③ 确认无误点击「锁定」→ ④ 最后在「战队管理」页发布整队成绩。
       </div>
 
       {/* Feedback */}
@@ -129,8 +128,8 @@ export function ScoreManagement() {
           className="rounded-lg border border-strokeSoft bg-surface3 px-3 py-2 text-sm text-text1 focus:border-brand focus:outline-none"
         >
           <option value="">全部状态</option>
-          <option value="draft">草稿</option>
-          <option value="final">终审</option>
+          <option value="draft">待审</option>
+          <option value="final">已锁定</option>
           <option value="published">已发布</option>
         </select>
       </div>
@@ -140,7 +139,7 @@ export function ScoreManagement() {
         <div className="rounded-xl border border-strokeSoft bg-surface2 p-12 text-center text-text3">
           <FileText className="mx-auto mb-3 h-12 w-12 opacity-30" />
           <p>暂无成绩单{filterTeam || filterTheme || filterStatus ? "（当前筛选条件下）" : ""}</p>
-          <p className="mt-2 text-xs">前往「计分终端」录入成绩</p>
+          <p className="mt-2 text-xs">在「单人计分器」中录入选手数据后，成绩单将自动出现在此处</p>
         </div>
       ) : (
         <div className="overflow-hidden rounded-xl border border-strokeSoft">
@@ -149,7 +148,7 @@ export function ScoreManagement() {
               <tr>
                 <th className="px-4 py-3 text-left">战队 / 选手</th>
                 <th className="px-4 py-3 text-left">主题</th>
-                <th className="px-4 py-3 text-right">预览分</th>
+                <th className="px-4 py-3 text-right">预计得分</th>
                 <th className="px-4 py-3 text-left">公式</th>
                 <th className="px-4 py-3 text-center">状态</th>
                 <th className="px-4 py-3 text-center">更新时间</th>
@@ -209,9 +208,9 @@ export function ScoreManagement() {
                             disabled={isUpdating}
                             onClick={() => handleStatusChange(sheet, "final")}
                             className="rounded-md bg-brand/10 px-3 py-1.5 text-xs font-medium text-brand transition-colors hover:bg-brand/20 disabled:opacity-50"
-                            title="终审确认"
+                            title="锁定成绩不可修改"
                           >
-                            {isUpdating ? "..." : "终审"}
+                            {isUpdating ? "..." : "锁定"}
                           </button>
                         )}
                         {sheet.status === "final" && (
@@ -219,9 +218,9 @@ export function ScoreManagement() {
                             disabled={isUpdating}
                             onClick={() => handleStatusChange(sheet, "draft")}
                             className="rounded-md bg-live/10 px-3 py-1.5 text-xs font-medium text-live transition-colors hover:bg-live/20 disabled:opacity-50"
-                            title="退回草稿"
+                            title="退回待审状态"
                           >
-                            {isUpdating ? "..." : "退回"}
+                            {isUpdating ? "..." : "退回待审"}
                           </button>
                         )}
                       </div>

@@ -45,14 +45,14 @@ export function AdminDashboard() {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="font-title text-3xl font-bold text-text1">仪表盘</h1>
-        <p className="mt-1 text-sm text-text3">赛事管理总览</p>
+        <h1 className="font-title text-3xl font-bold text-text1">赛事总览</h1>
+        <p className="mt-1 text-sm text-text3">实时查看所有队伍的录分、审核与发布进度</p>
       </div>
 
       {/* ── KPI Cards Grid ─────────────────────────────────────── */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard icon={Users} label="参赛战队" value={teams.length} sub={`${totalMembers} 名选手 · ${teamsReady.length} 就绪`} accent="brand" />
-        <StatCard icon={FileText} label="已终审成绩单" value={finalSheets.length} sub={`${draftSheets.length} 草稿中 · 共 ${sheets.length} 份`} accent="brand" />
+        <StatCard icon={Users} label="参赛战队" value={teams.length} sub={`${totalMembers} 名选手 · ${teamsReady.length} 支可发布`} accent="brand" />
+        <StatCard icon={FileText} label="已锁定成绩单" value={finalSheets.length} sub={`${draftSheets.length} 待审核 · 共 ${sheets.length} 份`} accent="brand" />
         <StatCard icon={BarChart3} label="已发布队伍" value={publishedTeams.length} sub={`共 ${teams.length} 队`} accent="brand" />
         <StatCard icon={Radio} label="直播状态" value={broadcast.status} sub={broadcast.title || "—"} accent={broadcast.status === "LIVE" ? "live" : "brand"} />
       </div>
@@ -60,18 +60,18 @@ export function AdminDashboard() {
       {/* ── Scoring Progress ────────────────────────────────────── */}
       <div className="mt-8 grid gap-6 md:grid-cols-2">
         <div className="rounded-2xl border border-strokeSoft bg-surface2 p-6 shadow-panel">
-          <h3 className="mb-4 text-sm font-semibold text-text1">录分进度</h3>
-          <ProgressRow label="已录分" current={scoredMembers} total={totalMembers} pct={scoreProgress} color="bg-brand" />
-          <ProgressRow label="已终审" current={finalizedMembers} total={totalMembers} pct={finalizeProgress} color="bg-green-500" />
+          <h3 className="mb-4 text-sm font-semibold text-text1">整体进度追踪</h3>
+          <ProgressRow label="已录入" current={scoredMembers} total={totalMembers} pct={scoreProgress} color="bg-brand" />
+          <ProgressRow label="已锁定" current={finalizedMembers} total={totalMembers} pct={finalizeProgress} color="bg-green-500" />
           <ProgressRow label="已发布" current={publishedMembers} total={totalMembers} pct={totalMembers > 0 ? Math.round((publishedMembers / totalMembers) * 100) : 0} color="bg-amber-500" />
         </div>
         <div className="rounded-2xl border border-strokeSoft bg-surface2 p-6 shadow-panel">
           <h3 className="mb-4 text-sm font-semibold text-text1">快捷操作</h3>
           <div className="flex flex-col gap-3">
-            <QuickLink href="/admin/calculator" label="打开计分终端" desc="录入选手成绩数据" />
-            <QuickLink href="/admin/scores" label="成绩管理" desc="审核/终审成绩单" />
-            <QuickLink href="/admin/teams" label="战队管理" desc="设置合规参数并发布成绩" />
-            <QuickLink href="/admin/broadcast" label="直播控制" desc="管理赛事直播信息" />
+            <QuickLink href="/admin/calculator" label="打开单人计分器" desc="为单个选手录入比赛数据并提交" />
+            <QuickLink href="/admin/scores" label="成绩审核" desc="审核成绩单，确认无误后锁定" />
+            <QuickLink href="/admin/teams" label="战队管理" desc="管理合规数据，准备就绪后发布整队成绩" />
+            <QuickLink href="/admin/broadcast" label="直播控制" desc="更新直播状态与推流信息" />
           </div>
         </div>
       </div>
@@ -81,7 +81,7 @@ export function AdminDashboard() {
         <div className="mt-8">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-text1">
             <AlertTriangle className="h-5 w-5 text-live" />
-            合规阻塞问题
+            ⚠ 发布阻塞项 — 以下问题必须解决后才能发布
           </h2>
           <div className="grid gap-3 md:grid-cols-2">
             {teamsWithIssues.map((c) => (
@@ -103,17 +103,17 @@ export function AdminDashboard() {
         <div className="mt-8">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-text1">
             <CheckCircle className="h-5 w-5 text-brand" />
-            战队积分概览
+            各队成绩排行
           </h2>
           <div className="overflow-hidden rounded-xl border border-strokeSoft">
             <table className="w-full text-sm">
               <thead className="bg-surface2 text-text3">
                 <tr>
                   <th className="px-4 py-3 text-left">战队</th>
-                  <th className="px-4 py-3 text-right">录分</th>
-                  <th className="px-4 py-3 text-right">原始分</th>
-                  <th className="px-4 py-3 text-right">系数</th>
-                  <th className="px-4 py-3 text-right">最终分</th>
+                  <th className="px-4 py-3 text-right">进度</th>
+                  <th className="px-4 py-3 text-right">基础总分</th>
+                  <th className="px-4 py-3 text-right">合规系数</th>
+                  <th className="px-4 py-3 text-right">最终得分</th>
                   <th className="px-4 py-3 text-center">状态</th>
                 </tr>
               </thead>
@@ -142,7 +142,7 @@ export function AdminDashboard() {
                         {agg.publishBlockingIssues.length > 0 ? (
                           <span className="inline-flex items-center gap-1 rounded-full bg-live/10 px-2 py-0.5 text-xs text-live">
                             <AlertTriangle className="h-3 w-3" />
-                            {agg.publishBlockingIssues.length} 问题
+                            {agg.publishBlockingIssues.length} 项阻塞
                           </span>
                         ) : agg.publishReady ? (
                           <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-0.5 text-xs text-green-400">
@@ -152,7 +152,7 @@ export function AdminDashboard() {
                         ) : (
                           <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2 py-0.5 text-xs text-brand">
                             <CheckCircle className="h-3 w-3" />
-                            进行中
+                            录分中
                           </span>
                         )}
                       </td>
