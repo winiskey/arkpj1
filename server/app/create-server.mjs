@@ -9,6 +9,7 @@ import {
 } from "./domain.mjs";
 import { createRequestContext, handlePreflight, HttpError, Router } from "./http.mjs";
 import { createJsonFileStore } from "./json-file-store.mjs";
+import { calculateThemeScore } from "./scoring.mjs";
 import { createBackendService } from "./service.mjs";
 import {
   expectPlainObject,
@@ -21,6 +22,7 @@ import {
   validatePublicContentPayload,
   validateScoreSheetQueryFilters,
   validateScoreSheetStatusPayload,
+  validateSoloCalcPayload,
 } from "./validators.mjs";
 
 function withAdmin(handler) {
@@ -77,21 +79,7 @@ export function createApp(config) {
   }));
 
   router.register("POST", "/api/admin/calculator/solo", withAdmin(async (context) => {
-    const body = expectPlainObject(await context.readJson(), "soloCalcPayload");
-    const theme = body.theme;
-    const snapshot = body.snapshot;
-
-    if (typeof theme !== "string" || !["team", "sami", "sarkaz", "sui"].includes(theme)) {
-      context.sendError(400, `Invalid theme: ${theme}. Must be one of: team, sami, sarkaz, sui.`);
-      return;
-    }
-
-    if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) {
-      context.sendError(400, "snapshot must be a plain object.");
-      return;
-    }
-
-    const { calculateThemeScore } = await import("./scoring.mjs");
+    const { theme, snapshot } = validateSoloCalcPayload(await context.readJson());
     context.sendJson(200, calculateThemeScore(theme, snapshot));
   }));
 
@@ -185,6 +173,7 @@ export function createApp(config) {
   }));
 
   const server = http.createServer(async (request, response) => {
+    const start = Date.now();
     const context = createRequestContext({ request, response, config });
 
     try {
@@ -208,6 +197,9 @@ export function createApp(config) {
 
       console.error("Unhandled backend error", error);
       context.sendError(500, error instanceof Error ? error.message : "Internal server error.");
+    } finally {
+      const duration = Date.now() - start;
+      console.log(`${request.method} ${context.url.pathname} ${response.statusCode} ${duration}ms`);
     }
   });
 

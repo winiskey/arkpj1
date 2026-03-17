@@ -4,6 +4,7 @@ import {
   calculateSamiScore,
   calculateSarkazScore,
   calculateSuiScore,
+  calculateTeamScore,
 } from "./scoring.mjs";
 
 test("calculateSamiScore applies ending bonuses and final multiplier", () => {
@@ -96,4 +97,33 @@ test("calculateSuiScore applies item bonuses and overflow deductions before the 
   assert.equal(result.multiplier, 0.48);
   assert.equal(result.previewScore, 801.6);
   assert.equal(result.formulaText, "(1670.00 x 0.48)");
+});
+
+test("calculateTeamScore sums four player scores", () => {
+  const result = calculateTeamScore({
+    "team-p1": 100,
+    "team-p2": 200,
+    "team-p3": 300,
+    "team-p4": 400,
+  });
+
+  assert.equal(result.previewScore, 1000);
+  assert.equal(result.rawScore, 1000);
+  assert.equal(result.multiplier, 1);
+  assert.equal(result.formulaText, "团队总分 = 1000.00");
+});
+
+test("calculateTeamScore applies 1.2x pressure multiplier to selected player", () => {
+  const result = calculateTeamScore({
+    "team-p1": 100,
+    "team-p2": 200,
+    "team-p3": 300,
+    "team-p4": 400,
+    "team-pressure": 3,
+  });
+
+  // Player 3's 300 × 1.2 = 360, total = 100 + 200 + 360 + 400 = 1060
+  assert.equal(result.previewScore, 1060);
+  assert.equal(result.rawScore, 1060);
+  assert.equal(result.formulaText, "团队总分 = 1060.00");
 });

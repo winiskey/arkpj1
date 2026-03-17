@@ -27,5 +27,6 @@ export function getServerConfig() {
     bodyLimitBytes: parsePositiveInteger(process.env.API_BODY_LIMIT_BYTES, 1024 * 1024),
     corsOrigins: parseOrigins(process.env.API_CORS_ORIGINS),
     adminToken: String(process.env.ADMIN_TOKEN ?? "").trim(),
+    prettyJson: process.env.NODE_ENV !== "production",
   };
 }

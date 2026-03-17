@@ -299,7 +299,28 @@ export function calculateSuiScore(snapshot) {
   });
 }
 
+export function calculateTeamScore(snapshot) {
+  const scores = [
+    getNumber(snapshot, "team-p1"),
+    getNumber(snapshot, "team-p2"),
+    getNumber(snapshot, "team-p3"),
+    getNumber(snapshot, "team-p4"),
+  ];
+
+  const pressure = getNumber(snapshot, "team-pressure");
+  if (pressure >= 1 && pressure <= 4) {
+    scores[pressure - 1] *= 1.2;
+  }
+
+  const total = scores.reduce((a, b) => a + b, 0);
+  return buildResult(total, `团队总分 = ${formatNumber(total)}`, {
+    rawScore: roundScore(total),
+    multiplier: 1,
+  });
+}
+
 export function calculateThemeScore(theme, snapshot) {
+  if (theme === "team") return calculateTeamScore(snapshot);
   if (theme === "sami") return calculateSamiScore(snapshot);
   if (theme === "sarkaz") return calculateSarkazScore(snapshot);
   if (theme === "sui") return calculateSuiScore(snapshot);

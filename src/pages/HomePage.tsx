@@ -57,10 +57,10 @@ export function HomePage() {
     {
       label: "参赛队伍",
       value: String(teams.length).padStart(2, "0"),
-      detail: "已完成队伍档案同步",
+      detail: "已完成阵容同步",
     },
     {
-      label: "主题线路",
+      label: "肉鸽主题",
       value: String(themeRules.length).padStart(2, "0"),
       detail: "计分与限制规则并行",
     },
@@ -162,7 +162,7 @@ export function HomePage() {
                     </div>
                     <div>
                       <div className="font-title text-2xl font-bold text-white/90 transition-colors group-hover:text-white">队伍情报</div>
-                      <div className="mt-1.5 font-display text-[11px] tabular-nums uppercase tracking-[0.2em] text-white/40">{String(teams.length).padStart(2, "0")} 支队伍档案同步</div>
+                      <div className="mt-1.5 font-display text-[11px] tabular-nums uppercase tracking-[0.2em] text-white/40">{String(teams.length).padStart(2, "0")} 支队伍阵容同步</div>
                     </div>
                   </div>
                   <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/30 text-white/40 transition-[background-color,color] duration-300 group-hover:bg-brand/20 group-hover:text-brand">
@@ -183,7 +183,7 @@ export function HomePage() {
                     </div>
                     <div>
                       <div className="font-title text-2xl font-bold text-white/90 transition-colors group-hover:text-white">赛事手册</div>
-                      <div className="mt-1.5 font-display text-[11px] tabular-nums uppercase tracking-[0.2em] text-white/40">{String(themeRules.length).padStart(2, "0")} 条主题线路复核</div>
+                      <div className="mt-1.5 font-display text-[11px] tabular-nums uppercase tracking-[0.2em] text-white/40">{String(themeRules.length).padStart(2, "0")} 条肉鸽主题规则</div>
                     </div>
                   </div>
                   <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/30 text-white/40 transition-[background-color,color] duration-300 group-hover:bg-brand/20 group-hover:text-brand">

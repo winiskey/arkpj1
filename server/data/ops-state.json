@@ -1,28 +1,28 @@
 {
   "version": 1,
-  "updatedAt": "2026-03-10T05:25:52.300Z",
+  "updatedAt": "2026-03-16T13:12:17.397Z",
   "complianceByTeam": {
     "mygo": {
       "teamId": "mygo",
-      "pressureMemberId": null,
+      "pressureMemberId": "P1",
       "openingIngots": 0,
       "currentIngots": 0,
       "overtimeMinutes": 0,
       "operatorDrafts": [],
       "coachCalls": [],
       "notes": [],
-      "updatedAt": "2026-03-10T01:14:23.517254Z"
+      "updatedAt": "2026-03-16T10:48:49.614Z"
     },
     "tianqi-siqushi": {
       "teamId": "tianqi-siqushi",
-      "pressureMemberId": null,
+      "pressureMemberId": "P1",
       "openingIngots": 0,
       "currentIngots": 0,
       "overtimeMinutes": 0,
       "operatorDrafts": [],
       "coachCalls": [],
       "notes": [],
-      "updatedAt": "2026-03-10T01:14:23.517254Z"
+      "updatedAt": "2026-03-16T13:12:17.397Z"
     },
     "siqu-brothers": {
       "teamId": "siqu-brothers",

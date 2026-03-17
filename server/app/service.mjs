@@ -13,6 +13,8 @@ import {
   findScoreSheet,
   findTeam,
   listScoreSheets,
+  normalizeOperatorName,
+  nowIso,
   replaceAllSheetsForTeamPublish,
   syncOpsStateWithTeams,
   syncScoreSheetsState,
@@ -24,9 +26,7 @@ import {
 import { HttpError } from "./http.mjs";
 import { calculateThemeScore } from "./scoring.mjs";
 
-function timestamp() {
-  return new Date().toISOString();
-}
+
 
 function requireTeam(publicContent, teamId) {
   const team = findTeam(publicContent, teamId);
@@ -46,9 +46,6 @@ function requireMember(team, memberId, label = "member") {
   return member;
 }
 
-function normalizeOperatorName(value) {
-  return String(value ?? "").trim().toLowerCase();
-}
 
 function applyCompliancePatch(team, compliance, patch) {
   if ("pressureMemberId" in patch) {
@@ -74,7 +71,7 @@ function applyCompliancePatch(team, compliance, patch) {
     compliance.notes = patch.notes;
   }
 
-  compliance.updatedAt = timestamp();
+  compliance.updatedAt = nowIso();
 }
 
 export function createBackendService({ publicContentStore, opsStateStore, scoreSheetsStore }) {
@@ -98,8 +95,7 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
     },
 
     async getPublicBootstrap() {
-      const { publicContent } = await readSystemState();
-      return publicContent;
+      return publicContentStore.read();
     },
 
     async getAdminBootstrap() {
@@ -229,7 +225,7 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
     },
 
     async getScoreSheets(filters) {
-      const { scoreSheetsState } = await readSystemState();
+      const scoreSheetsState = syncScoreSheetsState(await scoreSheetsStore.read());
 
       if (filters.teamId && filters.memberId && filters.theme) {
         const sheetFilters = {
@@ -293,11 +289,11 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
       const sheet = nextPayload.id
         ? findScoreSheet(nextScoreSheetsState, { id: nextPayload.id })
         : findScoreSheet(nextScoreSheetsState, {
-            teamId: nextPayload.teamId,
-            memberId: nextPayload.memberId,
-            theme: nextPayload.theme,
-            matchId: nextPayload.matchId ?? null,
-          });
+          teamId: nextPayload.teamId,
+          memberId: nextPayload.memberId,
+          theme: nextPayload.theme,
+          matchId: nextPayload.matchId ?? null,
+        });
 
       return {
         sheet,
@@ -310,19 +306,20 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
     },
 
     async updateScoreSheetStatus(sheetId, status) {
-      const existingState = syncScoreSheetsState(await scoreSheetsStore.read());
-      const existingSheet = findScoreSheet(existingState, { id: sheetId });
-      if (!existingSheet) {
-        throw new HttpError(404, `Score sheet ${sheetId} was not found.`);
-      }
-
-      const nextScoreSheetsState = await scoreSheetsStore.update((state) =>
-        updateScoreSheetStatus(state, sheetId, status).state,
-      );
+      let teamId;
+      const nextScoreSheetsState = await scoreSheetsStore.update((state) => {
+        const synced = syncScoreSheetsState(state);
+        const existing = findScoreSheet(synced, { id: sheetId });
+        if (!existing) {
+          throw new HttpError(404, `Score sheet ${sheetId} was not found.`);
+        }
+        teamId = existing.teamId;
+        return updateScoreSheetStatus(state, sheetId, status).state;
+      });
       const sheet = findScoreSheet(nextScoreSheetsState, { id: sheetId });
 
       const { publicContent, opsState } = await readSystemState();
-      const team = requireTeam(publicContent, existingSheet.teamId);
+      const team = requireTeam(publicContent, teamId);
 
       return {
         sheet,
@@ -346,7 +343,7 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
         rarity: payload.rarity,
         isTemporaryRecruit: payload.isTemporaryRecruit,
         note: payload.note,
-        createdAt: timestamp(),
+        createdAt: nowIso(),
       };
 
       const nextOpsState = await opsStateStore.update((state) => {
@@ -361,7 +358,7 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
           );
         }
         next.complianceByTeam[team.id].operatorDrafts.push(nextDraft);
-        next.complianceByTeam[team.id].updatedAt = timestamp();
+        next.complianceByTeam[team.id].updatedAt = nowIso();
         next.updatedAt = next.complianceByTeam[team.id].updatedAt;
         return next;
       });
@@ -378,7 +375,7 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
         id: randomUUID(),
         operatorName: payload.operatorName.trim(),
         rarity: payload.rarity,
-        createdAt: timestamp(),
+        createdAt: nowIso(),
       };
 
       const nextPublicContent = await publicContentStore.update((current) => {
@@ -441,7 +438,7 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
         const next = syncOpsStateWithTeams(publicContent, state);
         const compliance = next.complianceByTeam[team.id];
         compliance.operatorDrafts = compliance.operatorDrafts.filter((entry) => entry.id !== recordId);
-        compliance.updatedAt = timestamp();
+        compliance.updatedAt = nowIso();
         next.updatedAt = compliance.updatedAt;
         return next;
       });
@@ -469,7 +466,7 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
         targetMemberId: payload.targetMemberId,
         durationMinutes: payload.durationMinutes,
         note: payload.note,
-        createdAt: timestamp(),
+        createdAt: nowIso(),
       };
 
       const nextOpsState = await opsStateStore.update((state) => {
@@ -479,7 +476,7 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
           throw new HttpError(400, "Coach call count exceeds the rule limit.");
         }
         next.complianceByTeam[team.id].coachCalls.push(nextCall);
-        next.complianceByTeam[team.id].updatedAt = timestamp();
+        next.complianceByTeam[team.id].updatedAt = nowIso();
         next.updatedAt = next.complianceByTeam[team.id].updatedAt;
         return next;
       });
@@ -499,7 +496,7 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
         const next = syncOpsStateWithTeams(publicContent, state);
         const compliance = next.complianceByTeam[team.id];
         compliance.coachCalls = compliance.coachCalls.filter((entry) => entry.id !== recordId);
-        compliance.updatedAt = timestamp();
+        compliance.updatedAt = nowIso();
         next.updatedAt = compliance.updatedAt;
         return next;
       });

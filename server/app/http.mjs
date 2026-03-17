@@ -38,7 +38,8 @@ export function sendJson(response, request, config, statusCode, payload) {
 
   applyCorsHeaders(headers, request, config);
   response.writeHead(statusCode, headers);
-  response.end(`${JSON.stringify(payload, null, 2)}\n`);
+  const indent = config.prettyJson !== false ? 2 : undefined;
+  response.end(`${JSON.stringify(payload, null, indent)}\n`);
 }
 
 export function sendNoContent(response, request, config) {

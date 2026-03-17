@@ -2,6 +2,11 @@
 import { createApp } from "./app/create-server.mjs";
 
 const config = getServerConfig();
+
+if (!config.adminToken) {
+  console.warn("⚠️  ADMIN_TOKEN is not set. Admin endpoints are UNPROTECTED.");
+}
+
 const { server, service } = createApp(config);
 
 await service.ensureReady();
@@ -14,3 +19,10 @@ server.on("error", (error) => {
 server.listen(config.port, config.host, () => {
   console.log(`Ark backend listening on http://${config.host}:${config.port}`);
 });
+
+for (const signal of ["SIGTERM", "SIGINT"]) {
+  process.on(signal, () => {
+    console.log(`Received ${signal}, shutting down…`);
+    server.close(() => process.exit(0));
+  });
+}

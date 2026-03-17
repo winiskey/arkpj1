@@ -665,3 +665,14 @@ export function validateScoreSheetQueryFilters(filters) {
 
   return next;
 }
+
+export function validateSoloCalcPayload(payload) {
+  const object = expectPlainObject(payload, "soloCalcPayload");
+  const theme = expectString(object.theme, "soloCalcPayload.theme");
+  if (!["team", ...THEME_CODES].includes(theme)) {
+    throw new Error(`soloCalcPayload.theme must be one of: team, ${THEME_CODES.join(", ")}.`);
+  }
+
+  const snapshot = expectPlainObject(object.snapshot, "soloCalcPayload.snapshot");
+  return { theme, snapshot };
+}

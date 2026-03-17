@@ -45,7 +45,7 @@ export const tournamentConfig = Object.freeze({
   },
 });
 
-function nowIso() {
+export function nowIso() {
   return new Date().toISOString();
 }
 
@@ -296,7 +296,7 @@ export function assertMatchBelongsToTeam(publicContent, teamId, matchId) {
   return match;
 }
 
-function normalizeOperatorName(value) {
+export function normalizeOperatorName(value) {
   return String(value ?? "").trim().toLowerCase();
 }
 
@@ -820,11 +820,11 @@ export function upsertScoreSheet(state, payload, createId) {
   const existingByIdentity = existingById
     ? null
     : findScoreSheet(nextState, {
-        teamId: payload.teamId,
-        memberId: payload.memberId,
-        theme: payload.theme,
-        matchId: payload.matchId ?? null,
-      });
+      teamId: payload.teamId,
+      memberId: payload.memberId,
+      theme: payload.theme,
+      matchId: payload.matchId ?? null,
+    });
 
   const existing = existingById ?? existingByIdentity;
   if (existing) {
