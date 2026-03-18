@@ -28,7 +28,7 @@ export function AdminLayout() {
 
   const [stage, setStage] = useState<"enter" | "exit" | "idle">("idle");
   const [displayKey, setDisplayKey] = useState(location.pathname);
-  const [displayContent, setDisplayContent] = useState<ReactNode>(outlet);
+  const [frozenContent, setFrozenContent] = useState<ReactNode>(null);
   const prevPathRef = useRef(location.pathname);
 
   const handleLogout = () => {
@@ -36,41 +36,39 @@ export function AdminLayout() {
     navigate("/admin/login");
   };
 
-  // Capture the latest outlet when the route actually changes
+  // Handle route transition animation
   useEffect(() => {
     if (location.pathname === prevPathRef.current) {
-      // Same route — just update content in place (e.g. data refresh)
-      setDisplayContent(outlet);
       return;
     }
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reducedMotion) {
-      setDisplayContent(outlet);
       setDisplayKey(location.pathname);
       prevPathRef.current = location.pathname;
       mainRef.current?.scrollTo(0, 0);
       return;
     }
 
-    // Start exit phase — keep old content visible
+    // Freeze current content during exit animation
+    setFrozenContent(outlet);
     setStage("exit");
 
     const exitTimer = setTimeout(() => {
-      // Swap to new content
-      setDisplayContent(outlet);
+      setFrozenContent(null);
       setDisplayKey(location.pathname);
       prevPathRef.current = location.pathname;
       mainRef.current?.scrollTo(0, 0);
       setStage("enter");
 
-      // Clear enter class after animation completes
       const enterTimer = setTimeout(() => setStage("idle"), 420);
       return () => clearTimeout(enterTimer);
     }, 150);
 
     return () => clearTimeout(exitTimer);
-  }, [location.pathname, outlet]);
+  }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const displayContent = frozenContent ?? outlet;
 
   const animClass =
     stage === "exit" ? "admin-page-exit" :

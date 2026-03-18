@@ -1,5 +1,5 @@
 ﻿import { Menu } from "lucide-react";
-import { NavLink, Route, Routes, useLocation } from "react-router-dom";
+import { NavLink, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { lazy, Suspense, useCallback, useMemo, useRef, useState } from "react";
 import { HomePage } from "./pages/HomePage";
 import { LOGO_IMAGE_SRC } from "./lib/logo";
@@ -155,6 +155,7 @@ function AppShell() {
               <Route element={<RulesPage />} path="/rules" />
               <Route element={<AdminLogin />} path="/admin/login" />
               <Route element={<ProtectedRoute><AdminLayout /></ProtectedRoute>} path="/admin">
+                <Route index element={<Navigate to="/admin/dashboard" replace />} />
                 <Route element={<AdminDashboard />} path="dashboard" />
                 <Route element={<ScoreManagement />} path="scores" />
                 <Route element={<TeamManagement />} path="teams" />
