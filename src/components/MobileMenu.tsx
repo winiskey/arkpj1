@@ -217,6 +217,27 @@ export function MobileMenu({ isOpen, onClose, navItems, startDate, triggerRef }:
             </div>
             <div className="section-tag">Tactical Archive</div>
           </div>
+
+          <NavLink
+            className={`mt-3 flex items-center justify-between rounded-[20px] border border-white/6 bg-white/[0.02] px-5 py-4 transition-[transform,opacity,border-color,background-color] duration-[280ms] ease-[var(--ease-out)] hover:border-brand/20 hover:bg-brand/[0.06] ${
+              isOpen ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
+            }`}
+            style={{ transitionDelay: isOpen ? `${100 + (navItems.length + 1) * 45}ms` : "0ms" }}
+            tabIndex={isOpen ? undefined : -1}
+            to={localStorage.getItem("adminToken") ? "/admin/dashboard" : "/admin/login"}
+          >
+            <div className="flex items-center gap-3">
+              <div className="relative flex h-3 w-3 items-center justify-center">
+                <div className="absolute h-full w-full rotate-45 border border-brand/30" />
+                <div className="h-1 w-1 bg-brand/50" />
+              </div>
+              <div>
+                <div className="font-display text-[10px] uppercase tracking-[0.3em] text-white/30">Operations</div>
+                <div className="mt-1 font-title text-base font-bold tracking-[0.08em] text-text2">工作人员入口</div>
+              </div>
+            </div>
+            <div className="font-display text-[10px] uppercase tracking-[0.18em] text-brand/50">OPS →</div>
+          </NavLink>
         </div>
       </aside>
     </>

@@ -132,7 +132,7 @@ export function TeamsPage() {
           enTitle="TEAM INTELLIGENCE"
         />
 
-        <div className="grid gap-8 xl:grid-cols-[0.36fr_0.64fr] xl:items-start">
+        <div className="grid gap-8 lg:grid-cols-[0.36fr_0.64fr] lg:items-start">
           <aside className="space-y-4 gsap-stagger-item">
             {teams.map((team) => {
               const active = team.id === selectedTeam.id;

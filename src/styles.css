@@ -688,6 +688,38 @@ body {
   animation: nav-angle-rotate 10s linear infinite;
 }
 
+@keyframes admin-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes admin-page-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+.admin-page-transition {
+  animation: admin-page-enter var(--motion-page) var(--ease-out) both;
+}
+
+.admin-page-exit {
+  animation: admin-page-exit 150ms var(--ease-in) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

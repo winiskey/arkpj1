@@ -92,7 +92,7 @@ export function LivePage() {
         </section>
 
         <ScrollReveal delay={0.1} distance={40}>
-          <div className="grid gap-8 xl:grid-cols-[0.92fr_1.08fr] xl:items-start">
+          <div className="grid gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-start">
             <section className="space-y-4">
               <SectionHeader
                 cnTitle="队伍总榜"

@@ -1,72 +1,72 @@
-# Design System Master File
+# 设计系统主文件
 
-> **LOGIC:** When building a specific page, first check `design-system/pages/[page-name].md`.
-> If that file exists, its rules **override** this Master file.
-> If not, strictly follow the rules below.
-
----
-
-**Project:** Ark Tournament Admin
-**Generated:** 2026-03-15 19:02:35
-**Category:** Financial Dashboard
+> **逻辑说明：** 构建具体页面时，请先查阅 `design-system/pages/[页面名称].md`。
+> 若该文件存在，其规则**优先于**本主文件。
+> 若不存在，则严格遵循以下规则。
 
 ---
 
-## Global Rules
+**项目：** Ark Tournament Admin（方舟赛事管理后台）
+**生成时间：** 2026-03-15 19:02:35
+**分类：** 数据仪表盘
 
-### Color Palette
+---
 
-| Role | Hex | CSS Variable |
-|------|-----|--------------|
-| Primary | `#1E40AF` | `--color-primary` |
-| Secondary | `#3B82F6` | `--color-secondary` |
-| CTA/Accent | `#F59E0B` | `--color-cta` |
-| Background | `#F8FAFC` | `--color-background` |
-| Text | `#1E3A8A` | `--color-text` |
+## 全局规则
 
-**Color Notes:** Blue data + amber highlights
+### 色彩方案
 
-### Typography
+| 角色 | 十六进制 | CSS 变量 |
+|------|----------|----------|
+| 主色 | `#1E40AF` | `--color-primary` |
+| 辅色 | `#3B82F6` | `--color-secondary` |
+| 强调/行动色 | `#F59E0B` | `--color-cta` |
+| 背景色 | `#F8FAFC` | `--color-background` |
+| 文字色 | `#1E3A8A` | `--color-text` |
 
-- **Heading Font:** Fira Code
-- **Body Font:** Fira Sans
-- **Mood:** dashboard, data, analytics, code, technical, precise
-- **Google Fonts:** [Fira Code + Fira Sans](https://fonts.google.com/share?selection.family=Fira+Code:wght@400;500;600;700|Fira+Sans:wght@300;400;500;600;700)
+**色彩说明：** 蓝色数据 + 琥珀色高亮
 
-**CSS Import:**
+### 字体排版
+
+- **标题字体：** Fira Code
+- **正文字体：** Fira Sans
+- **风格关键词：** 仪表盘、数据、分析、代码、技术感、精准
+- **Google Fonts：** [Fira Code + Fira Sans](https://fonts.google.com/share?selection.family=Fira+Code:wght@400;500;600;700|Fira+Sans:wght@300;400;500;600;700)
+
+**CSS 引入：**
 ```css
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap');
 ```
 
-### Spacing Variables
+### 间距变量
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| `--space-xs` | `4px` / `0.25rem` | Tight gaps |
-| `--space-sm` | `8px` / `0.5rem` | Icon gaps, inline spacing |
-| `--space-md` | `16px` / `1rem` | Standard padding |
-| `--space-lg` | `24px` / `1.5rem` | Section padding |
-| `--space-xl` | `32px` / `2rem` | Large gaps |
-| `--space-2xl` | `48px` / `3rem` | Section margins |
-| `--space-3xl` | `64px` / `4rem` | Hero padding |
+| Token | 值 | 用途 |
+|-------|----|------|
+| `--space-xs` | `4px` / `0.25rem` | 紧凑间隙 |
+| `--space-sm` | `8px` / `0.5rem` | 图标间距、行内间距 |
+| `--space-md` | `16px` / `1rem` | 标准内边距 |
+| `--space-lg` | `24px` / `1.5rem` | 区块内边距 |
+| `--space-xl` | `32px` / `2rem` | 大间距 |
+| `--space-2xl` | `48px` / `3rem` | 区块外边距 |
+| `--space-3xl` | `64px` / `4rem` | 主视觉区内边距 |
 
-### Shadow Depths
+### 阴影层级
 
-| Level | Value | Usage |
-|-------|-------|-------|
-| `--shadow-sm` | `0 1px 2px rgba(0,0,0,0.05)` | Subtle lift |
-| `--shadow-md` | `0 4px 6px rgba(0,0,0,0.1)` | Cards, buttons |
-| `--shadow-lg` | `0 10px 15px rgba(0,0,0,0.1)` | Modals, dropdowns |
-| `--shadow-xl` | `0 20px 25px rgba(0,0,0,0.15)` | Hero images, featured cards |
+| 层级 | 值 | 用途 |
+|------|----|------|
+| `--shadow-sm` | `0 1px 2px rgba(0,0,0,0.05)` | 轻微浮起 |
+| `--shadow-md` | `0 4px 6px rgba(0,0,0,0.1)` | 卡片、按钮 |
+| `--shadow-lg` | `0 10px 15px rgba(0,0,0,0.1)` | 弹窗、下拉菜单 |
+| `--shadow-xl` | `0 20px 25px rgba(0,0,0,0.15)` | 主视觉图、特色卡片 |
 
 ---
 
-## Component Specs
+## 组件规范
 
-### Buttons
+### 按钮
 
 ```css
-/* Primary Button */
+/* 主按钮 */
 .btn-primary {
   background: #F59E0B;
   color: white;
@@ -82,7 +82,7 @@
   transform: translateY(-1px);
 }
 
-/* Secondary Button */
+/* 次级按钮 */
 .btn-secondary {
   background: transparent;
   color: #1E40AF;
@@ -95,7 +95,7 @@
 }
 ```
 
-### Cards
+### 卡片
 
 ```css
 .card {
@@ -113,7 +113,7 @@
 }
 ```
 
-### Inputs
+### 输入框
 
 ```css
 .input {
@@ -131,7 +131,7 @@
 }
 ```
 
-### Modals
+### 弹窗
 
 ```css
 .modal-overlay {
@@ -151,56 +151,53 @@
 
 ---
 
-## Style Guidelines
+## 风格指南
 
-**Style:** Dark Mode (OLED)
+**风格：** 深色模式（OLED）
 
-**Keywords:** Dark theme, low light, high contrast, deep black, midnight blue, eye-friendly, OLED, night mode, power efficient
+**关键词：** 深色主题、低亮度、高对比度、纯黑、午夜蓝、护眼、OLED、夜间模式、省电
 
-**Best For:** Night-mode apps, coding platforms, entertainment, eye-strain prevention, OLED devices, low-light
+**适用场景：** 夜间模式应用、编程平台、娱乐类、防眼疲劳、OLED 设备、低光环境
 
-**Key Effects:** Minimal glow (text-shadow: 0 0 10px), dark-to-light transitions, low white emission, high readability, visible focus
+**核心效果：** 极简发光（text-shadow: 0 0 10px）、暗到亮过渡、低白光发射、高可读性、可见焦点状态
 
-### Page Pattern
+### 页面布局模式
 
-**Pattern Name:** Horizontal Scroll Journey
+**模式名称：** 横向滚动旅程
 
-- **Conversion Strategy:** Immersive product discovery. High engagement. Keep navigation visible.
-28,Bento Grid Showcase,bento,  grid,  features,  modular,  apple-style,  showcase", 1. Hero, 2. Bento Grid (Key Features), 3. Detail Cards, 4. Tech Specs, 5. CTA, Floating Action Button or Bottom of Grid, Card backgrounds: #F5F5F7 or Glass. Icons: Vibrant brand colors. Text: Dark., Hover card scale (1.02), video inside cards, tilt effect, staggered reveal, Scannable value props. High information density without clutter. Mobile stack.
-29,Interactive 3D Configurator,3d,  configurator,  customizer,  interactive,  product", 1. Hero (Configurator), 2. Feature Highlight (synced), 3. Price/Specs, 4. Purchase, Inside Configurator UI + Sticky Bottom Bar, Neutral studio background. Product: Realistic materials. UI: Minimal overlay., Real-time rendering, material swap animation, camera rotate/zoom, light reflection, Increases ownership feeling. 360 view reduces return rates. Direct add-to-cart.
-30,AI-Driven Dynamic Landing,ai,  dynamic,  personalized,  adaptive,  generative", 1. Prompt/Input Hero, 2. Generated Result Preview, 3. How it Works, 4. Value Prop, Input Field (Hero) + 'Try it' Buttons, Adaptive to user input. Dark mode for compute feel. Neon accents., Typing text effects, shimmering generation loaders, morphing layouts, Immediate value demonstration. 'Show, don't tell'. Low friction start.
-- **CTA Placement:** Floating Sticky CTA or End of Horizontal Track
-- **Section Order:** 1. Intro (Vertical), 2. The Journey (Horizontal Track), 3. Detail Reveal, 4. Vertical Footer
+- **转化策略：** 沉浸式产品探索，高参与度，保持导航可见。
+- **CTA 位置：** 悬浮固定 CTA 或横向轨道末端
+- **区块顺序：** 1. 引言（纵向）、2. 旅程（横向轨道）、3. 细节展示、4. 纵向页脚
 
 ---
 
-## Anti-Patterns (Do NOT Use)
+## 反模式（禁止使用）
 
-- ❌ Light mode default
-- ❌ Slow rendering
+- ❌ 默认浅色模式
+- ❌ 渲染缓慢
 
-### Additional Forbidden Patterns
+### 额外禁止模式
 
-- ❌ **Emojis as icons** — Use SVG icons (Heroicons, Lucide, Simple Icons)
-- ❌ **Missing cursor:pointer** — All clickable elements must have cursor:pointer
-- ❌ **Layout-shifting hovers** — Avoid scale transforms that shift layout
-- ❌ **Low contrast text** — Maintain 4.5:1 minimum contrast ratio
-- ❌ **Instant state changes** — Always use transitions (150-300ms)
-- ❌ **Invisible focus states** — Focus states must be visible for a11y
+- ❌ **用 Emoji 代替图标** — 使用 SVG 图标（Heroicons、Lucide、Simple Icons）
+- ❌ **缺少 cursor:pointer** — 所有可点击元素必须设置 cursor:pointer
+- ❌ **悬停时布局偏移** — 避免导致布局偏移的缩放变换
+- ❌ **低对比度文字** — 最低对比度比值 4.5:1
+- ❌ **状态瞬间切换** — 始终使用过渡动画（150-300ms）
+- ❌ **不可见焦点状态** — 焦点状态必须可见以满足无障碍要求
 
 ---
 
-## Pre-Delivery Checklist
+## 交付前检查清单
 
-Before delivering any UI code, verify:
+交付任何 UI 代码前，请确认：
 
-- [ ] No emojis used as icons (use SVG instead)
-- [ ] All icons from consistent icon set (Heroicons/Lucide)
-- [ ] `cursor-pointer` on all clickable elements
-- [ ] Hover states with smooth transitions (150-300ms)
-- [ ] Light mode: text contrast 4.5:1 minimum
-- [ ] Focus states visible for keyboard navigation
-- [ ] `prefers-reduced-motion` respected
-- [ ] Responsive: 375px, 768px, 1024px, 1440px
-- [ ] No content hidden behind fixed navbars
-- [ ] No horizontal scroll on mobile
+- [ ] 未使用 Emoji 作为图标（改用 SVG）
+- [ ] 所有图标来自统一图标集（Heroicons/Lucide）
+- [ ] 所有可点击元素设置了 `cursor-pointer`
+- [ ] 悬停状态有平滑过渡（150-300ms）
+- [ ] 浅色模式：文字对比度最低 4.5:1
+- [ ] 焦点状态对键盘导航可见
+- [ ] 遵守 `prefers-reduced-motion`
+- [ ] 响应式适配：375px、768px、1024px、1440px
+- [ ] 内容不被固定导航栏遮挡
+- [ ] 移动端无横向滚动

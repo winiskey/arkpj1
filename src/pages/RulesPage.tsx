@@ -139,7 +139,7 @@ export function RulesPage() {
                     ))}
                   </div>
 
-                  <div className="grid gap-6 xl:grid-cols-[0.7fr_1.3fr]">
+                  <div className="grid gap-6 lg:grid-cols-[0.7fr_1.3fr]">
                     <div className="space-y-6">
                       <div className="panel-data px-5 py-5">
                         <div className="section-kicker">RESTRICTIONS</div>

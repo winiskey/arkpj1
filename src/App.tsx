@@ -98,6 +98,27 @@ function AppShell() {
                   {siteMeta.startDate}
                 </span>
               </div>
+
+              {/* Connector */}
+              <div className="flex gap-1.5 opacity-20 transition-opacity duration-300 group-hover:opacity-50">
+                <span className="h-0.5 w-0.5 bg-brand" />
+                <span className="h-0.5 w-0.5 bg-brand" />
+              </div>
+
+              {/* Node 3: Admin Portal */}
+              <NavLink
+                aria-label="工作人员后台入口"
+                className="group/ops flex items-center gap-2.5 opacity-50 transition-opacity duration-300 hover:opacity-100"
+                to={localStorage.getItem("adminToken") ? "/admin/dashboard" : "/admin/login"}
+              >
+                <div className="relative flex h-2.5 w-2.5 items-center justify-center">
+                  <div className="absolute h-full w-full rotate-45 border border-brand/30 transition-all duration-500 group-hover/ops:scale-125 group-hover/ops:border-brand/70" />
+                  <div className="h-0.5 w-0.5 bg-brand/60 transition-colors duration-300 group-hover/ops:bg-brand" />
+                </div>
+                <span className="font-display text-[10px] uppercase tracking-[0.3em] text-white/30 transition-colors duration-300 group-hover/ops:text-brand/70">
+                  OPS
+                </span>
+              </NavLink>
             </div>
           </div>
 

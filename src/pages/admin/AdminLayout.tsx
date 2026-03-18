@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate, useOutlet } from "react-router-dom";
 import {
   LayoutDashboard,
   FileText,
@@ -7,6 +7,7 @@ import {
   Calculator,
   LogOut,
 } from "lucide-react";
+import { useRef, useEffect, useState, type ReactNode } from "react";
 import { AdminDataProvider } from "./AdminDataContext";
 import { ToastProvider } from "./ToastContext";
 import { clearAdminToken } from "./useAdminApi";
@@ -21,11 +22,60 @@ const navItems = [
 
 export function AdminLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const outlet = useOutlet();
+  const mainRef = useRef<HTMLDivElement>(null);
+
+  const [stage, setStage] = useState<"enter" | "exit" | "idle">("idle");
+  const [displayKey, setDisplayKey] = useState(location.pathname);
+  const [displayContent, setDisplayContent] = useState<ReactNode>(outlet);
+  const prevPathRef = useRef(location.pathname);
 
   const handleLogout = () => {
     clearAdminToken();
     navigate("/admin/login");
   };
+
+  // Capture the latest outlet when the route actually changes
+  useEffect(() => {
+    if (location.pathname === prevPathRef.current) {
+      // Same route — just update content in place (e.g. data refresh)
+      setDisplayContent(outlet);
+      return;
+    }
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reducedMotion) {
+      setDisplayContent(outlet);
+      setDisplayKey(location.pathname);
+      prevPathRef.current = location.pathname;
+      mainRef.current?.scrollTo(0, 0);
+      return;
+    }
+
+    // Start exit phase — keep old content visible
+    setStage("exit");
+
+    const exitTimer = setTimeout(() => {
+      // Swap to new content
+      setDisplayContent(outlet);
+      setDisplayKey(location.pathname);
+      prevPathRef.current = location.pathname;
+      mainRef.current?.scrollTo(0, 0);
+      setStage("enter");
+
+      // Clear enter class after animation completes
+      const enterTimer = setTimeout(() => setStage("idle"), 420);
+      return () => clearTimeout(enterTimer);
+    }, 150);
+
+    return () => clearTimeout(exitTimer);
+  }, [location.pathname, outlet]);
+
+  const animClass =
+    stage === "exit" ? "admin-page-exit" :
+    stage === "enter" ? "admin-page-transition" :
+    "";
 
   return (
     <AdminDataProvider>
@@ -71,8 +121,10 @@ export function AdminLayout() {
           </aside>
 
           {/* ── Main content ────────────────────────────────────────── */}
-          <main className="flex-1 overflow-y-auto">
-            <Outlet />
+          <main ref={mainRef} className="flex-1 overflow-y-auto">
+            <div key={displayKey} className={animClass}>
+              {displayContent}
+            </div>
           </main>
         </div>
       </ToastProvider>

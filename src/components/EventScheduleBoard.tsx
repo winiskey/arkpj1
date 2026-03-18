@@ -149,7 +149,7 @@ export const EventScheduleBoard = memo(function EventScheduleBoard({ days, teamN
       </div>
 
       {/* ── Desktop: Grid View ── */}
-      <div className="relative z-10 hidden overflow-x-auto md:block">
+      <div className="relative z-10 hidden overflow-x-auto lg:block">
         <div className="min-w-[940px] p-6 lg:p-8">
           <div className="grid grid-cols-[170px_repeat(3,minmax(0,1fr))] gap-4">
             <div className="rounded-[24px] border border-white/5 bg-white/[0.02] px-5 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
@@ -203,7 +203,7 @@ export const EventScheduleBoard = memo(function EventScheduleBoard({ days, teamN
       </div>
 
       {/* ── Mobile: Card View ── */}
-      <div className="relative z-10 grid gap-4 p-4 md:hidden">
+      <div className="relative z-10 grid gap-4 p-4 lg:hidden">
         {visibleDays.map((day) => {
           const today = isToday(day);
 

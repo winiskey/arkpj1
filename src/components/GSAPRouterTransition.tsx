@@ -60,6 +60,15 @@ export function GSAPRouterTransition({ children }: { children: ReactNode }) {
     const nextLabel = getRouteLabel(location.pathname);
     setTransitionLabel(nextLabel);
 
+    // admin 路由跳过过渡动画，避免 GSAP 动画与 Suspense 异步加载冲突导致空白
+    if (location.pathname.startsWith("/admin") || currentPathRef.current.startsWith("/admin")) {
+      setDisplayChildren(children);
+      currentPathRef.current = location.pathname;
+      window.scrollTo(0, 0);
+      requestAnimationFrame(() => ScrollTrigger.refresh(true));
+      return;
+    }
+
     if (prefersReducedMotion()) {
       setDisplayChildren(children);
       currentPathRef.current = location.pathname;

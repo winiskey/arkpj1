@@ -82,7 +82,7 @@ export function HomePage() {
       {/* Deep environmental radial glow (Backlight for the logo) */}
       <div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_70%_50%,rgba(214,192,138,0.06),transparent_75%)]" />
 
-      <div className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-[1920px] flex-col px-5 py-12 md:px-10 md:py-20 xl:px-16 2xl:px-20">
+      <div className="relative z-10 flex min-h-[100dvh] w-full flex-col py-12 md:py-20">
 
         {/* Spatial Asymmetrical Layout */}
         <div className="flex flex-1 flex-col justify-center gap-14 lg:flex-row lg:items-center lg:justify-between lg:gap-20">
