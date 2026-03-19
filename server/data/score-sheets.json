@@ -1,5 +1,33 @@
 {
   "version": 1,
-  "updatedAt": "2026-03-10T01:14:23.517254Z",
-  "sheets": []
+  "updatedAt": "2026-03-19T09:57:55.348Z",
+  "sheets": [
+    {
+      "id": "eb41a07b-be1f-4f26-af91-3954a857f79e",
+      "teamId": "mygo",
+      "memberId": "P1",
+      "matchId": "M1",
+      "theme": "sami",
+      "snapshot": {
+        "sa-score": 2500,
+        "sa-items": 45,
+        "sa-plates": 8,
+        "sa-6s": 2,
+        "sa-5s": 3,
+        "sa-4s": 1,
+        "sa-gift": false,
+        "sa-combo": true,
+        "sa-gardener-nl": false,
+        "sa-sentinel-nl": false,
+        "sa-end-link": "0"
+      },
+      "previewScore": 3210,
+      "formulaText": "(3210.00)",
+      "note": "",
+      "status": "final",
+      "calculatorVersion": "jingchuge-admin-api-v1",
+      "createdAt": "2026-03-19T09:35:15.329Z",
+      "updatedAt": "2026-03-19T09:57:55.348Z"
+    }
+  ]
 }

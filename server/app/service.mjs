@@ -74,7 +74,7 @@ function applyCompliancePatch(team, compliance, patch) {
   compliance.updatedAt = nowIso();
 }
 
-export function createBackendService({ publicContentStore, opsStateStore, scoreSheetsStore }) {
+export function createBackendService({ publicContentStore, opsStateStore, scoreSheetsStore, broadcast = () => { } }) {
   async function readSystemState() {
     const [publicContent, rawOpsState, rawScoreSheets] = await Promise.all([
       publicContentStore.read(),
@@ -116,6 +116,7 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
       const savedPublicContent = await publicContentStore.replace(nextPublicContent);
       const nextOpsState = await opsStateStore.update((state) => syncOpsStateWithTeams(savedPublicContent, state));
       const nextScoreSheetsState = await scoreSheetsStore.update((state) => syncScoreSheetsState(state));
+      broadcast("team:updated", { publicContent: savedPublicContent });
       return buildAdminBootstrap(savedPublicContent, nextOpsState, nextScoreSheetsState);
     },
 
@@ -127,6 +128,7 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
         return next;
       });
 
+      broadcast("live:updated", nextPublicContent.liveBroadcast);
       return nextPublicContent.liveBroadcast;
     },
 
@@ -144,6 +146,7 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
         return next;
       });
 
+      broadcast("match:updated", nextPublicContent.matches.find((entry) => entry.id === matchId) ?? null);
       return nextPublicContent.matches.find((entry) => entry.id === matchId) ?? null;
     },
 
@@ -216,6 +219,9 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
         applyAggregateToPublicContent(current, nextAggregates),
       );
       const nextAggregate = nextAggregates.find((entry) => entry.teamId === team.id) ?? aggregate;
+
+      broadcast("score:updated", { teamId: team.id, aggregate: nextAggregate });
+      broadcast("team:updated", { publicContent: nextPublicContent });
 
       return {
         published: true,
@@ -295,7 +301,7 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
           matchId: nextPayload.matchId ?? null,
         });
 
-      return {
+      const result = {
         sheet,
         aggregate: buildTeamAggregate(
           team,
@@ -303,6 +309,9 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
           nextScoreSheetsState.sheets.filter((entry) => entry.teamId === team.id),
         ),
       };
+
+      broadcast("score:updated", { teamId: team.id, sheet, aggregate: result.aggregate });
+      return result;
     },
 
     async updateScoreSheetStatus(sheetId, status) {
@@ -321,7 +330,7 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
       const { publicContent, opsState } = await readSystemState();
       const team = requireTeam(publicContent, teamId);
 
-      return {
+      const result = {
         sheet,
         aggregate: buildTeamAggregate(
           team,
@@ -329,6 +338,9 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
           nextScoreSheetsState.sheets.filter((entry) => entry.teamId === team.id),
         ),
       };
+
+      broadcast("score:updated", { teamId: team.id, sheet, aggregate: result.aggregate });
+      return result;
     },
 
     async createOperatorDraft(teamId, payload) {
@@ -403,6 +415,8 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
       const team = requireTeam(nextPublicContent, teamId);
       const member = requireMember(team, memberId, "planned pick member");
 
+      broadcast("picks:updated", { teamId, memberId, operatorPicks: member.operatorPicks });
+
       return {
         created: nextPick,
         member,
@@ -422,6 +436,8 @@ export function createBackendService({ publicContentStore, opsStateStore, scoreS
 
       const team = requireTeam(nextPublicContent, teamId);
       const member = requireMember(team, memberId, "planned pick member");
+
+      broadcast("picks:updated", { teamId, memberId, operatorPicks: member.operatorPicks });
 
       return {
         deletedId: pickId,

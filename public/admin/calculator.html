@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>荆楚歌 #2 后台计分终端</title>
     <style>
-:root {
+        :root {
             --primary: #FFD60A;
             --bg-color: #000;
             --card-bg: #1C1C1E;
@@ -242,13 +242,16 @@
             transform: translateX(-50%);
             width: 92%;
             max-width: 760px;
-            background: rgba(20, 20, 23, .95);
+            background: rgba(20, 20, 23, .97);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
             padding: 12px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            z-index: 100;
         }
 
         .score-label {
@@ -540,7 +543,6 @@
                 text-align: left;
             }
         }
-
     </style>
 </head>
 
@@ -583,8 +585,10 @@
             <div id="toolbar-message" class="toolbar-message">等待加载后台数据...</div>
             <div class="action-group">
                 <button id="save-btn" class="action-btn" type="button" onclick="saveDraft()" disabled>保存草稿</button>
-                <button id="final-btn" class="action-btn primary" type="button" onclick="finalizeSheet()" disabled>锁定成绩</button>
-                <button id="publish-btn" class="action-btn success" type="button" onclick="publishTeam()" disabled>发布整队</button>
+                <button id="final-btn" class="action-btn primary" type="button" onclick="finalizeSheet()"
+                    disabled>锁定成绩</button>
+                <button id="publish-btn" class="action-btn success" type="button" onclick="publishTeam()"
+                    disabled>发布整队</button>
             </div>
         </div>
     </div>
@@ -598,7 +602,8 @@
 
     <div id="team" class="content-area active">
         <div class="section-card">
-            <div class="section-title">战队聚合<button class="section-reset-btn" onclick="resetSection(this)">刷新</button></div>
+            <div class="section-title">战队聚合<button class="section-reset-btn" onclick="resetSection(this)">刷新</button>
+            </div>
             <div class="summary-grid">
                 <div class="stat-card">
                     <div class="score-label">状态</div>
@@ -996,19 +1001,19 @@
             </div>
         </div>
 
-    <div class="bottom-dock">
-        <div>
-            <div class="score-label">当前页结果</div>
-            <div id="total-score" class="score-val">0.00</div>
+        <div class="bottom-dock">
+            <div>
+                <div class="score-label">当前页结果</div>
+                <div id="total-score" class="score-val">0.0</div>
+            </div>
+            <div>
+                <div id="formula-text" class="score-formula">等待输入</div>
+                <button class="dock-btn copy-btn" type="button" onclick="copyScore()">复制分数</button>
+                <button class="dock-btn reset-btn" type="button" onclick="resetForm()">重置当前主题</button>
+            </div>
         </div>
-        <div>
-            <div id="formula-text" class="score-formula">等待输入</div>
-            <button class="dock-btn copy-btn" type="button" onclick="copyScore()">复制分数</button>
-            <button class="dock-btn reset-btn" type="button" onclick="resetForm()">重置当前主题</button>
-        </div>
-    </div>
 
-    <script src="/admin/calculator.js"></script>
+        <script src="/admin/calculator.js"></script>
 </body>
 
 </html>

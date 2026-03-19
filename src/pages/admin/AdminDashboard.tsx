@@ -130,13 +130,13 @@ export function AdminDashboard() {
                         {agg.scoredCount}/{agg.memberCount}
                       </td>
                       <td className="px-4 py-3 text-right font-mono text-text2">
-                        {Math.round(agg.rawTotal).toLocaleString()}
+                        {agg.rawTotal.toFixed(1)}
                       </td>
                       <td className="px-4 py-3 text-right font-mono text-text2">
                         ×{agg.coefficient.toFixed(2)}
                       </td>
                       <td className="px-4 py-3 text-right font-mono font-bold text-brand">
-                        {Math.round(agg.finalTotal).toLocaleString()}
+                        {agg.finalTotal.toFixed(1)}
                       </td>
                       <td className="px-4 py-3 text-center">
                         {agg.publishBlockingIssues.length > 0 ? (

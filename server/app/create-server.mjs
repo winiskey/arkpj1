@@ -24,6 +24,7 @@ import {
   validateScoreSheetStatusPayload,
   validateSoloCalcPayload,
 } from "./validators.mjs";
+import { createWebSocketManager } from "./ws.mjs";
 
 function withAdmin(handler) {
   return async (context) => {
@@ -43,10 +44,13 @@ export function createApp(config) {
     async () => createDefaultScoreSheetsState(),
   );
 
+  const wsManager = createWebSocketManager();
+
   const service = createBackendService({
     publicContentStore,
     opsStateStore,
     scoreSheetsStore,
+    broadcast: (event, data) => wsManager.broadcast(event, data),
   });
 
   const router = new Router();
@@ -203,8 +207,12 @@ export function createApp(config) {
     }
   });
 
+  // Attach WebSocket to the HTTP server
+  wsManager.attach(server, () => service.getPublicBootstrap());
+
   return {
     server,
     service,
+    wsManager,
   };
 }

@@ -57,12 +57,12 @@ export function HomePage() {
     {
       label: "参赛队伍",
       value: String(teams.length).padStart(2, "0"),
-      detail: "已完成阵容同步",
+      detail: "阵容已登记",
     },
     {
       label: "肉鸽主题",
       value: String(themeRules.length).padStart(2, "0"),
-      detail: "计分与限制规则并行",
+      detail: "独立计分与限制规则",
     },
     {
       label: "冠军奖励",
@@ -91,13 +91,13 @@ export function HomePage() {
           <ScrollReveal delay={0} distance={40} className="relative z-20 flex max-w-[640px] flex-col justify-center space-y-10 lg:w-1/2">
             <div className="flex flex-wrap items-center gap-4 text-text2">
               <span className="rounded-full border border-brand/20 bg-brand/10 px-5 py-2 font-display text-[11px] font-semibold uppercase tracking-[0.22em] text-brand">
-                Season Interface
+                SEASON 02 · LIVE
               </span>
               <span className="font-display text-xs uppercase tracking-[0.18em] text-white/50">{siteMeta.eventCode}</span>
             </div>
 
             <div className="space-y-4">
-              <div className="font-display text-[13px] uppercase tracking-[0.25em] text-white/40">Signal Ceremony / Entry Sequence</div>
+              <div className="font-display text-[13px] uppercase tracking-[0.25em] text-white/40">JINGCHU SONG // SEASON 02</div>
               <h1>
                 <img
                   src="/title-bitmap.svg"
@@ -120,7 +120,7 @@ export function HomePage() {
             <div className="pt-6 sm:pt-8">
               <MagneticWrapper strength={40}>
                 <ClipButton size="lg" to="/live" variant="primary" className="!rounded-full border-none !bg-brand px-8 py-4 font-bold !text-black shadow-[0_0_40px_-5px_rgba(214,192,138,0.6)] focus-visible:outline-0 focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-black sm:px-10 sm:py-5 hover:!bg-brandStrong hover:shadow-[0_0_60px_-10px_rgba(231,215,173,0.8)]">
-                  进入主会场现场
+                  进入赛事主会场
                   <ArrowRight className="ml-3 h-5 w-5" aria-hidden="true" />
                 </ClipButton>
               </MagneticWrapper>

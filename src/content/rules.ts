@@ -5,7 +5,7 @@ export const ruleSections: RuleSection[] = [
     id: "section-format",
     slug: "format",
     title: "赛制总览",
-    intro: "本次比赛围绕铁人三项式的并行积分赛制展开，每队四人同时推进不同集成战略主题挑战。",
+    intro: "本次比赛采用并行积分赛制，每队四人同时推进不同集成战略主题挑战。",
     blocks: [
       {
         title: "赛制说明",
@@ -35,7 +35,7 @@ export const ruleSections: RuleSection[] = [
     id: "section-general-rules",
     slug: "general-rules",
     title: "通用规则",
-    intro: "这些规则适用于所有队伍和全部主题，是首版赛事站必须完整公开的判定基础。",
+    intro: "以下规则适用于所有队伍和全部主题。",
     blocks: [
       {
         title: "希望与协作限制",

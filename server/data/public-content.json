@@ -38,7 +38,7 @@
     {
       "title": "赛制核心",
       "label": "FORMAT",
-      "content": "四名选手分别挑战不同肉鸽主题，以修正后的个人结算分汇总为战队总分。"
+      "content": "四名选手分别挑战不同集成战略主题，以修正后的个人结算分汇总为战队总分。"
     },
     {
       "title": "判定逻辑",
@@ -66,44 +66,44 @@
       "id": "M1",
       "phase": "ROUND 1",
       "startTime": "",
-      "status": "PENDING",
+      "status": "FINISHED",
       "teamId": "mygo",
-      "totalScore": "0",
+      "totalScore": "8275.7",
       "members": [
         {
           "id": "P1",
-          "name": "吃豆腐蕁酱",
-          "theme": "探索者的銀凇止境",
-          "score": 0,
+          "name": "吃豆腐蘸酱",
+          "theme": "探索者的银凇止境",
+          "score": 3725,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 1
         },
         {
           "id": "P2",
-          "name": "红白、",
+          "name": "雪月花",
           "theme": "萨卡兹的无终奇语",
-          "score": 0,
+          "score": 3845.7,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 2
         },
         {
           "id": "P3",
-          "name": "若亭",
-          "theme": "岁的界园志异",
-          "score": 0,
+          "name": "红白白",
+          "theme": "萨卡兹的无终奇语",
+          "score": 705,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 3
         },
         {
           "id": "P4",
-          "name": "雪月花",
-          "theme": "探索者的銀凇止境",
+          "name": "若亭",
+          "theme": "岁的界园志异",
           "score": 0,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 4
         }
       ]
@@ -112,44 +112,44 @@
       "id": "M2",
       "phase": "ROUND 1",
       "startTime": "",
-      "status": "PENDING",
+      "status": "FINISHED",
       "teamId": "tianqi-siqushi",
-      "totalScore": "0",
+      "totalScore": "9595.3",
       "members": [
         {
           "id": "P1",
           "name": "某大叔速水好",
-          "theme": "探索者的銀凇止境",
-          "score": 0,
+          "theme": "探索者的银凇止境",
+          "score": 2375,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 1
         },
         {
           "id": "P2",
-          "name": "起步之志",
+          "name": "拾壹月的鹤主",
           "theme": "萨卡兹的无终奇语",
-          "score": 0,
+          "score": 3137.25,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 2
         },
         {
           "id": "P3",
           "name": "忍野忍不下去",
-          "theme": "岁的界园志异",
+          "theme": "萨卡兹的无终奇语",
           "score": 0,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 3
         },
         {
           "id": "P4",
-          "name": "拾壹月的鹤主",
-          "theme": "探索者的銀凇止境",
-          "score": 0,
+          "name": "起步之志",
+          "theme": "岁的界园志异",
+          "score": 4083.072,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 4
         }
       ],
@@ -164,44 +164,44 @@
       "id": "M3",
       "phase": "ROUND 1",
       "startTime": "",
-      "status": "PENDING",
+      "status": "FINISHED",
       "teamId": "siqu-brothers",
-      "totalScore": "0",
+      "totalScore": "5040.9",
       "members": [
         {
           "id": "P1",
-          "name": "Aimer",
-          "theme": "探索者的銀凇止境",
-          "score": 0,
+          "name": "朝霞",
+          "theme": "探索者的银凇止境",
+          "score": 3254,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 1
         },
         {
           "id": "P2",
-          "name": "朝霞",
+          "name": "Aimer",
           "theme": "萨卡兹的无终奇语",
           "score": 0,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 2
         },
         {
           "id": "P3",
           "name": "洛齐克",
-          "theme": "岁的界园志异",
-          "score": 0,
+          "theme": "萨卡兹的无终奇语",
+          "score": 158.25,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 3
         },
         {
           "id": "P4",
           "name": "顾秦",
-          "theme": "探索者的銀凇止境",
-          "score": 0,
+          "theme": "岁的界园志异",
+          "score": 1628.64,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 4
         }
       ],
@@ -216,44 +216,44 @@
       "id": "M4",
       "phase": "ROUND 1",
       "startTime": "",
-      "status": "PENDING",
+      "status": "FINISHED",
       "teamId": "strawberry-no1",
-      "totalScore": "0",
+      "totalScore": "12692.0",
       "members": [
         {
           "id": "P1",
-          "name": "归零",
-          "theme": "探索者的銀凇止境",
-          "score": 0,
+          "name": "浪淘沙尽天涯",
+          "theme": "探索者的银凇止境",
+          "score": 3653,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 1
         },
         {
           "id": "P2",
-          "name": "浪淘沙尽天涯",
+          "name": "言",
           "theme": "萨卡兹的无终奇语",
-          "score": 0,
+          "score": 1821.75,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 2
         },
         {
           "id": "P3",
           "name": "糖该葡萄糖",
-          "theme": "岁的界园志异",
-          "score": 0,
+          "theme": "萨卡兹的无终奇语",
+          "score": 3233.25,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 3
         },
         {
           "id": "P4",
-          "name": "言",
-          "theme": "探索者的銀凇止境",
-          "score": 0,
+          "name": "归零",
+          "theme": "岁的界园志异",
+          "score": 3983.952,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 4
         }
       ],
@@ -268,50 +268,50 @@
       "id": "M5",
       "phase": "ROUND 1",
       "startTime": "",
-      "status": "PENDING",
+      "status": "FINISHED",
       "teamId": "feirenzai",
-      "totalScore": "0",
+      "totalScore": "9186.7",
       "members": [
         {
           "id": "P1",
-          "name": "呃呃啊啊",
-          "theme": "探索者的銀凇止境",
-          "score": 0,
+          "name": "last要楽奈丶",
+          "theme": "探索者的银凇止境",
+          "score": 3123,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 1
         },
         {
           "id": "P2",
-          "name": "last要樂奈丶",
+          "name": "呃呃啊啊",
           "theme": "萨卡兹的无终奇语",
-          "score": 0,
+          "score": 2718,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 2
         },
         {
           "id": "P3",
-          "name": "圣人又土",
-          "theme": "岁的界园志异",
+          "name": "海嗣",
+          "theme": "萨卡兹的无终奇语",
           "score": 0,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 3
         },
         {
           "id": "P4",
-          "name": "海嗣",
-          "theme": "探索者的銀凇止境",
-          "score": 0,
+          "name": "圣人又土",
+          "theme": "岁的界园志异",
+          "score": 3345.72,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 4
         }
       ],
       "playersList": [
         "呃呃啊啊",
-        "last要樂奈丶",
+        "last要楽奈丶",
         "圣人又土",
         "海嗣"
       ]
@@ -320,44 +320,44 @@
       "id": "M6",
       "phase": "ROUND 1",
       "startTime": "",
-      "status": "PENDING",
+      "status": "FINISHED",
       "teamId": "feixing-xuerong",
-      "totalScore": "0",
+      "totalScore": "7862.0",
       "members": [
         {
           "id": "P1",
           "name": "幻尘",
-          "theme": "探索者的銀凇止境",
-          "score": 0,
+          "theme": "探索者的银凇止境",
+          "score": 4105.2,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 1
         },
         {
           "id": "P2",
           "name": "快晴",
           "theme": "萨卡兹的无终奇语",
-          "score": 0,
+          "score": 871.5,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 2
         },
         {
           "id": "P3",
-          "name": "白身鱼",
-          "theme": "岁的界园志异",
-          "score": 0,
+          "name": "魔法蜘蛛",
+          "theme": "萨卡兹的无终奇语",
+          "score": 2885.25,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 3
         },
         {
           "id": "P4",
-          "name": "魔法蜘蛛",
-          "theme": "探索者的銀凇止境",
+          "name": "白身鱼",
+          "theme": "岁的界园志异",
           "score": 0,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 4
         }
       ],
@@ -372,44 +372,44 @@
       "id": "M7",
       "phase": "ROUND 1",
       "startTime": "",
-      "status": "PENDING",
+      "status": "FINISHED",
       "teamId": "mofa-strategy",
-      "totalScore": "0",
+      "totalScore": "6122.4",
       "members": [
         {
           "id": "P1",
           "name": "兔头无权为我授勋",
-          "theme": "探索者的銀凇止境",
-          "score": 0,
+          "theme": "探索者的银凇止境",
+          "score": 689,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 1
         },
         {
           "id": "P2",
-          "name": "布兰卡",
+          "name": "酱香企鹅",
           "theme": "萨卡兹的无终奇语",
-          "score": 0,
+          "score": 249,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 2
         },
         {
           "id": "P3",
           "name": "淮南牛肉汤",
-          "theme": "岁的界园志异",
-          "score": 0,
+          "theme": "萨卡兹的无终奇语",
+          "score": 1368.75,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 3
         },
         {
           "id": "P4",
-          "name": "酱香企鹅",
-          "theme": "探索者的銀凇止境",
-          "score": 0,
+          "name": "布兰卡",
+          "theme": "岁的界园志异",
+          "score": 3815.616,
           "multiplier": 1,
-          "status": "PENDING",
+          "status": "FINISHED",
           "queueOrder": 4
         }
       ],
@@ -640,57 +640,57 @@
       "teamId": "strawberry-no1",
       "name": "草莓天下第一",
       "details": "轮次待排 / 已提交名单",
-      "total": "0",
-      "currentStatus": "PENDING",
-      "teamStatus": "PENDING"
+      "total": "12691.952000000001",
+      "currentStatus": "FINISHED",
+      "teamStatus": "FINISHED"
     },
     {
       "teamId": "mygo",
       "name": "mygo",
       "details": "轮次待排 / 已提交名单",
-      "total": "0",
-      "currentStatus": "PENDING",
-      "teamStatus": "PENDING"
+      "total": "8275.7",
+      "currentStatus": "FINISHED",
+      "teamStatus": "FINISHED"
     },
     {
       "teamId": "tianqi-siqushi",
       "name": "天启四区士",
       "details": "轮次待排 / 已提交名单",
-      "total": "0",
-      "currentStatus": "PENDING",
-      "teamStatus": "PENDING"
+      "total": "9595.322",
+      "currentStatus": "FINISHED",
+      "teamStatus": "FINISHED"
     },
     {
       "teamId": "siqu-brothers",
       "name": "四驱兄弟想队名",
       "details": "轮次待排 / 已提交名单",
-      "total": "0",
-      "currentStatus": "PENDING",
-      "teamStatus": "PENDING"
+      "total": "5040.89",
+      "currentStatus": "FINISHED",
+      "teamStatus": "FINISHED"
     },
     {
       "teamId": "feirenzai",
       "name": "非人哉",
       "details": "轮次待排 / 已提交名单",
-      "total": "0",
-      "currentStatus": "PENDING",
-      "teamStatus": "PENDING"
+      "total": "9186.72",
+      "currentStatus": "FINISHED",
+      "teamStatus": "FINISHED"
     },
     {
       "teamId": "feixing-xuerong",
       "name": "飞行雪绒",
       "details": "轮次待排 / 已提交名单",
-      "total": "0",
-      "currentStatus": "PENDING",
-      "teamStatus": "PENDING"
+      "total": "7861.95",
+      "currentStatus": "FINISHED",
+      "teamStatus": "FINISHED"
     },
     {
       "teamId": "mofa-strategy",
       "name": "魔法战略的集成审判",
       "details": "轮次待排 / 已提交名单",
-      "total": "0",
-      "currentStatus": "PENDING",
-      "teamStatus": "PENDING"
+      "total": "6122.366",
+      "currentStatus": "FINISHED",
+      "teamStatus": "FINISHED"
     }
   ],
   "judgeNotices": [
@@ -708,7 +708,7 @@
       "tag": "MYG",
       "enName": "MYGO",
       "status": "LIVE TRACKING",
-      "totalScore": "0",
+      "totalScore": "8275.7",
       "rank": 1,
       "manifesto": "以稳定推进为第一优先，四人轮转配合，确保每局都打出完整执行。",
       "radarStats": [
@@ -751,13 +751,13 @@
         },
         {
           "id": "P2",
-          "name": "红白、",
+          "name": "红白白",
           "role": "推进位",
           "theme": "萨卡兹的无终奇语",
           "signatureOp": "待补充",
           "squad": "推进分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/mygo/红白、.jpg",
+          "avatar": "/contestants/mygo/红白白.jpg",
           "operatorPicks": []
         },
         {
@@ -775,10 +775,10 @@
           "id": "P4",
           "name": "雪月花",
           "role": "终局位",
-          "theme": "探索者的银凇止境",
+          "theme": "萨卡兹的无终奇语",
           "signatureOp": "待补充",
           "squad": "终局分队",
-          "note": "选手资料已同步，详细战术信息待补充。",
+          "note": "🚨 该选手担任本队抗压位。",
           "avatar": "/contestants/mygo/雪月花.jpg",
           "operatorPicks": []
         }
@@ -790,7 +790,7 @@
       "tag": "TQS",
       "enName": "APOCALYPSE QUARTET",
       "status": "READY",
-      "totalScore": "0",
+      "totalScore": "9595.3",
       "rank": 2,
       "manifesto": "稳中求快，尽量把每一次希望和源石锭消耗都换成稳定分数。",
       "radarStats": [
@@ -833,20 +833,20 @@
         },
         {
           "id": "P2",
-          "name": "起步之志",
+          "name": "拾壹月的鹤主",
           "role": "推进位",
           "theme": "萨卡兹的无终奇语",
           "signatureOp": "待补充",
           "squad": "推进分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/天启四区士/起步之志.jpg",
+          "avatar": "/contestants/天启四区士/拾壹月的鹤主.jpg",
           "operatorPicks": []
         },
         {
           "id": "P3",
           "name": "忍野忍不下去",
           "role": "运营位",
-          "theme": "岁的界园志异",
+          "theme": "萨卡兹的无终奇语",
           "signatureOp": "待补充",
           "squad": "运营分队",
           "note": "选手资料已同步，详细战术信息待补充。",
@@ -855,13 +855,13 @@
         },
         {
           "id": "P4",
-          "name": "拾壹月的鹤主",
+          "name": "起步之志",
           "role": "终局位",
-          "theme": "探索者的银凇止境",
+          "theme": "岁的界园志异",
           "signatureOp": "待补充",
           "squad": "终局分队",
-          "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/天启四区士/拾壹月的鹤主.jpg",
+          "note": "🚨 该选手担任本队抗压位。",
+          "avatar": "/contestants/天启四区士/起步之志.jpg",
           "operatorPicks": []
         }
       ]
@@ -872,7 +872,7 @@
       "tag": "SQX",
       "enName": "4WD BROS",
       "status": "READY",
-      "totalScore": "0",
+      "totalScore": "5040.9",
       "rank": 3,
       "manifesto": "速度与细节并重，确保每一棒都能平稳接力。",
       "radarStats": [
@@ -904,31 +904,31 @@
       "members": [
         {
           "id": "P1",
-          "name": "Aimer",
+          "name": "朝霞",
           "role": "开局位",
           "theme": "探索者的银凇止境",
           "signatureOp": "待补充",
           "squad": "主攻分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/四驱兄弟想队名/Aimer.jpg",
+          "avatar": "/contestants/四驱兄弟想队名/朝霞.jpg",
           "operatorPicks": []
         },
         {
           "id": "P2",
-          "name": "朝霞",
+          "name": "Aimer",
           "role": "推进位",
           "theme": "萨卡兹的无终奇语",
           "signatureOp": "待补充",
           "squad": "推进分队",
-          "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/四驱兄弟想队名/朝霞.jpg",
+          "note": "🚨 该选手担任本队抗压位。",
+          "avatar": "/contestants/四驱兄弟想队名/Aimer.jpg",
           "operatorPicks": []
         },
         {
           "id": "P3",
           "name": "洛齐克",
           "role": "运营位",
-          "theme": "岁的界园志异",
+          "theme": "萨卡兹的无终奇语",
           "signatureOp": "待补充",
           "squad": "运营分队",
           "note": "选手资料已同步，详细战术信息待补充。",
@@ -939,7 +939,7 @@
           "id": "P4",
           "name": "顾秦",
           "role": "终局位",
-          "theme": "探索者的银凇止境",
+          "theme": "岁的界园志异",
           "signatureOp": "待补充",
           "squad": "终局分队",
           "note": "选手资料已同步，详细战术信息待补充。",
@@ -954,7 +954,7 @@
       "tag": "CMY",
       "enName": "STRAWBERRY NO.1",
       "status": "READY",
-      "totalScore": "0",
+      "totalScore": "12692.0",
       "rank": 4,
       "manifesto": "保持稳定节奏，先拿到确定分，再冲击紧急作战高收益路线。",
       "radarStats": [
@@ -986,46 +986,46 @@
       "members": [
         {
           "id": "P1",
-          "name": "归零",
+          "name": "浪淘沙尽天涯",
           "role": "开局位",
           "theme": "探索者的银凇止境",
           "signatureOp": "待补充",
           "squad": "主攻分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/草莓天下第一/归零.jpg",
+          "avatar": "/contestants/草莓天下第一/浪淘沙尽天涯.jpg",
           "operatorPicks": []
         },
         {
           "id": "P2",
-          "name": "浪淘沙尽天涯",
+          "name": "言",
           "role": "推进位",
           "theme": "萨卡兹的无终奇语",
           "signatureOp": "待补充",
           "squad": "推进分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/草莓天下第一/浪淘沙尽天涯.jpg",
+          "avatar": "/contestants/草莓天下第一/言.jpg",
           "operatorPicks": []
         },
         {
           "id": "P3",
           "name": "糖该葡萄糖",
           "role": "运营位",
-          "theme": "岁的界园志异",
+          "theme": "萨卡兹的无终奇语",
           "signatureOp": "待补充",
           "squad": "运营分队",
-          "note": "选手资料已同步，详细战术信息待补充。",
+          "note": "🚨 该选手担任本队抗压位。",
           "avatar": "/contestants/草莓天下第一/糖该葡萄糖.jpg",
           "operatorPicks": []
         },
         {
           "id": "P4",
-          "name": "言",
+          "name": "归零",
           "role": "终局位",
-          "theme": "探索者的银凇止境",
+          "theme": "岁的界园志异",
           "signatureOp": "待补充",
           "squad": "终局分队",
-          "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/草莓天下第一/言.jpg",
+          "note": "🚨 该选手担任本队抗压位。",
+          "avatar": "/contestants/草莓天下第一/归零.jpg",
           "operatorPicks": []
         }
       ]
@@ -1036,7 +1036,7 @@
       "tag": "FRZ",
       "enName": "FEI REN ZAI",
       "status": "READY",
-      "totalScore": "0",
+      "totalScore": "9186.7",
       "rank": 5,
       "manifesto": "打法灵活但不失稳健，核心目标是每棒都打出分数下限保障。",
       "radarStats": [
@@ -1068,46 +1068,46 @@
       "members": [
         {
           "id": "P1",
-          "name": "呃呃啊啊",
+          "name": "last要楽奈丶",
           "role": "开局位",
           "theme": "探索者的银凇止境",
           "signatureOp": "待补充",
           "squad": "主攻分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/非人哉/呃呃啊啊.jpg",
+          "avatar": "/contestants/非人哉/last要楽奈丶.jpg",
           "operatorPicks": []
         },
         {
           "id": "P2",
-          "name": "last要楽奈丶",
+          "name": "呃呃啊啊",
           "role": "推进位",
           "theme": "萨卡兹的无终奇语",
           "signatureOp": "待补充",
           "squad": "推进分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/非人哉/last要楽奈丶.jpg",
+          "avatar": "/contestants/非人哉/呃呃啊啊.jpg",
           "operatorPicks": []
         },
         {
           "id": "P3",
-          "name": "圣人又土",
+          "name": "海嗣",
           "role": "运营位",
-          "theme": "岁的界园志异",
+          "theme": "萨卡兹的无终奇语",
           "signatureOp": "待补充",
           "squad": "运营分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/非人哉/圣人又土.jpg",
+          "avatar": "/contestants/非人哉/海嗣.jpg",
           "operatorPicks": []
         },
         {
           "id": "P4",
-          "name": "海嗣",
+          "name": "圣人又土",
           "role": "终局位",
-          "theme": "探索者的银凇止境",
+          "theme": "岁的界园志异",
           "signatureOp": "待补充",
           "squad": "终局分队",
-          "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/非人哉/海嗣.jpg",
+          "note": "🚨 该选手担任本队抗压位。",
+          "avatar": "/contestants/非人哉/圣人又土.jpg",
           "operatorPicks": []
         }
       ]
@@ -1118,7 +1118,7 @@
       "tag": "FXR",
       "enName": "FLYING SNOW VELVET",
       "status": "READY",
-      "totalScore": "0",
+      "totalScore": "7862.0",
       "rank": 6,
       "manifesto": "以精确运营为主轴，确保关键节点的容错和藏品收益最大化。",
       "radarStats": [
@@ -1155,7 +1155,7 @@
           "theme": "探索者的银凇止境",
           "signatureOp": "待补充",
           "squad": "主攻分队",
-          "note": "选手资料已同步，详细战术信息待补充。",
+          "note": "🚨 该选手担任本队抗压位。",
           "avatar": "/contestants/飞行雪绒/幻尘.jpg",
           "operatorPicks": []
         },
@@ -1172,24 +1172,24 @@
         },
         {
           "id": "P3",
-          "name": "白身鱼",
+          "name": "魔法蜘蛛",
           "role": "运营位",
-          "theme": "岁的界园志异",
+          "theme": "萨卡兹的无终奇语",
           "signatureOp": "待补充",
           "squad": "运营分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/飞行雪绒/白身鱼.jpg",
+          "avatar": "/contestants/飞行雪绒/魔法蜘蛛.jpg",
           "operatorPicks": []
         },
         {
           "id": "P4",
-          "name": "魔法蜘蛛",
+          "name": "白身鱼",
           "role": "终局位",
-          "theme": "探索者的银凇止境",
+          "theme": "岁的界园志异",
           "signatureOp": "待补充",
           "squad": "终局分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/飞行雪绒/魔法蜘蛛.jpg",
+          "avatar": "/contestants/飞行雪绒/白身鱼.jpg",
           "operatorPicks": []
         }
       ]
@@ -1200,7 +1200,7 @@
       "tag": "MFS",
       "enName": "ARCANE STRATEGY TRIBUNAL",
       "status": "READY",
-      "totalScore": "0",
+      "totalScore": "6122.4",
       "rank": 7,
       "manifesto": "以全局规划为先，强调路线决策、希望分配和终局收束协同。",
       "radarStats": [
@@ -1243,20 +1243,20 @@
         },
         {
           "id": "P2",
-          "name": "布兰卡",
+          "name": "酱香企鹅",
           "role": "推进位",
           "theme": "萨卡兹的无终奇语",
           "signatureOp": "待补充",
           "squad": "推进分队",
           "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/魔法战略的集成审判/布兰卡.jpg",
+          "avatar": "/contestants/魔法战略的集成审判/酱香企鹅.jpg",
           "operatorPicks": []
         },
         {
           "id": "P3",
           "name": "淮南牛肉汤",
           "role": "运营位",
-          "theme": "岁的界园志异",
+          "theme": "萨卡兹的无终奇语",
           "signatureOp": "待补充",
           "squad": "运营分队",
           "note": "选手资料已同步，详细战术信息待补充。",
@@ -1265,13 +1265,13 @@
         },
         {
           "id": "P4",
-          "name": "酱香企鹅",
+          "name": "布兰卡",
           "role": "终局位",
-          "theme": "探索者的银凇止境",
+          "theme": "岁的界园志异",
           "signatureOp": "待补充",
           "squad": "终局分队",
-          "note": "选手资料已同步，详细战术信息待补充。",
-          "avatar": "/contestants/魔法战略的集成审判/酱香企鹅.jpg",
+          "note": "🚨 该选手担任本队抗压位。",
+          "avatar": "/contestants/魔法战略的集成审判/布兰卡.jpg",
           "operatorPicks": []
         }
       ]
@@ -1282,7 +1282,7 @@
       "id": "section-format",
       "slug": "format",
       "title": "赛制总览",
-      "intro": "本次比赛围绕铁人三项式的并行积分赛制展开，每队四人同时推进不同集成战略主题挑战。",
+      "intro": "本次比赛采用并行积分赛制，每队四人同时推进不同集成战略主题挑战。",
       "blocks": [
         {
           "title": "赛制说明",
@@ -1312,7 +1312,7 @@
       "id": "section-general-rules",
       "slug": "general-rules",
       "title": "通用规则",
-      "intro": "这些规则适用于所有队伍和全部主题，是首版赛事站必须完整公开的判定基础。",
+      "intro": "以下规则适用于所有队伍和全部主题。",
       "blocks": [
         {
           "title": "希望与协作限制",

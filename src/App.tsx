@@ -13,6 +13,8 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 const LivePage = lazy(() => import("./pages/LivePage").then((module) => ({ default: module.LivePage })));
 const RulesPage = lazy(() => import("./pages/RulesPage").then((module) => ({ default: module.RulesPage })));
 const TeamsPage = lazy(() => import("./pages/TeamsPage").then((module) => ({ default: module.TeamsPage })));
+const ContestantPage = lazy(() => import("./pages/ContestantPage").then((module) => ({ default: module.ContestantPage })));
+const HistoryPage = lazy(() => import("./pages/HistoryPage").then((module) => ({ default: module.HistoryPage })));
 
 const AdminLogin = lazy(() => import("./pages/admin/AdminLogin").then((m) => ({ default: m.AdminLogin })));
 const AdminLayout = lazy(() => import("./pages/admin/AdminLayout").then((m) => ({ default: m.AdminLayout })));
@@ -27,6 +29,7 @@ const navItems = [
   { to: "/live", label: "赛事大厅" },
   { to: "/teams", label: "队伍情报" },
   { to: "/rules", label: "赛事手册" },
+  { to: "/history", label: "历史赛事" },
 ];
 
 function AppShell() {
@@ -152,7 +155,9 @@ function AppShell() {
               <Route element={<HomePage />} path="/" />
               <Route element={<LivePage />} path="/live" />
               <Route element={<TeamsPage />} path="/teams" />
+              <Route element={<ContestantPage />} path="/contestants/:contestantId" />
               <Route element={<RulesPage />} path="/rules" />
+              <Route element={<HistoryPage />} path="/history" />
               <Route element={<AdminLogin />} path="/admin/login" />
               <Route element={<ProtectedRoute><AdminLayout /></ProtectedRoute>} path="/admin">
                 <Route index element={<Navigate to="/admin/dashboard" replace />} />

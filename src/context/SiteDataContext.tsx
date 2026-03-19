@@ -17,8 +17,10 @@ import {
   type ScheduleDay,
   type SiteMeta,
   type Team,
+  type TeamMemberOperatorPick,
   type ThemeRule,
 } from "../content";
+
 
 export interface OverviewPanel {
   title: string;
@@ -108,6 +110,87 @@ export function SiteDataProvider({ children }: PropsWithChildren) {
 
     return () => {
       isActive = false;
+    };
+  }, []);
+
+  // WebSocket: live data updates
+  useEffect(() => {
+    const wsProto = window.location.protocol === "https:" ? "wss:" : "ws:";
+    const wsUrl = `${wsProto}//${window.location.host}/ws`;
+    let ws: WebSocket | null = null;
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    let active = true;
+
+    function connect() {
+      ws = new WebSocket(wsUrl);
+
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data as string) as { event: string; data: unknown };
+
+          if (msg.event === "picks:updated") {
+            const { teamId, memberId, operatorPicks } = msg.data as {
+              teamId: string;
+              memberId: string;
+              operatorPicks: TeamMemberOperatorPick[];
+            };
+            setData((prev) => ({
+              ...prev,
+              teams: prev.teams.map((team) =>
+                team.id === teamId
+                  ? {
+                    ...team,
+                    members: team.members.map((member) =>
+                      member.id === memberId ? { ...member, operatorPicks } : member,
+                    ),
+                  }
+                  : team,
+              ),
+            }));
+          }
+
+          if (msg.event === "live:updated") {
+            const liveBroadcast = msg.data as LiveBroadcastMeta;
+            setData((prev) => ({ ...prev, liveBroadcast }));
+          }
+
+          if (msg.event === "match:updated") {
+            const updatedMatch = msg.data as Match;
+            setData((prev) => ({
+              ...prev,
+              matches: prev.matches.map((m) => (m.id === updatedMatch.id ? updatedMatch : m)),
+            }));
+          }
+
+          if (msg.event === "team:updated") {
+            // Full content replaced — re-fetch
+            fetch("/api/public/bootstrap")
+              .then((res) => res.json())
+              .then((payload: SiteDataBootstrap) => setData(payload))
+              .catch(() => { });
+          }
+        } catch {
+          // ignore parse errors
+        }
+      };
+
+      ws.onclose = () => {
+        if (active) {
+          reconnectTimer = setTimeout(connect, 5000);
+        }
+      };
+
+      ws.onerror = () => {
+        ws?.close();
+      };
+    }
+
+    connect();
+
+    return () => {
+      active = false;
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      ws?.close();
     };
   }, []);
 

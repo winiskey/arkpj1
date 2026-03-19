@@ -18,11 +18,16 @@ const server = await createServer({
         target: "http://127.0.0.1:8787",
         changeOrigin: true,
       },
+      "/ws": {
+        target: "http://127.0.0.1:8787",
+        changeOrigin: true,
+        ws: true,
+      },
     },
   },
 });
 
-const keepAlive = setInterval(() => {}, 1 << 30);
+const keepAlive = setInterval(() => { }, 1 << 30);
 
 const closeServer = async () => {
   clearInterval(keepAlive);

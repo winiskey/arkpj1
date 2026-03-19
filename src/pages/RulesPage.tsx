@@ -104,9 +104,9 @@ export function RulesPage() {
   return (
     <PageFrame className="gap-6 md:gap-8 lg:gap-10">
       <SectionHeader
-        cnTitle="赛事规章与细则"
+        cnTitle="赛事规则手册"
         description="荆楚歌 #2 赛事的完整规则手册，包含赛制说明、通用规则、各主题计分细则与系数计算公式。"
-        enTitle="TOURNAMENT ARCHIVE"
+        enTitle="TOURNAMENT RULEBOOK"
       />
 
       <div className="gsap-stagger-item">

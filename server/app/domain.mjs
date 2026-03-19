@@ -221,12 +221,11 @@ export function syncScoreSheetsState(state = createDefaultScoreSheetsState()) {
 }
 
 export function formatScore(value) {
-  const rounded = Math.round(parseNumber(value, 0) * 100) / 100;
-  const hasFraction = Math.abs(rounded - Math.round(rounded)) > 1e-6;
+  const rounded = Math.round(parseNumber(value, 0) * 10) / 10;
 
   return rounded.toLocaleString("en-US", {
-    minimumFractionDigits: hasFraction ? 2 : 0,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
   });
 }
 
@@ -390,40 +389,40 @@ export function buildTeamComplianceSummary(team, rawCompliance = normalizeCompli
   const warnings = [];
 
   if (!pressureRoleAssigned) {
-    blockingIssues.push("Pressure role is not assigned.");
+    blockingIssues.push("尚未分配抗压位选手。");
   } else if (!pressureRoleMemberExists) {
-    blockingIssues.push("Pressure role member is missing from the roster.");
+    blockingIssues.push("抗压位选手不在当前花名册中。");
   }
 
   if (missingMembers > 0) {
-    blockingIssues.push(`Roster is short by ${missingMembers} member(s).`);
+    blockingIssues.push(`花名册缺少 ${missingMembers} 名选手。`);
   }
 
   if (compliance.coachCalls.length > tournamentConfig.coachCalls.maxCount) {
-    blockingIssues.push("Coach call count exceeds the rule limit.");
+    blockingIssues.push("教练通话次数超过规则上限。");
   }
 
   if (overDurationCalls.length > 0) {
-    blockingIssues.push("At least one coach call exceeds the per-call duration limit.");
+    blockingIssues.push("至少有一次教练通话时长超过单次上限。");
   }
 
   const coefficientBreakdown = buildCoefficientBreakdown(compliance, duplicateSixStars, sharedIngotsSpent);
 
   if (coefficientBreakdown.overtime.delta !== 0) {
-    warnings.push(`Overtime coefficient penalty applied (${coefficientBreakdown.overtime.delta}).`);
+    warnings.push(`超时系数惩罚已生效 (${coefficientBreakdown.overtime.delta})。`);
   } else if (compliance.overtimeMinutes > 0) {
-    warnings.push("Overtime minutes were recorded but did not reach the first 20-minute penalty step.");
+    warnings.push("已记录超时分钟数，但未达到首个 20 分钟惩罚阈值。");
   }
 
   if (coefficientBreakdown.duplicateSixStars.delta !== 0) {
     warnings.push(
-      `Duplicate six-star coefficient penalty applied (${coefficientBreakdown.duplicateSixStars.delta}).`,
+      `重复六星干员系数惩罚已生效 (${coefficientBreakdown.duplicateSixStars.delta})。`,
     );
   }
 
   if (coefficientBreakdown.extraShopSpend.delta !== 0) {
     warnings.push(
-      `Extra shop spend coefficient penalty applied (${coefficientBreakdown.extraShopSpend.delta}).`,
+      `超额商店消费系数惩罚已生效 (${coefficientBreakdown.extraShopSpend.delta})。`,
     );
   }
 

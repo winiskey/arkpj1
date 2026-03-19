@@ -7,7 +7,7 @@ if (!config.adminToken) {
   console.warn("⚠️  ADMIN_TOKEN is not set. Admin endpoints are UNPROTECTED.");
 }
 
-const { server, service } = createApp(config);
+const { server, service, wsManager } = createApp(config);
 
 await service.ensureReady();
 
@@ -23,6 +23,7 @@ server.listen(config.port, config.host, () => {
 for (const signal of ["SIGTERM", "SIGINT"]) {
   process.on(signal, () => {
     console.log(`Received ${signal}, shutting down…`);
+    wsManager.close();
     server.close(() => process.exit(0));
   });
 }

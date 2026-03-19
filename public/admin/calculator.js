@@ -39,11 +39,10 @@ function escapeHtml(value) {
 }
 
 function formatScore(value) {
-    const rounded = Math.round((Number(value) || 0) * 100) / 100;
-    const hasFraction = Math.abs(rounded - Math.round(rounded)) > 1e-6;
+    const rounded = Math.round((Number(value) || 0) * 10) / 10;
     return rounded.toLocaleString("en-US", {
-        minimumFractionDigits: hasFraction ? 2 : 0,
-        maximumFractionDigits: 2,
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
     });
 }
 
@@ -294,9 +293,9 @@ function renderTeamAggregate(aggregate) {
     teamAggregateCache = aggregate;
     document.getElementById("team-status").textContent = aggregate?.status?.label || "待录入";
     document.getElementById("team-progress").textContent = aggregate ? `${aggregate.scoredCount} / ${aggregate.memberCount}` : "0 / 0";
-    document.getElementById("team-raw-total").textContent = aggregate?.formatted?.rawTotal || "0";
-    document.getElementById("team-pressure-bonus").textContent = aggregate?.formatted?.pressureBonus || "0";
-    document.getElementById("team-final-total").textContent = aggregate?.formatted?.finalTotal || aggregate?.formatted?.teamTotal || "0";
+    document.getElementById("team-raw-total").textContent = aggregate?.formatted?.rawTotal || "0.0";
+    document.getElementById("team-pressure-bonus").textContent = aggregate?.formatted?.pressureBonus || "0.0";
+    document.getElementById("team-final-total").textContent = aggregate?.formatted?.finalTotal || aggregate?.formatted?.teamTotal || "0.0";
 
     const membersBoard = document.getElementById("team-members-board");
     if (!aggregate) {
@@ -364,7 +363,7 @@ function calcSami() {
     const multiplier = gc("sa-gift") ? 1.2 : 1;
     return {
         total: raw * multiplier,
-        formula: multiplier === 1 ? `(${raw.toFixed(2)})` : `(${raw.toFixed(2)} x ${multiplier.toFixed(2)})`,
+        formula: multiplier === 1 ? `(${raw.toFixed(1)})` : `(${raw.toFixed(1)} x ${multiplier.toFixed(2)})`,
     };
 }
 
@@ -421,7 +420,7 @@ function calcSarkaz() {
     }
     if (gc("sk-roll")) ending *= 1.2;
     raw += ending;
-    return { total: raw * 0.75, formula: `(${raw.toFixed(2)} x 0.75)` };
+    return { total: raw * 0.75, formula: `(${raw.toFixed(1)} x 0.75)` };
 }
 
 function calcSui() {
@@ -473,7 +472,7 @@ function calcSui() {
     if (gc("sui-pen-1")) multiplier *= 0.5;
     if (gc("sui-pen-2")) multiplier *= 0.5;
 
-    return { total: raw * multiplier, formula: `(${raw.toFixed(2)} x ${multiplier.toFixed(2)})` };
+    return { total: raw * multiplier, formula: `(${raw.toFixed(1)} x ${multiplier.toFixed(2)})` };
 }
 
 function calculateCurrentResult() {
@@ -486,7 +485,7 @@ function calculateCurrentResult() {
 
 function calc() {
     const result = calculateCurrentResult();
-    document.getElementById("total-score").innerText = Number(result.total || 0).toFixed(2);
+    document.getElementById("total-score").innerText = Number(result.total || 0).toFixed(1);
     document.getElementById("formula-text").innerText = result.formula;
 }
 
@@ -606,7 +605,7 @@ async function saveSheetWithStatus(nextStatus) {
         matchId: document.getElementById("meta-match").value || null,
         theme: currentTab,
         snapshot: collectCurrentSnapshot(),
-        previewScore: Number((result.total || 0).toFixed(2)),
+        previewScore: Number((result.total || 0).toFixed(1)),
         formulaText: result.formula,
         note: document.getElementById("meta-note").value.trim(),
         status: nextStatus,
@@ -736,3 +735,10 @@ async function loadBootstrap() {
 
 calc();
 loadBootstrap();
+
+/* Auto-select number input value on focus — prevents "02500" typos */
+document.addEventListener("focusin", (e) => {
+    if (e.target.matches('input[type="number"]')) {
+        requestAnimationFrame(() => e.target.select());
+    }
+});

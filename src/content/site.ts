@@ -24,7 +24,7 @@ export const overviewPanels = [
     title: "赛制核心",
     label: "FORMAT",
     content:
-      "四名选手分别挑战不同肉鸽主题，以修正后的个人结算分汇总为战队总分。",
+      "四名选手分别挑战不同集成战略主题，以修正后的个人结算分汇总为战队总分。",
   },
   {
     title: "判定逻辑",

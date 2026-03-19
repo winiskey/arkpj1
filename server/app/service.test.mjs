@@ -165,7 +165,7 @@ test("publishTeam rejects blocking compliance states even when every sheet is fi
       name: "missing pressure role",
       team: createTeam(),
       compliance: { pressureMemberId: null },
-      expected: "Pressure role is not assigned.",
+      expected: "尚未分配抗压位选手。",
     },
     {
       name: "short roster",

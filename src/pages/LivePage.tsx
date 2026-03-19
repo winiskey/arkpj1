@@ -39,7 +39,7 @@ export function LivePage() {
     () => [
       {
         icon: CalendarDays,
-        label: "排期跨度",
+        label: "赛程跨度",
         value: `${eventSchedule[0]?.date ?? "--"} - ${eventSchedule[eventSchedule.length - 1]?.date ?? "--"}`,
         detail: `${eventSchedule.length} 天 / ${scheduledCount} 场已录入`,
       },
@@ -47,7 +47,7 @@ export function LivePage() {
         icon: Radio,
         label: "主会场焦点",
         value: featuredTeamName ?? "等待切入",
-        detail: featuredMatch ? `${featuredMatch.id} · ${featuredMatch.startTime}` : "等待裁判切入主会场",
+        detail: featuredMatch ? `${featuredMatch.id} · ${featuredMatch.startTime}` : "等待下一场开始",
       },
       {
         icon: Clock3,
@@ -106,7 +106,7 @@ export function LivePage() {
               <SectionHeader
                 cnTitle="主会场实时追踪"
                 description="当前进行中与待开赛的比赛一览；比赛结束后将自动归档。"
-                enTitle="LIVE COMMAND BOARD"
+                enTitle="LIVE TRACKING BOARD"
               />
               <ScheduleBoard matches={matches} teamNameById={teamNameById} />
             </section>
@@ -150,7 +150,7 @@ export function LivePage() {
 
             <details className="mt-6 border-t border-white/8 pt-5 text-sm text-text2">
               <summary className="flex list-none items-center justify-between gap-3 font-display uppercase tracking-[0.16em] text-text3 transition-colors hover:text-brand">
-                <span>展开详细说明</span>
+                <span>展开完整规则说明</span>
                 <ChevronDown className="h-4 w-4" />
               </summary>
               <div className="mt-5 space-y-4 text-[15px] leading-7 text-text2">
@@ -158,7 +158,7 @@ export function LivePage() {
                   <p key={notice}>{notice}</p>
                 ))}
                 <p className="border-l-2 border-brand/40 pl-4 text-sm text-text3">
-                  榜单优先服务于观众追踪主会场节奏，最终结果仍以裁判组复核公告为准。
+                  排行榜为实时追踪用途，最终成绩以裁判组复核公告为准。
                 </p>
               </div>
             </details>

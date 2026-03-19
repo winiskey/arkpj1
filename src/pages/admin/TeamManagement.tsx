@@ -60,9 +60,9 @@ export function TeamManagement() {
                   </div>
                   {aggregate && (
                     <div className="mt-1.5 flex items-center gap-4 text-sm">
-                      <span className="text-text2">基础总分: {Math.round(aggregate.rawTotal)}</span>
+                      <span className="text-text2">基础总分: {aggregate.rawTotal.toFixed(1)}</span>
                       <span className="text-text2">合规系数: {(aggregate.coefficient * 100).toFixed(1)}%</span>
-                      <span className="font-bold text-brand">最终得分: {Math.round(aggregate.finalTotal)}</span>
+                      <span className="font-bold text-brand">最终得分: {aggregate.finalTotal.toFixed(1)}</span>
                     </div>
                   )}
                 </div>
@@ -269,7 +269,7 @@ function TeamCompliancePanel({
           <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-text2">成绩预览</div>
           <div className="flex items-center justify-between border-b border-strokeSoft pb-2 text-sm">
             <span className="text-text2">基础总分:</span>
-            <span className="font-mono text-text1">{aggregate.rawTotal.toFixed(2)}</span>
+            <span className="font-mono text-text1">{aggregate.rawTotal.toFixed(1)}</span>
           </div>
           <div className="flex items-center justify-between border-b border-strokeSoft py-2 text-sm">
             <span className="text-text2">合规系数:</span>
@@ -277,7 +277,7 @@ function TeamCompliancePanel({
           </div>
           <div className="flex items-center justify-between pt-2 text-base font-bold">
             <span className="text-text1">最终得分:</span>
-            <span className="font-mono text-brand">{aggregate.finalTotal.toFixed(2)}</span>
+            <span className="font-mono text-brand">{aggregate.finalTotal.toFixed(1)}</span>
           </div>
         </div>
 
