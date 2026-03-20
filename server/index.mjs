@@ -4,7 +4,9 @@ import { createApp } from "./app/create-server.mjs";
 const config = getServerConfig();
 
 if (!config.adminToken) {
-  console.warn("⚠️  ADMIN_TOKEN is not set. Admin endpoints are UNPROTECTED.");
+  console.error("❌ FATAL: ADMIN_TOKEN 未配置，拒绝启动。");
+  console.error("   请在环境变量文件中设置 ADMIN_TOKEN=<强密码>，然后重启服务。");
+  process.exit(1);
 }
 
 const { server, service, wsManager } = createApp(config);

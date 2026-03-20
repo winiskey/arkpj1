@@ -406,12 +406,21 @@ server {
 ### 备份命令
 
 ```bash
-# 手动备份
-cp -r server/data/ backup/data-$(date +%Y%m%d-%H%M%S)/
-
-# 自动备份（cron，每小时）
-0 * * * * cp -r /srv/ark-site/server/data/ /srv/backup/ark-data-$(date +\%H)/
+# 手动备份（在服务器上执行）
+cp -r /var/www/arkproject/current/server/data/ /var/www/arkproject/backup/data-$(date +%Y%m%d-%H%M%S)/
 ```
+
+### 设置自动备份（cron）
+
+```bash
+# 编辑 crontab
+crontab -e
+
+# 添加以下行：每30分钟备份一次，保留48个快照（滚动覆盖）
+*/30 * * * * cp -r /var/www/arkproject/current/server/data/ /var/www/arkproject/backup/data-$(date +\%H\%M)/ 2>/dev/null
+```
+
+> 💡 建议赛前在服务器上配置好 cron，赛后再清理历史快照。
 
 ### 恢复
 
@@ -438,7 +447,7 @@ node server/index.mjs
 
 1. 检查 `ADMIN_TOKEN` 环境变量是否设置
 2. 请求时需携带: `X-Admin-Token: <token>` 或 `Authorization: Bearer <token>`
-3. 如果 `ADMIN_TOKEN` 为空，所有管理接口无需认证
+3. ⚠️ `ADMIN_TOKEN` 为空时，服务会**拒绝启动**（`process.exit(1)`），请确保 env 文件中已填写
 
 ### 计分不正确
 
@@ -466,12 +475,12 @@ node server/index.mjs
 
 | 事项 | 说明 |
 |------|------|
-| 🔑 Admin Token | 生产环境必须设置非空值 |
-| 🌐 CORS | 不要在生产环境使用 `*`，明确指定允许的域名 |
-| 📝 错误信息 | 500 错误目前会返回内部错误信息（低危，建议生产环境改为通用提示） |
-| 🔐 Token 比较 | 当前使用 `!==` 比较（存在理论时序攻击风险，考虑改用 `crypto.timingSafeEqual`） |
-| 💾 数据文件 | `server/data/` 不应公开访问 |
-| 🔒 HTTPS | 生产环境必须启用 HTTPS（在反向代理层处理） |
+| 🔑 Admin Token | **必须设置非空值**，否则服务拒绝启动。生成示例：`openssl rand -hex 32` |
+| 🌐 CORS | 不要在生产环境使用 `*`，明确指定允许的域名（如 `https://yourdomain.com`） |
+| 💾 数据文件 | `server/data/` 已通过 `.gitignore` 排除，不会提交到 Git，但需手动定期备份 |
+| 🔒 HTTPS | 生产环境必须启用 HTTPS（在 nginx 反向代理层配置 SSL） |
+| 📝 错误信息 | 500 错误目前会返回内部错误信息（低危，赛后如有需要可改为通用提示） |
+| 🔐 Token 比较 | 当前使用 `!==` 字符串比较（理论时序攻击风险极低，小型赛事可接受） |
 
 ---
 

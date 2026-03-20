@@ -17,6 +17,9 @@ output/
 chrome-headless-profile/
 arkproject-deploy.zip
 
+# Server runtime data (live tournament state — never commit)
+server/data/
+
 # Local review/debug assets
 ui-*.png
 _frame_test.png
