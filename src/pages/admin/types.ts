@@ -220,7 +220,10 @@ export interface TeamAggregate {
     teamId: string;
     teamName: string;
     teamTag: string;
-    status: string;
+    status: {
+        key: string;
+        label: string;
+    };
     memberCount: number;
     scoredCount: number;
     finalizedCount: number;

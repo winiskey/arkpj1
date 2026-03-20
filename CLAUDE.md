@@ -31,9 +31,13 @@ Browser (React SPA)  ←→  Vite Dev Proxy (:3000)  ←→  Node.js API (:8787)
                                               (server/data/*.json)
 ```
 
-**Frontend** (`src/`): React 18 + TypeScript + Tailwind CSS + GSAP + React Router v6. All pages are lazy-loaded. `SiteDataContext` bootstraps data: it starts from static content in `src/content/` and attempts to upgrade to live API data from `/api/public/bootstrap` on mount. If the API is unavailable, the static fallback is used silently.
+**Frontend** (`src/`): React 18 + TypeScript + Tailwind CSS + GSAP + React Router v6. UI text is in Chinese (简体中文). All pages are lazy-loaded. `SiteDataContext` bootstraps data: it starts from static content in `src/content/` and attempts to upgrade to live API data from `/api/public/bootstrap` on mount. If the API is unavailable, the static fallback is used silently.
 
-**Backend** (`server/`): Zero-dependency Node.js HTTP server (pure ESM). No framework. Routes are registered in `server/app/create-server.mjs`. All admin routes are wrapped with `withAdmin()` which calls `context.assertAdminAuth()` (Bearer token from `ADMIN_TOKEN` env var). Persistence is atomic JSON via `json-file-store.mjs` with a write-ahead queue.
+**Admin frontend** (`src/pages/admin/`): Protected by `ProtectedRoute` (checks `localStorage.adminToken`). Uses its own `AdminDataContext` for admin-specific state. Pages: Dashboard, ScoreManagement, TeamManagement, BroadcastControl, ScoreCalculator.
+
+**Backend** (`server/`): Zero-dependency Node.js HTTP server (pure ESM). No framework. Routes are registered in `server/app/create-server.mjs`. All admin routes are wrapped with `withAdmin()` which calls `context.assertAdminAuth()` (Bearer token from `ADMIN_TOKEN` env var). Persistence is atomic JSON via `json-file-store.mjs` with a write-ahead queue. WebSocket support (`ws.mjs`) broadcasts live updates to connected clients; attached to the HTTP server in `createApp()`.
+
+**Public API routes** (no auth): `GET /api/health`, `GET /api/public/bootstrap` (full public data), `GET /api/public/rule-config` (rule version + tournament config).
 
 **Data flow for scoring**: Admin submits a score sheet → `service.mjs` calls `domain.mjs` to validate and upsert → `scoring.mjs` recalculates the theme score server-side → aggregate (team total) is recomputed via `buildTeamAggregate()` in `domain.mjs`.
 
@@ -66,13 +70,15 @@ Set these in `.env` (already gitignored). In production, `ADMIN_TOKEN` must be n
 | GET | `/api/admin/ops/bootstrap` | Full admin dashboard data |
 | GET | `/api/admin/calculator/bootstrap` | Calculator page data |
 | POST | `/api/admin/calculator/solo` | Recalculate a single score |
-| PUT | `/api/admin/public-content` | Replace all public content |
+| GET/PUT | `/api/admin/public-content` | Read / replace all public content |
 | PATCH | `/api/admin/live-broadcast` | Update broadcast status |
 | PATCH | `/api/admin/matches/:matchId` | Update match status/score |
 | GET/PATCH | `/api/admin/teams/:teamId/compliance` | Read/write compliance data |
 | GET | `/api/admin/teams/:teamId/aggregate` | Get team aggregate |
 | POST | `/api/admin/teams/:teamId/publish` | Publish team results |
-| GET/POST | `/api/admin/score-sheets` | List / upsert score sheets |
+| GET | `/api/admin/score-sheets` | List score sheets (query filters: teamId, memberId, theme, status, matchId) |
+| POST | `/api/admin/score-sheets/upsert` | Create or update a score sheet |
 | PATCH | `/api/admin/score-sheets/:sheetId/status` | Promote sheet status |
 | POST/DELETE | `/api/admin/teams/:teamId/operators` | Manage operator drafts |
+| POST/DELETE | `/api/admin/teams/:teamId/members/:memberId/planned-picks` | Manage planned picks |
 | POST/DELETE | `/api/admin/teams/:teamId/calls` | Manage coach calls |

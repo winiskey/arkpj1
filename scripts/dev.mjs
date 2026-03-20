@@ -1,4 +1,7 @@
 import { createServer } from "vite";
+import { loadProjectEnv } from "./load-env.mjs";
+
+loadProjectEnv();
 
 const args = process.argv.slice(2);
 const getArgValue = (flag, fallback) => {

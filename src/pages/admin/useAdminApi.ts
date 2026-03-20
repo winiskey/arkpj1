@@ -11,6 +11,7 @@ import type {
     ComplianceSummary,
     TeamAggregate,
     MatchStatus,
+    ThemeCode,
 } from "./types";
 
 // ── Token management ───────────────────────────────────────────────
@@ -154,20 +155,45 @@ export async function patchMatch(
 // ── Score Sheets ───────────────────────────────────────────────────
 
 export async function upsertScoreSheet(payload: {
+    id?: string;
     teamId: string;
     memberId: string;
     matchId?: string | null;
-    theme: string;
+    theme: ThemeCode;
     snapshot: Record<string, unknown>;
     previewScore?: number;
     formulaText?: string;
     note?: string;
+    status?: string;
     calculatorVersion?: string;
-}): Promise<{ scoreSheet: ScoreSheet }> {
+}): Promise<{ sheet: ScoreSheet; aggregate: TeamAggregate }> {
     return adminFetch("/api/admin/score-sheets/upsert", {
         method: "POST",
         body: JSON.stringify(payload),
     });
+}
+
+export async function fetchScoreSheet(filters: {
+    teamId: string;
+    memberId: string;
+    theme: ThemeCode;
+    matchId?: string | null;
+}): Promise<{ sheet: ScoreSheet | null }> {
+    const params = new URLSearchParams({
+        teamId: filters.teamId,
+        memberId: filters.memberId,
+        theme: filters.theme,
+    });
+
+    if (filters.matchId) {
+        params.set("matchId", filters.matchId);
+    }
+
+    return adminFetch(`/api/admin/score-sheets?${params.toString()}`);
+}
+
+export async function fetchTeamAggregate(teamId: string): Promise<TeamAggregate> {
+    return adminFetch(`/api/admin/teams/${teamId}/aggregate`);
 }
 
 export async function patchScoreSheetStatus(

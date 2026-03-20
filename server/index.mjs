@@ -1,6 +1,8 @@
-﻿import { getServerConfig } from "./app/config.mjs";
+import { loadProjectEnv } from "../scripts/load-env.mjs";
+import { getServerConfig } from "./app/config.mjs";
 import { createApp } from "./app/create-server.mjs";
 
+loadProjectEnv();
 const config = getServerConfig();
 
 if (!config.adminToken) {

@@ -1,4 +1,7 @@
-﻿import { spawn } from "node:child_process";
+import { spawn } from "node:child_process";
+import { loadProjectEnv } from "./load-env.mjs";
+
+loadProjectEnv();
 
 const commands = [
   {
