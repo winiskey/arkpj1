@@ -7,6 +7,9 @@ on:
   push:
     branches:
       - main
+  schedule:
+    # 04:00 Asia/Shanghai = 20:00 UTC
+    - cron: "0 20 * * *"
   workflow_dispatch:
 
 concurrency:
