@@ -1,5 +1,4 @@
 ﻿import http from "node:http";
-import { opsStatePath, publicContentPath, scoreSheetsPath } from "./config.mjs";
 import {
   createDefaultOpsState,
   createDefaultScoreSheetsState,
@@ -34,13 +33,13 @@ function withAdmin(handler) {
 }
 
 export function createApp(config) {
-  const publicContentStore = createJsonFileStore(publicContentPath, async () => createEmptyPublicContent());
+  const publicContentStore = createJsonFileStore(config.publicContentPath, async () => createEmptyPublicContent());
   const opsStateStore = createJsonFileStore(
-    opsStatePath,
+    config.opsStatePath,
     async () => createDefaultOpsState(await publicContentStore.read()),
   );
   const scoreSheetsStore = createJsonFileStore(
-    scoreSheetsPath,
+    config.scoreSheetsPath,
     async () => createDefaultScoreSheetsState(),
   );
 

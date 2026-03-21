@@ -1,8 +1,19 @@
-﻿import { fileURLToPath } from "node:url";
+import { join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
-export const publicContentPath = fileURLToPath(new URL("../data/public-content.json", import.meta.url));
-export const opsStatePath = fileURLToPath(new URL("../data/ops-state.json", import.meta.url));
-export const scoreSheetsPath = fileURLToPath(new URL("../data/score-sheets.json", import.meta.url));
+export const defaultDataDir = fileURLToPath(new URL("../data", import.meta.url));
+
+export function getRuntimeDataPaths(dataDir = process.env.ARK_DATA_DIR) {
+  const normalizedDataDir = String(dataDir ?? "").trim();
+  const resolvedDataDir = normalizedDataDir ? resolve(normalizedDataDir) : defaultDataDir;
+
+  return {
+    dataDir: resolvedDataDir,
+    publicContentPath: join(resolvedDataDir, "public-content.json"),
+    opsStatePath: join(resolvedDataDir, "ops-state.json"),
+    scoreSheetsPath: join(resolvedDataDir, "score-sheets.json"),
+  };
+}
 
 function parsePositiveInteger(value, fallback) {
   const parsed = Number(value);
@@ -21,6 +32,8 @@ function parseOrigins(value) {
 }
 
 export function getServerConfig() {
+  const runtimeDataPaths = getRuntimeDataPaths();
+
   return {
     host: process.env.API_HOST ?? "127.0.0.1",
     port: parsePositiveInteger(process.env.API_PORT, 8787),
@@ -28,5 +41,6 @@ export function getServerConfig() {
     corsOrigins: parseOrigins(process.env.API_CORS_ORIGINS),
     adminToken: String(process.env.ADMIN_TOKEN ?? "").trim(),
     prettyJson: process.env.NODE_ENV !== "production",
+    ...runtimeDataPaths,
   };
 }

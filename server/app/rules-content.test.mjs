@@ -1,9 +1,9 @@
 ﻿import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
+import { getRuntimeDataPaths } from "./config.mjs";
 
-const publicContentPath = fileURLToPath(new URL("../data/public-content.json", import.meta.url));
+const { publicContentPath } = getRuntimeDataPaths();
 
 function findSection(data, sectionId) {
   return data.ruleSections.find((section) => section.id === sectionId);

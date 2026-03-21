@@ -2,6 +2,7 @@
 import { createRequire } from "node:module";
 import { dirname, resolve } from "node:path";
 import ts from "typescript";
+import { getRuntimeDataPaths } from "../server/app/config.mjs";
 
 const require = createRequire(import.meta.url);
 const moduleCache = new Map();
@@ -74,6 +75,7 @@ const publicContent = {
   themeRules: contentModule.themeRules,
 };
 
-mkdirSync("server/data", { recursive: true });
-writeFileSync("server/data/public-content.json", `${JSON.stringify(publicContent, null, 2)}\n`, "utf8");
-console.log("Exported server/data/public-content.json from src/content.");
+const { publicContentPath } = getRuntimeDataPaths();
+mkdirSync(dirname(publicContentPath), { recursive: true });
+writeFileSync(publicContentPath, `${JSON.stringify(publicContent, null, 2)}\n`, "utf8");
+console.log(`Exported ${publicContentPath} from src/content.`);

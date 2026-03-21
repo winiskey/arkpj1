@@ -1,0 +1,79 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Resolve deploy variables
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_APP_DIR: ${{ secrets.DEPLOY_APP_DIR }}
+          DEPLOY_SERVICE_NAME: ${{ secrets.DEPLOY_SERVICE_NAME }}
+          DEPLOY_HEALTHCHECK_URL: ${{ secrets.DEPLOY_HEALTHCHECK_URL }}
+          DEPLOY_RUN_CONTENT_SYNC: ${{ secrets.DEPLOY_RUN_CONTENT_SYNC }}
+          DEPLOY_RUN_NGINX_RELOAD: ${{ secrets.DEPLOY_RUN_NGINX_RELOAD }}
+          DEPLOY_STARTUP_WAIT_SECONDS: ${{ secrets.DEPLOY_STARTUP_WAIT_SECONDS }}
+        run: |
+          set -euo pipefail
+          : "${DEPLOY_HOST:?Missing DEPLOY_HOST secret}"
+          : "${DEPLOY_USER:?Missing DEPLOY_USER secret}"
+          echo "DEPLOY_HOST=$DEPLOY_HOST" >> "$GITHUB_ENV"
+          echo "DEPLOY_USER=$DEPLOY_USER" >> "$GITHUB_ENV"
+          echo "DEPLOY_PORT=${DEPLOY_PORT:-22}" >> "$GITHUB_ENV"
+          echo "DEPLOY_APP_DIR=${DEPLOY_APP_DIR:-/home/admin/arkpj1}" >> "$GITHUB_ENV"
+          echo "DEPLOY_SERVICE_NAME=${DEPLOY_SERVICE_NAME:-ark-backend}" >> "$GITHUB_ENV"
+          echo "DEPLOY_HEALTHCHECK_URL=${DEPLOY_HEALTHCHECK_URL:-http://127.0.0.1:8787/api/health}" >> "$GITHUB_ENV"
+          echo "DEPLOY_RUN_CONTENT_SYNC=${DEPLOY_RUN_CONTENT_SYNC:-0}" >> "$GITHUB_ENV"
+          echo "DEPLOY_RUN_NGINX_RELOAD=${DEPLOY_RUN_NGINX_RELOAD:-0}" >> "$GITHUB_ENV"
+          echo "DEPLOY_STARTUP_WAIT_SECONDS=${DEPLOY_STARTUP_WAIT_SECONDS:-3}" >> "$GITHUB_ENV"
+
+      - name: Configure SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          : "${DEPLOY_SSH_KEY:?Missing DEPLOY_SSH_KEY secret}"
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p "$DEPLOY_PORT" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+
+      - name: Ensure target directory exists
+        run: |
+          set -euo pipefail
+          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "mkdir -p '$DEPLOY_APP_DIR'"
+
+      - name: Sync repository to server
+        run: |
+          set -euo pipefail
+          rsync -az --delete \
+            --exclude '.git/' \
+            --exclude 'node_modules/' \
+            --exclude 'dist/' \
+            --exclude 'server/data/' \
+            -e "ssh -p $DEPLOY_PORT" \
+            ./ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_APP_DIR/"
+
+      - name: Run remote redeploy
+        run: |
+          set -euo pipefail
+          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" \
+            "APP_DIR='$DEPLOY_APP_DIR' SERVICE_NAME='$DEPLOY_SERVICE_NAME' HEALTHCHECK_URL='$DEPLOY_HEALTHCHECK_URL' RUN_CONTENT_SYNC='$DEPLOY_RUN_CONTENT_SYNC' RUN_NGINX_RELOAD='$DEPLOY_RUN_NGINX_RELOAD' STARTUP_WAIT_SECONDS='$DEPLOY_STARTUP_WAIT_SECONDS' bash '$DEPLOY_APP_DIR/deploy/ubuntu/redeploy.sh'"
