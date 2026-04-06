@@ -54,6 +54,7 @@ Browser (React SPA)  ←→  Vite Dev Proxy (:3000)  ←→  Node.js API (:8787)
 git clone https://github.com/winiskey/arkpj1.git
 cd arkpj1
 npm install
+cp .env.example .env
 ```
 
 ### Development
@@ -90,9 +91,9 @@ npm run sync:content
 | `API_PORT` | `8787` | Backend listen port |
 | `API_BODY_LIMIT_BYTES` | `1048576` | Max request body size (bytes) |
 | `API_CORS_ORIGINS` | `""` | Allowed origins (comma-separated) |
-| `ADMIN_TOKEN` | `""` | Admin API authentication token |
+| `ADMIN_TOKEN` | Required | Admin API authentication token; the backend refuses to start if this is empty |
 
-> ⚠️ In production, always set `ADMIN_TOKEN` to a non-empty secret value.
+Start from `.env.example` for local setup. `ADMIN_TOKEN` must be set in every environment.
 
 ## Project Structure
 
@@ -137,8 +138,8 @@ The coefficient starts at 1.0 and is reduced by overtime penalties, duplicate 6�
 ## Testing
 
 ```bash
-# Run all backend tests (17 tests)
-node --test server/app/scoring.test.mjs server/app/service.test.mjs server/app/rules-content.test.mjs
+# Run all backend tests discovered under server/app/*.test.mjs
+npm test
 
 # Type check
 npx tsc --noEmit

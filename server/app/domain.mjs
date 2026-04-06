@@ -1,10 +1,11 @@
 ﻿export const SCORE_SHEET_STATUSES = ["draft", "final", "published"];
 export const THEME_CODES = ["sami", "sarkaz", "sui"];
+export const FINALS_TRACK_CODES = ["sami", "sarkaz_chou", "sarkaz_meiyuan", "sui"];
 export const MATCH_STATUSES = ["IN_PROGRESS", "PENDING", "FINISHED"];
 export const MEMBER_RUN_STATUSES = ["LIVE", "PENDING", "FINISHED"];
 export const BROADCAST_STATUSES = ["LIVE", "UPCOMING", "OFFLINE"];
 export const SCHEDULE_SLOT_TONES = ["default", "alert", "featured"];
-export const ruleVersion = "jingchuge-2-docx-2026-03-12";
+export const ruleVersion = "jingchuge-2-finals-2026-04-02";
 
 const STATUS_WEIGHT = {
   draft: 0,
@@ -14,6 +15,21 @@ const STATUS_WEIGHT = {
 
 const THEME_CODE_SET = new Set(THEME_CODES);
 const SCORE_STATUS_SET = new Set(SCORE_SHEET_STATUSES);
+const FINALS_TRACK_CODE_SET = new Set(FINALS_TRACK_CODES);
+const DEFAULT_FINALS_TEAM_A_ID = "strawberry-no1";
+const DEFAULT_FINALS_TEAM_B_ID = "mygo";
+const DEFAULT_FINALS_ENABLED_TRACKS = Object.freeze({
+  sami: true,
+  sarkaz_chou: true,
+  sarkaz_meiyuan: true,
+  sui: false,
+});
+const DEFAULT_FIRST_PICK_SLOT = Object.freeze({
+  sami: "teamA",
+  sarkaz_chou: "teamA",
+  sarkaz_meiyuan: "teamB",
+  sui: null,
+});
 
 export const tournamentConfig = Object.freeze({
   roster: {
@@ -107,6 +123,16 @@ function normalizeComplianceRecord(teamId, record = {}) {
   };
 }
 
+function normalizeFinalsPick(entry) {
+  const pick = plainObject(entry);
+  return {
+    id: typeof pick.id === "string" ? pick.id : "",
+    operatorName: typeof pick.operatorName === "string" ? pick.operatorName : "",
+    rarity: Math.max(0, parseNumber(pick.rarity, 6)),
+    createdAt: typeof pick.createdAt === "string" ? pick.createdAt : nowIso(),
+  };
+}
+
 function isValidScoreSheet(sheet) {
   return (
     sheet
@@ -183,6 +209,7 @@ export function createDefaultOpsState(publicContent = createEmptyPublicContent()
     complianceByTeam: Object.fromEntries(
       (publicContent.teams ?? []).map((team) => [team.id, normalizeComplianceRecord(team.id, { updatedAt: timestamp })]),
     ),
+    finalsConfig: createDefaultFinalsConfig(publicContent),
   };
 }
 
@@ -196,22 +223,52 @@ export function createDefaultScoreSheetsState() {
 
 export function syncOpsStateWithTeams(publicContent, opsState = createDefaultOpsState(publicContent)) {
   const nextState = plainObject(opsState);
-  const complianceByTeam = plainObject(nextState.complianceByTeam);
+  const currentComplianceByTeam = plainObject(nextState.complianceByTeam);
+  const complianceByTeam = {};
 
   for (const team of publicContent.teams ?? []) {
-    complianceByTeam[team.id] = normalizeComplianceRecord(team.id, complianceByTeam[team.id]);
+    complianceByTeam[team.id] = normalizeComplianceRecord(team.id, currentComplianceByTeam[team.id]);
   }
 
   return {
     version: parseNumber(nextState.version, 1),
     updatedAt: typeof nextState.updatedAt === "string" ? nextState.updatedAt : nowIso(),
     complianceByTeam,
+    finalsConfig: normalizeFinalsConfig(publicContent, nextState.finalsConfig),
   };
 }
 
-export function syncScoreSheetsState(state = createDefaultScoreSheetsState()) {
+function isScoreSheetLinkedToPublicContent(sheet, publicContent) {
+  const team = findTeam(publicContent, sheet.teamId);
+  if (!team) {
+    return false;
+  }
+
+  const member = findMember(team, sheet.memberId);
+  if (!member) {
+    return false;
+  }
+
+  if (inferThemeCodeFromLabel(member.theme) !== sheet.theme) {
+    return false;
+  }
+
+  if (sheet.matchId == null) {
+    return true;
+  }
+
+  const match = findMatch(publicContent, sheet.matchId);
+  return Boolean(match && match.teamId === team.id);
+}
+
+export function syncScoreSheetsState(state = createDefaultScoreSheetsState(), publicContent = null) {
   const nextState = plainObject(state);
-  const sheets = Array.isArray(nextState.sheets) ? nextState.sheets.filter(isValidScoreSheet).map(normalizeScoreSheet) : [];
+  const sheets = Array.isArray(nextState.sheets)
+    ? nextState.sheets
+      .filter(isValidScoreSheet)
+      .map(normalizeScoreSheet)
+      .filter((sheet) => !publicContent || isScoreSheetLinkedToPublicContent(sheet, publicContent))
+    : [];
 
   return {
     version: parseNumber(nextState.version, 1),
@@ -227,6 +284,170 @@ export function formatScore(value) {
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
   });
+}
+
+function isTeamIdPresent(teamIds, teamId) {
+  return typeof teamId === "string" && teamIds.includes(teamId);
+}
+
+function pickTeamByPreferredId(teams, preferredId, usedIds) {
+  if (preferredId) {
+    const preferred = teams.find((team) => team.id === preferredId && !usedIds.has(team.id));
+    if (preferred) {
+      return preferred;
+    }
+  }
+
+  return teams.find((team) => !usedIds.has(team.id)) ?? null;
+}
+
+function resolveFinalsTeams(publicContent, preferredTeamAId = null, preferredTeamBId = null) {
+  const teams = Array.isArray(publicContent?.teams) ? publicContent.teams : [];
+  const usedIds = new Set();
+
+  const teamA = pickTeamByPreferredId(teams, preferredTeamAId ?? DEFAULT_FINALS_TEAM_A_ID, usedIds);
+  if (teamA) {
+    usedIds.add(teamA.id);
+  }
+
+  const teamB = pickTeamByPreferredId(teams, preferredTeamBId ?? DEFAULT_FINALS_TEAM_B_ID, usedIds);
+  return { teamA, teamB };
+}
+
+function getThemeMembers(team, themeCode) {
+  return (team?.members ?? []).filter((member) => inferThemeCodeFromLabel(member.theme) === themeCode);
+}
+
+function createDefaultSarkazLaneAssignment(team) {
+  const sarkazMembers = getThemeMembers(team, "sarkaz");
+  return {
+    chouMemberId: sarkazMembers[0]?.id ?? null,
+    meiyuanMemberId: sarkazMembers[1]?.id ?? null,
+  };
+}
+
+function normalizeSarkazLaneAssignment(team, assignment = {}) {
+  const next = plainObject(assignment);
+  const sarkazMemberIds = new Set(getThemeMembers(team, "sarkaz").map((member) => member.id));
+  const defaultAssignment = createDefaultSarkazLaneAssignment(team);
+
+  const chouMemberId = next.chouMemberId === null
+    ? null
+    : sarkazMemberIds.has(next.chouMemberId)
+      ? next.chouMemberId
+      : next.chouMemberId === undefined
+        ? defaultAssignment.chouMemberId
+        : null;
+
+  let meiyuanMemberId = next.meiyuanMemberId === null
+    ? null
+    : sarkazMemberIds.has(next.meiyuanMemberId)
+      ? next.meiyuanMemberId
+      : next.meiyuanMemberId === undefined
+        ? defaultAssignment.meiyuanMemberId
+        : null;
+
+  if (chouMemberId && meiyuanMemberId === chouMemberId) {
+    meiyuanMemberId = defaultAssignment.meiyuanMemberId !== chouMemberId ? defaultAssignment.meiyuanMemberId : null;
+  }
+
+  return {
+    chouMemberId,
+    meiyuanMemberId,
+  };
+}
+
+function getTrackDefaultFirstPickTeamId(trackCode, teamAId, teamBId) {
+  const slot = DEFAULT_FIRST_PICK_SLOT[trackCode];
+  if (slot === "teamA") {
+    return teamAId ?? null;
+  }
+  if (slot === "teamB") {
+    return teamBId ?? null;
+  }
+  return null;
+}
+
+function normalizeFinalsTrackConfig(trackCode, finalistIds, teamAId, teamBId, trackConfig = {}) {
+  const next = plainObject(trackConfig);
+  const picksByTeamIdInput = plainObject(next.picksByTeamId);
+  const enabled = trackCode === "sui"
+    ? false
+    : typeof next.enabled === "boolean"
+      ? next.enabled
+      : DEFAULT_FINALS_ENABLED_TRACKS[trackCode];
+
+  const picksByTeamId = Object.fromEntries(
+    finalistIds.map((teamId) => [
+      teamId,
+      Array.isArray(picksByTeamIdInput[teamId]) ? picksByTeamIdInput[teamId].map(normalizeFinalsPick).slice(0, 3) : [],
+    ]),
+  );
+
+  const defaultFirstPickTeamId = getTrackDefaultFirstPickTeamId(trackCode, teamAId, teamBId);
+  const firstPickTeamId = enabled && isTeamIdPresent(finalistIds, next.firstPickTeamId)
+    ? next.firstPickTeamId
+    : enabled
+      ? defaultFirstPickTeamId
+      : null;
+
+  return {
+    enabled,
+    firstPickTeamId,
+    picksByTeamId,
+    updatedAt: typeof next.updatedAt === "string" ? next.updatedAt : nowIso(),
+  };
+}
+
+export function createDefaultFinalsConfig(publicContent = createEmptyPublicContent()) {
+  const { teamA, teamB } = resolveFinalsTeams(publicContent);
+  const finalistIds = [teamA?.id, teamB?.id].filter(Boolean);
+
+  return {
+    enabled: Boolean(teamA && teamB),
+    teamAId: teamA?.id ?? null,
+    teamBId: teamB?.id ?? null,
+    tracks: Object.fromEntries(
+      FINALS_TRACK_CODES.map((trackCode) => [
+        trackCode,
+        normalizeFinalsTrackConfig(trackCode, finalistIds, teamA?.id ?? null, teamB?.id ?? null),
+      ]),
+    ),
+    sarkazLaneAssignments: Object.fromEntries(
+      finalistIds.map((teamId) => {
+        const team = findTeam(publicContent, teamId);
+        return [teamId, createDefaultSarkazLaneAssignment(team)];
+      }),
+    ),
+    updatedAt: nowIso(),
+  };
+}
+
+export function normalizeFinalsConfig(publicContent, finalsConfig = {}) {
+  const next = plainObject(finalsConfig);
+  const { teamA, teamB } = resolveFinalsTeams(publicContent, next.teamAId ?? null, next.teamBId ?? null);
+  const finalistIds = [teamA?.id, teamB?.id].filter(Boolean);
+  const tracks = plainObject(next.tracks);
+  const laneAssignments = plainObject(next.sarkazLaneAssignments);
+
+  return {
+    enabled: typeof next.enabled === "boolean" ? next.enabled && finalistIds.length === 2 : finalistIds.length === 2,
+    teamAId: teamA?.id ?? null,
+    teamBId: teamB?.id ?? null,
+    tracks: Object.fromEntries(
+      FINALS_TRACK_CODES.map((trackCode) => [
+        trackCode,
+        normalizeFinalsTrackConfig(trackCode, finalistIds, teamA?.id ?? null, teamB?.id ?? null, tracks[trackCode]),
+      ]),
+    ),
+    sarkazLaneAssignments: Object.fromEntries(
+      finalistIds.map((teamId) => {
+        const team = findTeam(publicContent, teamId);
+        return [teamId, normalizeSarkazLaneAssignment(team, laneAssignments[teamId])];
+      }),
+    ),
+    updatedAt: typeof next.updatedAt === "string" ? next.updatedAt : nowIso(),
+  };
 }
 
 export function inferThemeCodeFromLabel(label) {
@@ -264,6 +485,92 @@ export function findMatch(publicContent, matchId) {
 
 export function findMember(team, memberId) {
   return team.members.find((member) => member.id === memberId) ?? null;
+}
+
+export function findFinalistTeams(publicContent, finalsConfig) {
+  const normalized = normalizeFinalsConfig(publicContent, finalsConfig);
+  return {
+    teamA: normalized.teamAId ? findTeam(publicContent, normalized.teamAId) : null,
+    teamB: normalized.teamBId ? findTeam(publicContent, normalized.teamBId) : null,
+  };
+}
+
+export function isFinalsTeam(finalsConfig, teamId) {
+  return Boolean(teamId) && (finalsConfig?.teamAId === teamId || finalsConfig?.teamBId === teamId);
+}
+
+export function resolveFinalsTrackForMember(finalsConfig, team, member) {
+  if (!finalsConfig?.enabled || !team || !member || !isFinalsTeam(finalsConfig, team.id)) {
+    return null;
+  }
+
+  const themeCode = inferThemeCodeFromLabel(member.theme);
+  if (themeCode === "sami") {
+    return finalsConfig.tracks?.sami?.enabled ? "sami" : null;
+  }
+
+  if (themeCode !== "sarkaz") {
+    return null;
+  }
+
+  const assignment = finalsConfig.sarkazLaneAssignments?.[team.id];
+  if (!assignment) {
+    return null;
+  }
+
+  if (assignment.chouMemberId === member.id && finalsConfig.tracks?.sarkaz_chou?.enabled) {
+    return "sarkaz_chou";
+  }
+
+  if (assignment.meiyuanMemberId === member.id && finalsConfig.tracks?.sarkaz_meiyuan?.enabled) {
+    return "sarkaz_meiyuan";
+  }
+
+  return null;
+}
+
+export function isFinalsTrackConfigured(finalsConfig, trackCode) {
+  if (!FINALS_TRACK_CODE_SET.has(trackCode)) {
+    return false;
+  }
+
+  const track = finalsConfig?.tracks?.[trackCode];
+  if (!track?.enabled) {
+    return true;
+  }
+
+  const finalistIds = [finalsConfig.teamAId, finalsConfig.teamBId].filter(Boolean);
+  if (finalistIds.length !== 2) {
+    return false;
+  }
+
+  if (!isTeamIdPresent(finalistIds, track.firstPickTeamId)) {
+    return false;
+  }
+
+  return finalistIds.every((teamId) => Array.isArray(track.picksByTeamId?.[teamId]) && track.picksByTeamId[teamId].length === 3);
+}
+
+export function areSarkazLaneAssignmentsConfigured(publicContent, finalsConfig) {
+  if (!finalsConfig?.enabled) {
+    return true;
+  }
+
+  const finalistIds = [finalsConfig.teamAId, finalsConfig.teamBId].filter(Boolean);
+  return finalistIds.every((teamId) => {
+    const team = findTeam(publicContent, teamId);
+    const assignment = finalsConfig.sarkazLaneAssignments?.[teamId];
+    if (!team || !assignment) {
+      return false;
+    }
+
+    const sarkazMembers = getThemeMembers(team, "sarkaz");
+    if (sarkazMembers.length < 2) {
+      return false;
+    }
+
+    return Boolean(assignment.chouMemberId && assignment.meiyuanMemberId && assignment.chouMemberId !== assignment.meiyuanMemberId);
+  });
 }
 
 export function assertThemeMatchesMember(team, memberId, theme) {
@@ -489,20 +796,27 @@ function parseNumericScore(value) {
   return 0;
 }
 
-function pickLatestSheetForMember(teamSheets, member) {
+function pickAggregateSheetForMember(teamSheets, member) {
   const expectedTheme = inferThemeCodeFromLabel(member.theme);
   const matches = teamSheets.filter((sheet) => sheet.memberId === member.id && sheet.theme === expectedTheme);
   if (!matches.length) {
     return null;
   }
 
+  // Team aggregates intentionally collapse all match-scoped variants into one
+  // effective sheet per member/theme by status, then recency.
   return [...matches].sort((left, right) => {
     const statusDiff = STATUS_WEIGHT[right.status] - STATUS_WEIGHT[left.status];
     if (statusDiff !== 0) {
       return statusDiff;
     }
 
-    return parseTimestamp(right.updatedAt) - parseTimestamp(left.updatedAt);
+    const updatedAtDiff = parseTimestamp(right.updatedAt) - parseTimestamp(left.updatedAt);
+    if (updatedAtDiff !== 0) {
+      return updatedAtDiff;
+    }
+
+    return parseTimestamp(right.createdAt) - parseTimestamp(left.createdAt);
   })[0];
 }
 
@@ -526,7 +840,7 @@ export function buildTeamAggregate(team, rawCompliance, teamSheets) {
   const complianceRecord = normalizeComplianceRecord(team.id, rawCompliance);
   const compliance = buildTeamComplianceSummary(team, complianceRecord);
   const members = team.members.map((member) => {
-    const sheet = pickLatestSheetForMember(teamSheets, member);
+    const sheet = pickAggregateSheetForMember(teamSheets, member);
     const baseScore = sheet ? parseNumericScore(sheet.previewScore) : 0;
     const isPressureMember = complianceRecord.pressureMemberId === member.id;
     const pressureBonus = isPressureMember ? baseScore * 0.2 : 0;
@@ -558,6 +872,11 @@ export function buildTeamAggregate(team, rawCompliance, teamSheets) {
   const scoredCount = members.filter((member) => member.sheet).length;
   const nextPendingMember = members.find((member) => !member.sheet || member.sheet.status === "draft") ?? null;
   const publishBlockingIssues = [...compliance.blockingIssues];
+  const remainingFinalizations = members.length - finalizedCount;
+
+  if (remainingFinalizations > 0) {
+    publishBlockingIssues.push(`仍有 ${remainingFinalizations} 名选手未完成终稿确认。`);
+  }
 
   const updatedAt = members.reduce((latest, member) => {
     const candidate = member.sheet?.updatedAt ?? null;
@@ -741,8 +1060,12 @@ export function validateScoreSheetPayload(payload, team, { matchIdOptional = tru
   }
 }
 
-function getIdentityKey(sheet) {
+export function getScoreSheetIdentityKey(sheet) {
   return [sheet.teamId, sheet.memberId, sheet.theme, sheet.matchId ?? ""].join("::");
+}
+
+function isSameScoreSheetIdentity(left, right) {
+  return getScoreSheetIdentityKey(left) === getScoreSheetIdentityKey(right);
 }
 
 export function findScoreSheet(state, filters = {}) {
@@ -825,6 +1148,10 @@ export function upsertScoreSheet(state, payload, createId) {
       matchId: payload.matchId ?? null,
     });
 
+  if (existingById && !isSameScoreSheetIdentity(existingById, payload)) {
+    throw new Error("scoreSheet id does not match the requested team/member/theme/match identity.");
+  }
+
   const existing = existingById ?? existingByIdentity;
   if (existing) {
     existing.matchId = payload.matchId ?? null;
@@ -870,9 +1197,9 @@ export function upsertScoreSheet(state, payload, createId) {
   };
 }
 
-export function updateScoreSheetStatus(state, sheetId, status) {
+export function updateScoreSheetStatus(state, sheetId, status, publicContent = null) {
   assertScoreSheetStatus(status);
-  const nextState = syncScoreSheetsState(state);
+  const nextState = syncScoreSheetsState(state, publicContent);
   const sheet = findScoreSheet(nextState, { id: sheetId });
   if (!sheet) {
     throw new Error(`Score sheet ${sheetId} was not found.`);
@@ -888,8 +1215,24 @@ export function updateScoreSheetStatus(state, sheetId, status) {
   };
 }
 
-export function replaceAllSheetsForTeamPublish(state, teamId) {
-  const nextState = syncScoreSheetsState(state);
+export function deleteScoreSheet(state, sheetId, publicContent = null) {
+  const nextState = syncScoreSheetsState(state, publicContent);
+  const sheet = findScoreSheet(nextState, { id: sheetId });
+  if (!sheet) {
+    throw new Error(`Score sheet ${sheetId} was not found.`);
+  }
+
+  nextState.sheets = nextState.sheets.filter((entry) => entry.id !== sheetId);
+  nextState.updatedAt = nowIso();
+
+  return {
+    state: nextState,
+    sheet,
+  };
+}
+
+export function replaceAllSheetsForTeamPublish(state, teamId, publicContent = null) {
+  const nextState = syncScoreSheetsState(state, publicContent);
   const timestamp = nowIso();
 
   for (const sheet of nextState.sheets) {
@@ -909,6 +1252,7 @@ export function buildAdminBootstrap(publicContent, opsState, scoreSheetsState) {
     ruleVersion,
     tournamentConfig,
     opsState,
+    finalsConfig: opsState.finalsConfig,
     scoreSheets: scoreSheetsState.sheets.map(summariseScoreSheet),
     compliance: buildComplianceCollection(publicContent.teams, opsState.complianceByTeam),
     aggregates: buildAllTeamAggregates(publicContent, opsState, scoreSheetsState),
@@ -921,6 +1265,7 @@ export function buildCalculatorBootstrap(publicContent, opsState, scoreSheetsSta
     tournamentConfig,
     teams: publicContent.teams,
     matches: publicContent.matches,
+    finalsConfig: opsState.finalsConfig,
     scoreSheets: scoreSheetsState.sheets.map(summariseScoreSheet),
     compliance: buildComplianceCollection(publicContent.teams, opsState.complianceByTeam),
     aggregates: buildAllTeamAggregates(publicContent, opsState, scoreSheetsState),

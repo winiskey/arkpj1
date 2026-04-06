@@ -1,5 +1,6 @@
 ﻿import {
   BROADCAST_STATUSES,
+  FINALS_TRACK_CODES,
   MATCH_STATUSES,
   MEMBER_RUN_STATUSES,
   SCORE_SHEET_STATUSES,
@@ -13,6 +14,7 @@ const memberRunStatusSet = new Set(MEMBER_RUN_STATUSES);
 const scoreStatusSet = new Set(SCORE_SHEET_STATUSES);
 const scheduleSlotToneSet = new Set(SCHEDULE_SLOT_TONES);
 const themeCodeSet = new Set(THEME_CODES);
+const finalsTrackCodeSet = new Set(FINALS_TRACK_CODES);
 
 function isPlainObject(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -537,24 +539,14 @@ export function validateLiveBroadcastPatch(payload) {
 
 export function validateMatchPatch(payload) {
   const object = expectPlainObject(payload, "matchPatch");
-  assertNoUnknownKeys(object, ["phase", "startTime", "status", "teamId", "totalScore", "currentMemberId", "currentMemberName", "members", "playersList", "note"], "matchPatch");
+  assertNoUnknownKeys(object, ["phase", "startTime", "status", "totalScore", "currentMemberId", "note"], "matchPatch");
 
   const next = {};
   if ("phase" in object) next.phase = expectString(object.phase, "matchPatch.phase", { allowEmpty: true });
   if ("startTime" in object) next.startTime = expectString(object.startTime, "matchPatch.startTime", { allowEmpty: true });
   if ("status" in object) next.status = expectEnum(object.status, "matchPatch.status", matchStatusSet);
-  if ("teamId" in object) next.teamId = expectString(object.teamId, "matchPatch.teamId");
   if ("totalScore" in object) next.totalScore = expectString(object.totalScore, "matchPatch.totalScore", { allowEmpty: true });
   if ("currentMemberId" in object) next.currentMemberId = expectOptionalString(object.currentMemberId, "matchPatch.currentMemberId", { allowEmpty: false });
-  if ("currentMemberName" in object) next.currentMemberName = expectOptionalString(object.currentMemberName, "matchPatch.currentMemberName", { allowEmpty: true });
-  if ("members" in object) {
-    next.members = expectArray(object.members, "matchPatch.members").map((entry, index) =>
-      validateMatchMember(entry, `matchPatch.members[${index}]`),
-    );
-  }
-  if ("playersList" in object) {
-    next.playersList = expectStringArray(object.playersList, "matchPatch.playersList", { allowEmpty: false });
-  }
   if ("note" in object) next.note = expectOptionalString(object.note, "matchPatch.note", { allowEmpty: true });
 
   return next;
@@ -623,6 +615,166 @@ export function validateCoachCallPayload(payload) {
   };
 }
 
+function normalizeOperatorNameForValidation(value) {
+  return String(value ?? "")
+    .trim()
+    .replace(/\s+/g, "")
+    .toLowerCase();
+}
+
+function validateFinalsPick(value, name) {
+  const object = expectPlainObject(value, name);
+  assertNoUnknownKeys(object, ["id", "operatorName", "rarity", "createdAt"], name);
+
+  const rarity = object.rarity === undefined ? 6 : expectNumber(object.rarity, `${name}.rarity`, { integer: true, min: 1 });
+  if (rarity !== 6) {
+    throw new Error(`${name}.rarity must be 6.`);
+  }
+
+  return {
+    id: object.id === undefined ? "" : expectString(object.id, `${name}.id`, { allowEmpty: true }),
+    operatorName: expectString(object.operatorName, `${name}.operatorName`),
+    rarity,
+    createdAt: object.createdAt === undefined ? "" : expectString(object.createdAt, `${name}.createdAt`, { allowEmpty: true }),
+  };
+}
+
+function validateFinalsTrackConfig(value, name, trackCode, teamIds) {
+  const object = value === undefined ? {} : expectPlainObject(value, name);
+  assertNoUnknownKeys(object, ["enabled", "firstPickTeamId", "picksByTeamId", "updatedAt"], name);
+
+  const enabled = trackCode === "sui"
+    ? false
+    : object.enabled === undefined
+      ? true
+      : expectBoolean(object.enabled, `${name}.enabled`);
+
+  const picksByTeamIdInput = object.picksByTeamId === undefined ? {} : expectPlainObject(object.picksByTeamId, `${name}.picksByTeamId`);
+  assertNoUnknownKeys(picksByTeamIdInput, teamIds, `${name}.picksByTeamId`);
+
+  const picksByTeamId = Object.fromEntries(
+    teamIds.map((teamId) => {
+      const picks = picksByTeamIdInput[teamId] === undefined
+        ? []
+        : expectArray(picksByTeamIdInput[teamId], `${name}.picksByTeamId.${teamId}`).map((entry, index) =>
+          validateFinalsPick(entry, `${name}.picksByTeamId.${teamId}[${index}]`),
+        );
+
+      if (picks.length > 3) {
+        throw new Error(`${name}.picksByTeamId.${teamId} must contain at most 3 picks.`);
+      }
+
+      const duplicateNames = new Set();
+      for (const pick of picks) {
+        const normalizedName = normalizeOperatorNameForValidation(pick.operatorName);
+        if (duplicateNames.has(normalizedName)) {
+          throw new Error(`${name}.picksByTeamId.${teamId} contains duplicate operators.`);
+        }
+        duplicateNames.add(normalizedName);
+      }
+
+      return [teamId, picks];
+    }),
+  );
+
+  const firstPickTeamId = object.firstPickTeamId === undefined || object.firstPickTeamId === null
+    ? null
+    : expectString(object.firstPickTeamId, `${name}.firstPickTeamId`);
+
+  if (enabled && !teamIds.includes(firstPickTeamId)) {
+    throw new Error(`${name}.firstPickTeamId must be one of the finalist teams.`);
+  }
+
+  const usedByTeamA = new Set((picksByTeamId[teamIds[0]] ?? []).map((pick) => normalizeOperatorNameForValidation(pick.operatorName)));
+  const usedByTeamB = new Set((picksByTeamId[teamIds[1]] ?? []).map((pick) => normalizeOperatorNameForValidation(pick.operatorName)));
+  for (const operatorName of usedByTeamA) {
+    if (usedByTeamB.has(operatorName)) {
+      throw new Error(`${name} cannot assign the same operator to both teams.`);
+    }
+  }
+
+  return {
+    enabled,
+    firstPickTeamId: enabled ? firstPickTeamId : null,
+    picksByTeamId,
+  };
+}
+
+function validateSarkazLaneAssignment(value, name, team) {
+  const object = value === undefined ? {} : expectPlainObject(value, name);
+  assertNoUnknownKeys(object, ["chouMemberId", "meiyuanMemberId"], name);
+
+  const sarkazMembers = (team.members ?? []).filter((member) => String(member.theme ?? "").includes("萨卡兹"));
+  const sarkazMemberIds = new Set(sarkazMembers.map((member) => member.id));
+  const chouMemberId = object.chouMemberId === undefined || object.chouMemberId === null
+    ? null
+    : expectString(object.chouMemberId, `${name}.chouMemberId`);
+  const meiyuanMemberId = object.meiyuanMemberId === undefined || object.meiyuanMemberId === null
+    ? null
+    : expectString(object.meiyuanMemberId, `${name}.meiyuanMemberId`);
+
+  if (chouMemberId && !sarkazMemberIds.has(chouMemberId)) {
+    throw new Error(`${name}.chouMemberId must reference a Sarkaz member on team ${team.name}.`);
+  }
+
+  if (meiyuanMemberId && !sarkazMemberIds.has(meiyuanMemberId)) {
+    throw new Error(`${name}.meiyuanMemberId must reference a Sarkaz member on team ${team.name}.`);
+  }
+
+  if (chouMemberId && meiyuanMemberId && chouMemberId === meiyuanMemberId) {
+    throw new Error(`${name} cannot assign the same member to both Sarkaz lanes.`);
+  }
+
+  return {
+    chouMemberId,
+    meiyuanMemberId,
+  };
+}
+
+export function validateFinalsConfigPayload(payload, publicContent) {
+  const object = expectPlainObject(payload, "finalsConfig");
+  assertNoUnknownKeys(object, ["enabled", "teamAId", "teamBId", "tracks", "sarkazLaneAssignments", "updatedAt"], "finalsConfig");
+
+  const teamAId = expectString(object.teamAId, "finalsConfig.teamAId");
+  const teamBId = expectString(object.teamBId, "finalsConfig.teamBId");
+  if (teamAId === teamBId) {
+    throw new Error("finalsConfig.teamAId and finalsConfig.teamBId must be different.");
+  }
+
+  const teamsById = new Map((publicContent.teams ?? []).map((team) => [team.id, team]));
+  const teamA = teamsById.get(teamAId);
+  const teamB = teamsById.get(teamBId);
+  if (!teamA || !teamB) {
+    throw new Error("finalsConfig finalists must exist in public content.");
+  }
+
+  const enabled = object.enabled === undefined ? true : expectBoolean(object.enabled, "finalsConfig.enabled");
+  const teamIds = [teamAId, teamBId];
+  const tracksInput = object.tracks === undefined ? {} : expectPlainObject(object.tracks, "finalsConfig.tracks");
+  assertNoUnknownKeys(tracksInput, [...finalsTrackCodeSet], "finalsConfig.tracks");
+
+  const tracks = Object.fromEntries(
+    FINALS_TRACK_CODES.map((trackCode) => [
+      trackCode,
+      validateFinalsTrackConfig(tracksInput[trackCode], `finalsConfig.tracks.${trackCode}`, trackCode, teamIds),
+    ]),
+  );
+
+  const laneAssignmentsInput = object.sarkazLaneAssignments === undefined ? {} : expectPlainObject(object.sarkazLaneAssignments, "finalsConfig.sarkazLaneAssignments");
+  assertNoUnknownKeys(laneAssignmentsInput, teamIds, "finalsConfig.sarkazLaneAssignments");
+
+  return {
+    enabled,
+    teamAId,
+    teamBId,
+    tracks,
+    sarkazLaneAssignments: {
+      [teamAId]: validateSarkazLaneAssignment(laneAssignmentsInput[teamAId], `finalsConfig.sarkazLaneAssignments.${teamAId}`, teamA),
+      [teamBId]: validateSarkazLaneAssignment(laneAssignmentsInput[teamBId], `finalsConfig.sarkazLaneAssignments.${teamBId}`, teamB),
+    },
+  };
+}
+
 export function validateScoreSheetStatusPayload(payload) {
   const object = expectPlainObject(payload, "scoreSheetStatus");
   assertNoUnknownKeys(object, ["status"], "scoreSheetStatus");
@@ -668,11 +820,17 @@ export function validateScoreSheetQueryFilters(filters) {
 
 export function validateSoloCalcPayload(payload) {
   const object = expectPlainObject(payload, "soloCalcPayload");
+  assertNoUnknownKeys(object, ["teamId", "memberId", "theme", "snapshot"], "soloCalcPayload");
   const theme = expectString(object.theme, "soloCalcPayload.theme");
   if (!["team", ...THEME_CODES].includes(theme)) {
     throw new Error(`soloCalcPayload.theme must be one of: team, ${THEME_CODES.join(", ")}.`);
   }
 
   const snapshot = expectPlainObject(object.snapshot, "soloCalcPayload.snapshot");
-  return { theme, snapshot };
+  return {
+    teamId: object.teamId === undefined ? undefined : expectString(object.teamId, "soloCalcPayload.teamId"),
+    memberId: object.memberId === undefined ? undefined : expectString(object.memberId, "soloCalcPayload.memberId"),
+    theme,
+    snapshot,
+  };
 }

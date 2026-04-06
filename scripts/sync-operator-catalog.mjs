@@ -3,6 +3,7 @@ import { dirname, resolve } from "node:path";
 
 const PRTS_API_URL = "https://prts.wiki/api.php";
 const OPERATOR_LIST_PAGE_ID = "1831";
+// Generated admin data file. Treat this as sync output, not hand-authored source.
 const OUTPUT_PATH = resolve("src/pages/admin/operatorCatalog.json");
 const FILE_TITLE_PREFIX = "文件:头像_";
 const USER_AGENT = "ArkProjectOperatorCatalogSync/1.0";

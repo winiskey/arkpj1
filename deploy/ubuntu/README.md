@@ -56,13 +56,13 @@ Recommended initial contents:
 API_HOST=127.0.0.1
 API_PORT=8787
 API_CORS_ORIGINS=
-ADMIN_TOKEN=
+ADMIN_TOKEN=change-this-on-the-server
 ```
 
 Notes:
 
 - Leave `API_CORS_ORIGINS` empty when the site is served through the same domain via nginx.
-- `ADMIN_TOKEN` is left empty here because the current admin page does not yet inject a token. Keep `/admin/` blocked publicly until HTTPS/auth is added.
+- `ADMIN_TOKEN` is required. The backend now refuses to start if it is empty.
 
 ## 5. Install service + nginx config
 
@@ -80,6 +80,8 @@ cd /var/www/arkproject/current
 chmod +x deploy/ubuntu/install-on-server.sh
 ./deploy/ubuntu/install-on-server.sh
 ```
+
+`install-on-server.sh` writes a template hash baseline beside the live `systemd` and nginx configs. Later deploys will stop if the checked-in template changes until you review the live config and rerun this script to acknowledge the new baseline.
 
 ## 6. Verify
 
@@ -100,11 +102,10 @@ After uploading new code:
 
 ```bash
 cd /var/www/arkproject/current
-npm ci
-npm run build
-sudo systemctl restart ark-backend
-sudo systemctl reload nginx
+bash deploy/ubuntu/redeploy.sh
 ```
+
+If `redeploy.sh` reports template drift, compare the checked-in `.example` files with the live config under `/etc`, apply any manual edits you want to keep, then rerun `deploy/ubuntu/install-on-server.sh` to record the new reviewed baseline before deploying again.
 
 ## Security note
 

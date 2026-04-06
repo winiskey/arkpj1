@@ -3,9 +3,14 @@ import { createRequire } from "node:module";
 import { dirname, resolve } from "node:path";
 import ts from "typescript";
 import { getRuntimeDataPaths } from "../server/app/config.mjs";
+import { publicContentSeedPath } from "../server/app/public-content-seed.mjs";
 
 const require = createRequire(import.meta.url);
 const moduleCache = new Map();
+
+// This script mirrors src/content into runtime JSON files. Keep the loader
+// behavior aligned with the actual TypeScript toolchain; it is not a second
+// authoritative module system.
 
 function resolveModulePath(specifier, parentFile) {
   const basePath = resolve(dirname(parentFile), specifier);
@@ -78,4 +83,8 @@ const publicContent = {
 const { publicContentPath } = getRuntimeDataPaths();
 mkdirSync(dirname(publicContentPath), { recursive: true });
 writeFileSync(publicContentPath, `${JSON.stringify(publicContent, null, 2)}\n`, "utf8");
+mkdirSync(dirname(publicContentSeedPath), { recursive: true });
+writeFileSync(publicContentSeedPath, `${JSON.stringify(publicContent, null, 2)}\n`, "utf8");
+
 console.log(`Exported ${publicContentPath} from src/content.`);
+console.log(`Updated seed ${publicContentSeedPath}.`);

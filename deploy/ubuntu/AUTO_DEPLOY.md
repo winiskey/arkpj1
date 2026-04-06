@@ -7,7 +7,7 @@ The deploy flow is:
 1. GitHub Actions checks out the repo.
 2. The runner syncs repository files to your server over SSH.
 3. The server runs `deploy/ubuntu/redeploy.sh`.
-4. The script installs dependencies, builds the app, restarts `ark-backend`, and checks `/api/health`.
+4. The script installs dependencies, builds the app, runs `npm test`, restarts `ark-backend`, and checks `/api/health`.
 
 ## Why This Setup
 
@@ -92,6 +92,7 @@ Optional secrets:
 - `DEPLOY_PORT`: SSH port, defaults to `22`
 - `DEPLOY_APP_DIR`: deploy target directory, defaults to `/home/admin/arkpj1`
 - `DEPLOY_SERVICE_NAME`: defaults to `ark-backend`
+- `DEPLOY_NGINX_SITE_NAME`: defaults to `arkproject`
 - `DEPLOY_HEALTHCHECK_URL`: defaults to `http://127.0.0.1:8787/api/health`
 - `DEPLOY_RUN_CONTENT_SYNC`: defaults to `0`; set to `1` only if repo content should overwrite runtime `public-content.json`
 - `DEPLOY_RUN_NGINX_RELOAD`: defaults to `0`
@@ -115,5 +116,6 @@ Expected log lines include:
 
 - The workflow syncs files with `rsync`; it does not require the server to `git pull`.
 - `server/data/` is excluded from sync on purpose. Live data should live under `ARK_DATA_DIR`.
+- `redeploy.sh` now checks template baseline hashes for `systemd` and nginx. If a checked-in `.example` file changes, review the live config and rerun `deploy/ubuntu/install-on-server.sh` on the server before the next deploy.
 - If the repository is private, this approach still works because GitHub Actions already has the checked-out code.
 - Leave `DEPLOY_RUN_CONTENT_SYNC=0` if the admin backend is already editing live public content on the server.

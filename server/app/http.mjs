@@ -202,7 +202,7 @@ export function createRequestContext({ request, response, config }) {
     },
     assertAdminAuth() {
       if (!config.adminToken) {
-        return;
+        throw new HttpError(500, "ADMIN_TOKEN is not configured.");
       }
 
       const candidate = extractAdminToken(request);

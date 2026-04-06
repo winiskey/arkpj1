@@ -44,6 +44,22 @@ function createTeam({ memberCount = 4 } = {}) {
   };
 }
 
+function createFinalistTeam(id, name) {
+  return {
+    id,
+    name,
+    tag: name.slice(0, 3).toUpperCase(),
+    rank: 1,
+    totalScore: "0",
+    members: [
+      { id: `${id}-sami`, name: `${name}-萨米`, role: "P1", theme: "探索者的银凇止境" },
+      { id: `${id}-chou`, name: `${name}-死仇`, role: "P2", theme: "萨卡兹的无终奇语" },
+      { id: `${id}-meiyuan`, name: `${name}-美愿`, role: "P3", theme: "萨卡兹的无终奇语" },
+      { id: `${id}-sui`, name: `${name}-界园`, role: "P4", theme: "岁的界园志异" },
+    ],
+  };
+}
+
 function createPublicContent(team) {
   const publicContent = createEmptyPublicContent();
   publicContent.teams = [team];
@@ -52,12 +68,12 @@ function createPublicContent(team) {
   return publicContent;
 }
 
-function createScoreSheet(memberId, theme, previewScore = 100, status = "final") {
+function createScoreSheet(memberId, theme, previewScore = 100, status = "final", matchId = null, overrides = {}) {
   return {
     id: `${memberId}-${theme}`,
     teamId: "team-1",
     memberId,
-    matchId: null,
+    matchId,
     theme,
     snapshot: {},
     previewScore,
@@ -67,6 +83,7 @@ function createScoreSheet(memberId, theme, previewScore = 100, status = "final")
     calculatorVersion: "jingchuge-html-v1",
     createdAt: "2026-03-12T00:00:00.000Z",
     updatedAt: "2026-03-12T00:00:00.000Z",
+    ...overrides,
   };
 }
 
@@ -152,6 +169,138 @@ test("upsertScoreSheet ignores tampered client totals and recalculates from snap
   assert.equal(stored.sheets[0].formulaText, "(220.00)");
 });
 
+test("ensureReady backfills placeholder public content with the committed seed", async () => {
+  const publicContentStore = createMemoryStore(createEmptyPublicContent());
+  const opsStateStore = createMemoryStore(createDefaultOpsState());
+  const scoreSheetsStore = createMemoryStore(createDefaultScoreSheetsState());
+  const service = createBackendService({ publicContentStore, opsStateStore, scoreSheetsStore });
+
+  await service.ensureReady();
+
+  const publicContent = await publicContentStore.read();
+  assert.ok(publicContent.ruleSections.length > 0);
+  assert.ok(publicContent.themeRules.length > 0);
+  assert.ok(publicContent.teams.length > 0);
+  assert.ok(publicContent.siteMeta.eventName);
+});
+
+test("getFinalsConfig seeds the current finalists and default first-pick tracks", async () => {
+  const publicContent = createEmptyPublicContent();
+  publicContent.teams = [
+    createFinalistTeam("strawberry-no1", "草莓天下第一"),
+    createFinalistTeam("mygo", "mygo"),
+  ];
+
+  const service = createBackendService({
+    publicContentStore: createMemoryStore(publicContent),
+    opsStateStore: createMemoryStore(createDefaultOpsState(publicContent)),
+    scoreSheetsStore: createMemoryStore(createDefaultScoreSheetsState()),
+  });
+
+  const finalsConfig = await service.getFinalsConfig();
+
+  assert.equal(finalsConfig.teamAId, "strawberry-no1");
+  assert.equal(finalsConfig.teamBId, "mygo");
+  assert.equal(finalsConfig.tracks.sami.firstPickTeamId, "strawberry-no1");
+  assert.equal(finalsConfig.tracks.sarkaz_chou.firstPickTeamId, "strawberry-no1");
+  assert.equal(finalsConfig.tracks.sarkaz_meiyuan.firstPickTeamId, "mygo");
+  assert.equal(finalsConfig.tracks.sui.enabled, false);
+});
+
+test("calculateSoloScore reports finals pick warnings without auto-deducting the score", async () => {
+  const publicContent = createEmptyPublicContent();
+  const teamA = createFinalistTeam("strawberry-no1", "草莓天下第一");
+  const teamB = createFinalistTeam("mygo", "mygo");
+  publicContent.teams = [teamA, teamB];
+
+  const opsState = createDefaultOpsState(publicContent);
+  opsState.finalsConfig.tracks.sarkaz_chou.picksByTeamId = {
+    "strawberry-no1": [
+      { id: "a1", operatorName: "推进之王", rarity: 6, createdAt: "2026-04-05T00:00:00.000Z" },
+      { id: "a2", operatorName: "能天使", rarity: 6, createdAt: "2026-04-05T00:00:00.000Z" },
+      { id: "a3", operatorName: "银灰", rarity: 6, createdAt: "2026-04-05T00:00:00.000Z" },
+    ],
+    mygo: [
+      { id: "b1", operatorName: "陈", rarity: 6, createdAt: "2026-04-05T00:00:00.000Z" },
+      { id: "b2", operatorName: "艾雅法拉", rarity: 6, createdAt: "2026-04-05T00:00:00.000Z" },
+      { id: "b3", operatorName: "煌", rarity: 6, createdAt: "2026-04-05T00:00:00.000Z" },
+    ],
+  };
+
+  const service = createBackendService({
+    publicContentStore: createMemoryStore(publicContent),
+    opsStateStore: createMemoryStore(opsState),
+    scoreSheetsStore: createMemoryStore(createDefaultScoreSheetsState()),
+  });
+
+  const result = await service.calculateSoloScore({
+    teamId: "strawberry-no1",
+    memberId: "strawberry-no1-chou",
+    theme: "sarkaz",
+    snapshot: {
+      "finals-enabled": true,
+      "finals-active-operators": ["陈", "史尔特尔"],
+      "sk-score": 100,
+    },
+  });
+
+  assert.equal(result.previewScore, 85);
+  assert.ok(result.finalsValidation);
+  assert.equal(result.finalsValidation.trackCode, "sarkaz_chou");
+  assert.equal(result.finalsValidation.suggestedPenalty, 600);
+  assert.deepEqual(result.finalsValidation.opponentPickedOperators, ["陈"]);
+  assert.deepEqual(result.finalsValidation.outsidePoolOperators, ["陈", "史尔特尔"]);
+});
+
+test("upsertScoreSheet blocks locking a finals Sarkaz sheet when the lane assignment is missing", async () => {
+  const publicContent = createEmptyPublicContent();
+  const teamA = createFinalistTeam("strawberry-no1", "草莓天下第一");
+  const teamB = createFinalistTeam("mygo", "mygo");
+  publicContent.teams = [teamA, teamB];
+
+  const opsState = createDefaultOpsState(publicContent);
+  opsState.finalsConfig.sarkazLaneAssignments["strawberry-no1"] = {
+    chouMemberId: null,
+    meiyuanMemberId: null,
+  };
+  opsState.finalsConfig.tracks.sarkaz_chou.picksByTeamId = {
+    "strawberry-no1": [
+      { id: "a1", operatorName: "推进之王", rarity: 6, createdAt: "2026-04-05T00:00:00.000Z" },
+      { id: "a2", operatorName: "能天使", rarity: 6, createdAt: "2026-04-05T00:00:00.000Z" },
+      { id: "a3", operatorName: "银灰", rarity: 6, createdAt: "2026-04-05T00:00:00.000Z" },
+    ],
+    mygo: [
+      { id: "b1", operatorName: "陈", rarity: 6, createdAt: "2026-04-05T00:00:00.000Z" },
+      { id: "b2", operatorName: "艾雅法拉", rarity: 6, createdAt: "2026-04-05T00:00:00.000Z" },
+      { id: "b3", operatorName: "煌", rarity: 6, createdAt: "2026-04-05T00:00:00.000Z" },
+    ],
+  };
+  opsState.finalsConfig.tracks.sarkaz_meiyuan.picksByTeamId = structuredClone(opsState.finalsConfig.tracks.sarkaz_chou.picksByTeamId);
+
+  const service = createBackendService({
+    publicContentStore: createMemoryStore(publicContent),
+    opsStateStore: createMemoryStore(opsState),
+    scoreSheetsStore: createMemoryStore(createDefaultScoreSheetsState()),
+  });
+
+  await assert.rejects(
+    () => service.upsertScoreSheet({
+      teamId: "strawberry-no1",
+      memberId: "strawberry-no1-chou",
+      matchId: null,
+      theme: "sarkaz",
+      snapshot: {
+        "finals-enabled": true,
+        "finals-active-operators": ["推进之王"],
+        "sk-score": 100,
+      },
+      status: "final",
+      calculatorVersion: "jingchuge-react-admin-v1",
+    }),
+    /尚未绑定死仇 \/ 美愿赛道/,
+  );
+});
+
 test("publishTeam rejects blocking compliance states even when every sheet is final", async (t) => {
   const baseSheets = [
     createScoreSheet("m1", "sami"),
@@ -176,7 +325,7 @@ test("publishTeam rejects blocking compliance states even when every sheet is fi
         createScoreSheet("m2", "sarkaz"),
         createScoreSheet("m3", "sui"),
       ],
-      expected: "Roster is short by 1 member(s).",
+      expected: "花名册缺少 1 名选手。",
     },
     {
       name: "too many coach calls",
@@ -190,7 +339,7 @@ test("publishTeam rejects blocking compliance states even when every sheet is fi
           { id: "c4", requestedByMemberId: "m1", targetMemberId: "m2", durationMinutes: 3 },
         ],
       },
-      expected: "Coach call count exceeds the rule limit.",
+      expected: "教练通话次数超过规则上限。",
     },
     {
       name: "over-duration coach call",
@@ -201,7 +350,7 @@ test("publishTeam rejects blocking compliance states even when every sheet is fi
           { id: "c1", requestedByMemberId: "m1", targetMemberId: "m2", durationMinutes: 4 },
         ],
       },
-      expected: "At least one coach call exceeds the per-call duration limit.",
+      expected: "至少有一次教练通话时长超过单次上限。",
     },
   ];
 
@@ -223,6 +372,30 @@ test("publishTeam rejects blocking compliance states even when every sheet is fi
       );
     });
   }
+});
+
+test("deleteScoreSheet removes the stored sheet and recalculates publish blockers", async () => {
+  const { service, scoreSheetsStore } = createServiceWithStores({
+    compliance: { pressureMemberId: "m1" },
+    sheets: [
+      createScoreSheet("m1", "sami"),
+      createScoreSheet("m2", "sarkaz"),
+      createScoreSheet("m3", "sui"),
+      createScoreSheet("m4", "sami"),
+    ],
+  });
+
+  const result = await service.deleteScoreSheet("m4-sami");
+
+  assert.equal(result.deletedId, "m4-sami");
+  assert.equal(result.aggregate.scoredCount, 3);
+  assert.equal(result.aggregate.finalizedCount, 3);
+  assert.equal(result.aggregate.publishReady, false);
+  assert.ok(result.aggregate.publishBlockingIssues.includes("仍有 1 名选手未完成终稿确认。"));
+
+  const stored = await scoreSheetsStore.read();
+  assert.equal(stored.sheets.length, 3);
+  assert.equal(stored.sheets.some((entry) => entry.id === "m4-sami"), false);
 });
 
 test("createCoachCall rejects over-limit duration and total count before mutating state", async (t) => {
@@ -375,4 +548,150 @@ test("createPlannedPick rejects a 14th planned six-star on the same member", asy
   const publicContent = await publicContentStore.read();
   const member = publicContent.teams[0].members.find((entry) => entry.id === "m1");
   assert.equal(member.operatorPicks.length, tournamentConfig.operatorDrafts.maxSixStarsPerMember);
+});
+
+test("upsertScoreSheet rejects an id that points to a different identity", async () => {
+  const existingSheet = createScoreSheet("m2", "sarkaz", 123, "draft");
+  const { service, scoreSheetsStore } = createServiceWithStores({
+    compliance: { pressureMemberId: "m1" },
+    sheets: [existingSheet],
+  });
+
+  await assert.rejects(
+    () => service.upsertScoreSheet({
+      id: existingSheet.id,
+      teamId: "team-1",
+      memberId: "m1",
+      matchId: null,
+      theme: "sami",
+      snapshot: {
+        "sa-score": 100,
+      },
+      status: "draft",
+      calculatorVersion: "jingchuge-react-admin-v1",
+    }),
+    /identity/,
+  );
+
+  const stored = await scoreSheetsStore.read();
+  assert.equal(stored.sheets.length, 1);
+  assert.equal(stored.sheets[0].memberId, "m2");
+  assert.equal(stored.sheets[0].theme, "sarkaz");
+  assert.equal(stored.sheets[0].previewScore, 123);
+});
+
+test("buildTeamAggregate explicitly collapses match-scoped sheets by status and recency", () => {
+  const team = createTeam();
+  const aggregate = buildTeamAggregate(team, { pressureMemberId: "m4" }, [
+    createScoreSheet("m1", "sami", 111, "draft", "match-1", {
+      id: "sheet-draft",
+      updatedAt: "2026-03-12T10:00:00.000Z",
+      createdAt: "2026-03-12T10:00:00.000Z",
+    }),
+    createScoreSheet("m1", "sami", 222, "final", "match-2", {
+      id: "sheet-final",
+      updatedAt: "2026-03-12T09:00:00.000Z",
+      createdAt: "2026-03-12T09:00:00.000Z",
+    }),
+    createScoreSheet("m2", "sarkaz", 50),
+    createScoreSheet("m3", "sui", 60),
+    createScoreSheet("m4", "sami", 70),
+  ]);
+
+  assert.equal(aggregate.members.find((entry) => entry.memberId === "m1")?.sheet?.id, "sheet-final");
+  assert.equal(aggregate.members.find((entry) => entry.memberId === "m1")?.score, 222);
+});
+
+test("replacePublicContent drops orphan compliance and score sheets during sync", async () => {
+  const team = createTeam();
+  const { service, opsStateStore, scoreSheetsStore } = createServiceWithStores({
+    team,
+    compliance: { pressureMemberId: "m1" },
+    sheets: [
+      createScoreSheet("m1", "sami"),
+      {
+        ...createScoreSheet("ghost-member", "sami"),
+        id: "ghost-sheet",
+        teamId: "ghost-team",
+        memberId: "ghost-member",
+      },
+    ],
+  });
+
+  const currentOpsState = await opsStateStore.read();
+  currentOpsState.complianceByTeam["ghost-team"] = {
+    teamId: "ghost-team",
+    pressureMemberId: null,
+    openingIngots: 0,
+    currentIngots: 0,
+    overtimeMinutes: 0,
+    operatorDrafts: [],
+    coachCalls: [],
+    notes: [],
+    updatedAt: "2026-03-12T00:00:00.000Z",
+  };
+  await opsStateStore.replace(currentOpsState);
+
+  const nextPublicContent = createEmptyPublicContent();
+  nextPublicContent.teams = [];
+  nextPublicContent.matches = [];
+  nextPublicContent.leaderboard = [];
+
+  await service.replacePublicContent(nextPublicContent);
+
+  const syncedOpsState = await opsStateStore.read();
+  assert.deepEqual(Object.keys(syncedOpsState.complianceByTeam), []);
+
+  const syncedScoreSheetsState = await scoreSheetsStore.read();
+  assert.equal(syncedScoreSheetsState.sheets.length, 0);
+});
+
+test("patchMatch validates member ownership and derives currentMemberName", async () => {
+  const team = createTeam();
+  const publicContent = createPublicContent(team);
+  publicContent.matches = [
+    {
+      id: "match-1",
+      phase: "Round 1",
+      startTime: "09:00",
+      status: "PENDING",
+      teamId: "team-1",
+      totalScore: "0",
+      currentMemberId: null,
+      currentMemberName: null,
+      members: team.members.map((member, index) => ({
+        id: member.id,
+        name: member.name,
+        theme: member.theme,
+        score: 0,
+        multiplier: 1,
+        status: "PENDING",
+        queueOrder: index,
+      })),
+      playersList: team.members.map((member) => member.name),
+      note: "",
+    },
+  ];
+
+  const service = createBackendService({
+    publicContentStore: createMemoryStore(publicContent),
+    opsStateStore: createMemoryStore(createDefaultOpsState(publicContent)),
+    scoreSheetsStore: createMemoryStore(createDefaultScoreSheetsState()),
+  });
+
+  await assert.rejects(
+    () => service.patchMatch("match-1", { currentMemberId: "ghost" }),
+    /does not exist on match/,
+  );
+
+  const patched = await service.patchMatch("match-1", {
+    currentMemberId: "m2",
+    note: "ready",
+    status: "IN_PROGRESS",
+  });
+
+  assert.equal(patched.currentMemberId, "m2");
+  assert.equal(patched.currentMemberName, "B");
+  assert.equal(patched.note, "ready");
+  assert.equal(patched.status, "IN_PROGRESS");
 });

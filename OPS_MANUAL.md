@@ -101,7 +101,7 @@ ArkProject/
 │   │   ├── scoring.mjs        # 三主题计分引擎
 │   │   ├── validators.mjs     # API 输入验证器
 │   │   ├── json-file-store.mjs# 原子性 JSON 文件存储
-│   │   └── *.test.mjs         # 测试文件（3 个）
+│   │   └── *.test.mjs         # 后端测试文件
 │   └── data/                  # 运行时数据（⚠️ 需备份）
 │       ├── public-content.json# 公开内容 (~43KB)
 │       ├── ops-state.json     # 运维状态 (~2KB)
@@ -123,9 +123,9 @@ ArkProject/
 | `API_PORT` | `8787` | 后端监听端口 |
 | `API_BODY_LIMIT_BYTES` | `1048576` (1MB) | 请求体大小限制 |
 | `API_CORS_ORIGINS` | `""` (空 = 拒绝跨域) | 允许的源，逗号分隔。`*` 为全部放行 |
-| `ADMIN_TOKEN` | `""` (空 = 管理接口无需认证) | 管理 API 认证 Token |
+| `ADMIN_TOKEN` | 必填 | 管理 API 认证 Token；为空时后端会拒绝启动 |
 
-> ⚠️ **生产环境必须设置**: `ADMIN_TOKEN`（非空值）和 `API_CORS_ORIGINS`
+> ⚠️ 请从 `.env.example` 或部署目录中的 `ark-backend.env.example` 生成本地配置，并始终设置非空 `ADMIN_TOKEN`
 
 ---
 
@@ -145,8 +145,8 @@ ArkProject/
 ### 测试
 
 ```bash
-# 运行全部后端测试（17 个）
-node --test server/app/scoring.test.mjs server/app/service.test.mjs server/app/rules-content.test.mjs
+# 运行全部后端测试
+npm test
 
 # 运行单个测试文件
 node --test server/app/scoring.test.mjs
