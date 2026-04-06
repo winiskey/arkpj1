@@ -114,6 +114,10 @@ function buildResult(total, formulaText, extras = {}) {
   };
 }
 
+function isFinalsEnabled(snapshot) {
+  return getBoolean(snapshot, "finals-enabled");
+}
+
 export function calculateSamiScore(snapshot) {
   const rawBase =
     getNumber(snapshot, "sa-score")
@@ -131,9 +135,13 @@ export function calculateSamiScore(snapshot) {
   if (getBoolean(snapshot, "sa-sentinel-nl")) raw += 100;
   if (getBoolean(snapshot, "sa-gift")) raw += 70;
 
-  return buildResult(raw, `(${formatNumber(raw)})`, {
+  const finalsEnabled = isFinalsEnabled(snapshot);
+  const total = raw;
+
+  return buildResult(total, `(${formatNumber(raw)})`, {
     rawScore: roundScore(raw),
     multiplier: 1,
+    finalsEnabled,
   });
 }
 
@@ -209,27 +217,35 @@ export function calculateSarkazScore(snapshot) {
   }
 
   raw += ending;
-  const total = raw * 0.75;
-  return buildResult(total, `(${formatNumber(raw)} x 0.75)`, {
+  const finalsEnabled = isFinalsEnabled(snapshot);
+  const multiplier = finalsEnabled ? 0.85 : 0.75;
+  const total = raw * multiplier;
+
+  return buildResult(total, `(${formatNumber(raw)} x ${formatNumber(multiplier)})`, {
     rawScore: roundScore(raw),
-    multiplier: 0.75,
+    multiplier: roundScore(multiplier),
+    finalsEnabled,
   });
 }
 
 export function calculateSuiScore(snapshot) {
+  const finalsEnabled = isFinalsEnabled(snapshot);
   const items = Math.max(0, getNumber(snapshot, "sui-items"));
   const steps = Math.max(0, getNumber(snapshot, "sui-steps"));
+  const enteredJinxi = finalsEnabled && getBoolean(snapshot, "sui-finals-jinxi");
+  const itemScoreCap = enteredJinxi ? 80 : 120;
 
   if (getBoolean(snapshot, "sui-rule-violate") || steps > 150) {
     return buildResult(0, "Rule violation => 0", {
       rawScore: 0,
       multiplier: 0,
+      finalsEnabled,
     });
   }
 
   let raw =
     getNumber(snapshot, "sui-score")
-    + Math.min(items, 120) * 5
+    + Math.min(items, itemScoreCap) * 5
     + getNumber(snapshot, "sui-6s") * 50
     + getNumber(snapshot, "sui-5s") * 20
     + getNumber(snapshot, "sui-4s") * 10;
@@ -286,9 +302,9 @@ export function calculateSuiScore(snapshot) {
   }
 
   raw -= Math.max(0, steps - 100) * 1.5;
-  raw -= Math.max(0, items - 120) * 7.5;
+  raw -= Math.max(0, items - itemScoreCap) * 7.5;
 
-  let multiplier = 0.4 * (1 + (getBoolean(snapshot, "sui-item-a") ? 0.2 : 0) + (getBoolean(snapshot, "sui-item-b") ? 0.2 : 0));
+  let multiplier = (finalsEnabled ? 0.5 : 0.4) * (1 + (getBoolean(snapshot, "sui-item-a") ? 0.2 : 0) + (getBoolean(snapshot, "sui-item-b") ? 0.2 : 0));
   if (getBoolean(snapshot, "sui-pen-1")) multiplier *= 0.5;
   if (getBoolean(snapshot, "sui-pen-2")) multiplier *= 0.5;
 
@@ -296,6 +312,7 @@ export function calculateSuiScore(snapshot) {
   return buildResult(total, `(${formatNumber(raw)} x ${formatNumber(multiplier)})`, {
     rawScore: roundScore(raw),
     multiplier: roundScore(multiplier),
+    finalsEnabled,
   });
 }
 

@@ -5,7 +5,7 @@ import { patchScoreSheetStatus } from "./useAdminApi";
 import type { ScoreSheetSummary, ThemeCode } from "./types";
 
 const THEME_LABELS: Record<ThemeCode, string> = {
-  sami: "探索者的银淞止境",
+  sami: "探索者的银凇止境",
   sarkaz: "萨卡兹的无终奇语",
   sui: "岁的界园志异",
 };

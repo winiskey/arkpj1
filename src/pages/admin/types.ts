@@ -4,6 +4,7 @@
 // ── Enums ──────────────────────────────────────────────────────────
 
 export type ThemeCode = "sami" | "sarkaz" | "sui";
+export type FinalsTrackCode = "sami" | "sarkaz_chou" | "sarkaz_meiyuan" | "sui";
 export type ScoreSheetStatus = "draft" | "final" | "published";
 export type MatchStatus = "IN_PROGRESS" | "PENDING" | "FINISHED";
 export type MemberRunStatus = "LIVE" | "PENDING" | "FINISHED";
@@ -28,6 +29,50 @@ export interface OperatorCatalogPick {
     operatorName: string;
     rarity: number;
     createdAt: string;
+}
+
+export interface FinalsPick {
+    id: string;
+    operatorName: string;
+    rarity: number;
+    createdAt: string;
+}
+
+export interface FinalsTrackConfig {
+    enabled: boolean;
+    firstPickTeamId: string | null;
+    picksByTeamId: Record<string, FinalsPick[]>;
+    updatedAt?: string;
+}
+
+export interface FinalsSarkazLaneAssignment {
+    chouMemberId: string | null;
+    meiyuanMemberId: string | null;
+}
+
+export interface FinalsConfig {
+    enabled: boolean;
+    teamAId: string | null;
+    teamBId: string | null;
+    tracks: Record<FinalsTrackCode, FinalsTrackConfig>;
+    sarkazLaneAssignments: Record<string, FinalsSarkazLaneAssignment>;
+    updatedAt: string;
+}
+
+export interface FinalsValidation {
+    enabled: boolean;
+    pickEnabled: boolean;
+    configured: boolean;
+    trackCode: FinalsTrackCode | null;
+    trackLabel: string | null;
+    firstPickTeamId: string | null;
+    ownPicks: string[];
+    opponentPicks: string[];
+    activeOperators: string[];
+    outsidePoolOperators: string[];
+    opponentPickedOperators: string[];
+    suggestedPenalty: number;
+    messages: string[];
 }
 
 export interface TeamMetric {
@@ -285,6 +330,7 @@ export interface AdminBootstrap {
     };
     ruleVersion: string;
     tournamentConfig: Record<string, unknown>;
+    finalsConfig: FinalsConfig;
     opsState: {
         version: number;
         updatedAt: string;

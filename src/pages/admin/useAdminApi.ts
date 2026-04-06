@@ -9,6 +9,8 @@ import type {
     OperatorDraft,
     CoachCall,
     ComplianceSummary,
+    FinalsConfig,
+    FinalsValidation,
     TeamAggregate,
     MatchStatus,
     ThemeCode,
@@ -109,15 +111,17 @@ export interface SoloCalcResult {
     formulaText: string;
     rawScore?: number;
     multiplier?: number;
+    finalsValidation?: FinalsValidation;
 }
 
 export async function calculateSoloScore(
     theme: string,
     snapshot: Record<string, unknown>,
+    context: Partial<{ teamId: string; memberId: string }> = {},
 ): Promise<SoloCalcResult> {
     return adminFetch<SoloCalcResult>("/api/admin/calculator/solo", {
         method: "POST",
-        body: JSON.stringify({ theme, snapshot }),
+        body: JSON.stringify({ ...context, theme, snapshot }),
     });
 }
 
@@ -166,9 +170,20 @@ export async function upsertScoreSheet(payload: {
     note?: string;
     status?: string;
     calculatorVersion?: string;
-}): Promise<{ sheet: ScoreSheet; aggregate: TeamAggregate }> {
+}): Promise<{ sheet: ScoreSheet; aggregate: TeamAggregate; finalsValidation?: FinalsValidation }> {
     return adminFetch("/api/admin/score-sheets/upsert", {
         method: "POST",
+        body: JSON.stringify(payload),
+    });
+}
+
+export async function fetchFinalsConfig(): Promise<FinalsConfig> {
+    return adminFetch("/api/admin/finals-config");
+}
+
+export async function replaceFinalsConfig(payload: FinalsConfig): Promise<FinalsConfig> {
+    return adminFetch("/api/admin/finals-config", {
+        method: "PUT",
         body: JSON.stringify(payload),
     });
 }
@@ -206,8 +221,10 @@ export async function patchScoreSheetStatus(
     });
 }
 
-export async function deleteScoreSheet(sheetId: string): Promise<void> {
-    await adminFetch(`/api/admin/score-sheets/${sheetId}`, {
+export async function deleteScoreSheet(
+    sheetId: string,
+): Promise<{ deletedId: string; aggregate: TeamAggregate }> {
+    return adminFetch(`/api/admin/score-sheets/${sheetId}`, {
         method: "DELETE",
     });
 }

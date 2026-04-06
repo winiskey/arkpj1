@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import { useAdminData } from "./AdminDataContext";
 import { useToast } from "./ToastContext";
+import { OperatorAvatar, OperatorCombobox } from "./OperatorCombobox";
+import { findOperatorCatalogEntry, normalizeOperatorName } from "./operatorCatalog";
 import {
   calculateSoloScore,
   fetchScoreSheet,
@@ -22,9 +24,10 @@ import {
   publishTeam,
   upsertScoreSheet,
 } from "./useAdminApi";
-import type { Team, TeamAggregate, TeamMember } from "./types";
+import type { FinalsValidation, OperatorCatalogEntry, Team, TeamAggregate, TeamMember } from "./types";
 import {
   createDefaultSnapshots,
+  FINALS_ENABLED_FIELD,
   getDefaultThemeSnapshot,
   hydrateThemeSnapshot,
   inferThemeCodeFromMemberTheme,
@@ -49,6 +52,7 @@ import {
   SUI_BEAST_LOSS_FIELD,
   SUI_ENDING_FIELD,
   SUI_ENDING_PERF_FIELD,
+  SUI_FINALS_JINXI_FIELD,
   SUI_MULTIPLIER_FIELDS,
   SUI_RELIC_FIELDS,
   SUI_RULE_FIELD,
@@ -72,6 +76,7 @@ interface SheetViewState {
 
 interface PreviewState {
   formula: string;
+  finalsValidation?: FinalsValidation;
   multiplier?: number;
   rawScore?: number;
   score: number;
@@ -88,6 +93,8 @@ const EMPTY_PREVIEW: PreviewState = {
   score: 0,
   formula: "等待输入",
 };
+
+const ACTIVE_OPERATORS_KEY = "finals-active-operators";
 
 function createDefaultThemeBaselines(): Record<CalculatorTheme, ThemeBaselineState> {
   return {
@@ -112,11 +119,23 @@ function createDefaultThemeBaselines(): Record<CalculatorTheme, ThemeBaselineSta
   };
 }
 
+function areSnapshotValuesEqual(left: SnapshotValue | undefined, right: SnapshotValue | undefined) {
+  if (Array.isArray(left) || Array.isArray(right)) {
+    if (!Array.isArray(left) || !Array.isArray(right) || left.length !== right.length) {
+      return false;
+    }
+
+    return left.every((entry, index) => entry === right[index]);
+  }
+
+  return left === right;
+}
+
 function areSnapshotsEqual(left: ThemeSnapshot, right: ThemeSnapshot) {
   const keys = new Set([...Object.keys(left), ...Object.keys(right)]);
 
   for (const key of keys) {
-    if (left[key] !== right[key]) {
+    if (!areSnapshotValuesEqual(left[key], right[key])) {
       return false;
     }
   }
@@ -297,6 +316,95 @@ function SelectInput({
   );
 }
 
+function ActiveOperatorPicker({
+  disabled,
+  operators,
+  onChange,
+}: {
+  disabled: boolean;
+  operators: string[];
+  onChange: (operators: string[]) => void;
+}) {
+  const [pickerValue, setPickerValue] = useState<OperatorCatalogEntry | null>(null);
+
+  const existingSelections = useMemo(() => {
+    const map = new Map<string, string[]>();
+    for (const operatorName of operators) {
+      map.set(normalizeOperatorName(operatorName), ["本局使用"]);
+    }
+    return map;
+  }, [operators]);
+
+  const selectedNames = useMemo(
+    () => new Set(operators.map((operatorName) => normalizeOperatorName(operatorName))),
+    [operators],
+  );
+
+  const handleAdd = (entry: OperatorCatalogEntry | null) => {
+    setPickerValue(entry);
+    if (!entry) {
+      return;
+    }
+
+    const normalizedName = normalizeOperatorName(entry.name);
+    if (selectedNames.has(normalizedName)) {
+      setPickerValue(null);
+      return;
+    }
+
+    onChange([...operators, entry.name]);
+    setPickerValue(null);
+  };
+
+  const handleRemove = (operatorName: string) => {
+    onChange(operators.filter((entry) => normalizeOperatorName(entry) !== normalizeOperatorName(operatorName)));
+  };
+
+  return (
+    <div className="space-y-4">
+      <OperatorCombobox
+        clearAfterSelect
+        disabled={disabled}
+        existingSelections={existingSelections}
+        keepOpenOnSelect
+        onChange={handleAdd}
+        placeholder="添加本局实际使用的六星干员"
+        selectedNames={selectedNames}
+        value={pickerValue}
+      />
+
+      {operators.length > 0 ? (
+        <div className="flex flex-wrap gap-2">
+          {operators.map((operatorName) => {
+            const entry = findOperatorCatalogEntry(operatorName);
+            return (
+              <div
+                className="flex items-center gap-2 rounded-2xl border border-white/8 bg-white/[0.03] px-2.5 py-2 text-sm text-text2"
+                key={operatorName}
+              >
+                <OperatorAvatar entry={entry} name={operatorName} sizeClassName="h-9 w-9" />
+                <div className="max-w-[9rem] truncate font-medium">{operatorName}</div>
+                <button
+                  aria-label={`移除 ${operatorName}`}
+                  className="rounded-full border border-white/10 bg-black/10 px-2 py-1 text-xs text-text3 transition-colors hover:border-live/35 hover:bg-live/10 hover:text-live"
+                  onClick={() => handleRemove(operatorName)}
+                  type="button"
+                >
+                  删除
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] px-4 py-5 text-sm text-text3">
+          暂未录入本局实际使用的六星干员
+        </div>
+      )}
+    </div>
+  );
+}
+
 function SectionCard({
   children,
   description,
@@ -317,7 +425,7 @@ function SectionCard({
         </div>
         {onReset ? (
           <button
-            className="inline-flex items-center gap-2 rounded-lg border border-live/25 bg-live/10 px-3 py-2 text-sm text-live transition-colors hover:bg-live/15"
+            className="inline-flex items-center gap-2 rounded-lg border border-live/25 bg-live/10 px-3 py-2 text-sm text-live transition-colors hover:bg-live/15 disabled:cursor-not-allowed disabled:opacity-50"
             onClick={onReset}
             type="button"
           >
@@ -405,6 +513,7 @@ export function ScoreCalculator() {
 
   const teams = data?.publicContent.teams ?? [];
   const matches = data?.publicContent.matches ?? [];
+  const finalsConfig = data?.finalsConfig ?? null;
   const selectedTeam = useMemo(
     () => teams.find((team) => team.id === selectedTeamId) ?? null,
     [selectedTeamId, teams],
@@ -720,13 +829,18 @@ export function ScoreCalculator() {
       if (previewRequestRef.current !== requestId) return;
       setPreviewLoading(true);
 
-      calculateSoloScore(activeTab, activeThemeSnapshot ?? {})
+      calculateSoloScore(
+        activeTab,
+        activeThemeSnapshot ?? {},
+        selectedTeam && selectedMember ? { teamId: selectedTeam.id, memberId: selectedMember.id } : {},
+      )
         .then((result) => {
           if (previewRequestRef.current !== requestId) {
             return;
           }
 
           setPreview({
+            finalsValidation: result.finalsValidation,
             score: result.previewScore,
             formula: result.formulaText,
             rawScore: result.rawScore,
@@ -739,6 +853,7 @@ export function ScoreCalculator() {
           }
 
           setPreview({
+            finalsValidation: undefined,
             score: 0,
             formula: fetchError instanceof Error ? fetchError.message : "预览计算失败",
           });
@@ -803,6 +918,10 @@ export function ScoreCalculator() {
       return;
     }
 
+    if (!canEditActiveSheet) {
+      return;
+    }
+
     if (!window.confirm("确定要清空当前主题的录分内容吗？")) {
       return;
     }
@@ -860,6 +979,9 @@ export function ScoreCalculator() {
           status: result.sheet.status,
         },
       }));
+      if (result.finalsValidation) {
+        setPreview((current) => ({ ...current, finalsValidation: result.finalsValidation }));
+      }
       setToolbarState(nextStatus === "final" ? "成绩单已锁定" : "草稿已保存", "success");
       toast.success(nextStatus === "final" ? "成绩单已锁定" : "草稿已保存");
     } catch (saveError) {
@@ -1339,7 +1461,7 @@ export function ScoreCalculator() {
           ) : null}
 
           {activeTab === "sami" ? (
-            <div className="space-y-6">
+            <fieldset className={canEditActiveSheet ? "space-y-6" : "space-y-6 opacity-60"} disabled={!canEditActiveSheet}>
               <SectionCard
                 description={`已填写 ${samiSummary.base} 个基础输入项`}
                 onReset={() => setSnapshots((current) => ({ ...current, sami: getDefaultThemeSnapshot("sami") }))}
@@ -1403,11 +1525,42 @@ export function ScoreCalculator() {
                   ))}
                 </div>
               </SectionCard>
-            </div>
+
+              <SectionCard
+                description="决赛采用只 P 不 B：双方从萨米初赛干员池中轮流 Pick 3 个。系统会根据本局实际使用的六星干员自动提示池外 / 对方 Pick 违规，但当前不会自动改写分数。"
+                onReset={() => {
+                  updateSnapshotField("sami", FINALS_ENABLED_FIELD.key, false);
+                  updateSnapshotField("sami", ACTIVE_OPERATORS_KEY, []);
+                }}
+                title="决赛附加规则"
+              >
+                <div className="space-y-4">
+                  <CheckboxCard
+                    checked={Boolean(snapshots.sami[FINALS_ENABLED_FIELD.key])}
+                    field={FINALS_ENABLED_FIELD}
+                    onChange={(value) => updateSnapshotField("sami", FINALS_ENABLED_FIELD.key, value)}
+                  />
+                  <fieldset
+                    className={Boolean(snapshots.sami[FINALS_ENABLED_FIELD.key]) ? "space-y-4" : "space-y-4 opacity-60"}
+                    disabled={!Boolean(snapshots.sami[FINALS_ENABLED_FIELD.key])}
+                  >
+                    <div className="text-sm leading-6 text-text3">
+                      当前赛道会自动识别：
+                      池外六星建议轻罚，每名 -100；使用对方 Pick 六星建议重罚，每名 -500。
+                    </div>
+                    <ActiveOperatorPicker
+                      disabled={!Boolean(snapshots.sami[FINALS_ENABLED_FIELD.key])}
+                      onChange={(operators) => updateSnapshotField("sami", ACTIVE_OPERATORS_KEY, operators)}
+                      operators={Array.isArray(snapshots.sami[ACTIVE_OPERATORS_KEY]) ? snapshots.sami[ACTIVE_OPERATORS_KEY] as string[] : []}
+                    />
+                  </fieldset>
+                </div>
+              </SectionCard>
+            </fieldset>
           ) : null}
 
           {activeTab === "sarkaz" ? (
-            <div className="space-y-6">
+            <fieldset className={canEditActiveSheet ? "space-y-6" : "space-y-6 opacity-60"} disabled={!canEditActiveSheet}>
               <SectionCard description={`已勾选 ${sarkazSummary.flags} 项关键状态`} onReset={() => {
                 for (const field of SARKAZ_KEY_FIELDS) {
                   updateSnapshotField("sarkaz", field.key, false);
@@ -1460,7 +1613,7 @@ export function ScoreCalculator() {
               </SectionCard>
 
               <SectionCard
-                description="不容拒绝在持有羯磨时按“先加后乘”；主题最终统一乘以 0.75。"
+                description="不容拒绝在持有羯磨时按“先加后乘”；主题最终倍率初赛 ×0.75，决赛 ×0.85。"
                 onReset={() => setSnapshots((current) => ({ ...current, sarkaz: getDefaultThemeSnapshot("sarkaz") }))}
                 title="结局关逻辑"
               >
@@ -1500,11 +1653,41 @@ export function ScoreCalculator() {
                   </div>
                 </div>
               </SectionCard>
-            </div>
+
+              <SectionCard
+                description="决赛采用只 P 不 B：萨卡兹按死仇 / 美愿两条赛道分别轮流 Pick 3 个。当前选手会按赛道自动比对本局实际使用干员，并给出建议处罚。"
+                onReset={() => {
+                  updateSnapshotField("sarkaz", FINALS_ENABLED_FIELD.key, false);
+                  updateSnapshotField("sarkaz", ACTIVE_OPERATORS_KEY, []);
+                }}
+                title="决赛附加规则"
+              >
+                <div className="space-y-4">
+                  <CheckboxCard
+                    checked={Boolean(snapshots.sarkaz[FINALS_ENABLED_FIELD.key])}
+                    field={FINALS_ENABLED_FIELD}
+                    onChange={(value) => updateSnapshotField("sarkaz", FINALS_ENABLED_FIELD.key, value)}
+                  />
+                  <fieldset
+                    className={Boolean(snapshots.sarkaz[FINALS_ENABLED_FIELD.key]) ? "space-y-4" : "space-y-4 opacity-60"}
+                    disabled={!Boolean(snapshots.sarkaz[FINALS_ENABLED_FIELD.key])}
+                  >
+                    <div className="text-sm leading-6 text-text3">
+                      萨卡兹决赛倍率为 ×0.85。系统会根据死仇 / 美愿赛道配置自动提示池外或对方 Pick 违规。
+                    </div>
+                    <ActiveOperatorPicker
+                      disabled={!Boolean(snapshots.sarkaz[FINALS_ENABLED_FIELD.key])}
+                      onChange={(operators) => updateSnapshotField("sarkaz", ACTIVE_OPERATORS_KEY, operators)}
+                      operators={Array.isArray(snapshots.sarkaz[ACTIVE_OPERATORS_KEY]) ? snapshots.sarkaz[ACTIVE_OPERATORS_KEY] as string[] : []}
+                    />
+                  </fieldset>
+                </div>
+              </SectionCard>
+            </fieldset>
           ) : null}
 
           {activeTab === "sui" ? (
-            <div className="space-y-6">
+            <fieldset className={canEditActiveSheet ? "space-y-6" : "space-y-6 opacity-60"} disabled={!canEditActiveSheet}>
               <SectionCard description={`已填写 ${suiSummary.base} 个基础输入项`} onReset={() => setSnapshots((current) => ({ ...current, sui: { ...current.sui, "sui-score": 0, "sui-items": 0, "sui-steps": 0, "sui-6s": 0, "sui-5s": 0, "sui-4s": 0, "sui-rule-violate": false } }))} title="基础数据">
                 <div className="space-y-4">
                   {SUI_BASE_ROWS.map((row, index) => (
@@ -1607,7 +1790,35 @@ export function ScoreCalculator() {
                   ))}
                 </div>
               </SectionCard>
-            </div>
+
+              <SectionCard
+                description="界园决赛不参与 Pick / BP。启用决赛模式后仅应用 ×0.50 基础倍率；若进入过今昔境，则藏品计分与超藏惩罚阈值都降为 80。"
+                onReset={() => {
+                  updateSnapshotField("sui", FINALS_ENABLED_FIELD.key, false);
+                  updateSnapshotField("sui", SUI_FINALS_JINXI_FIELD.key, false);
+                }}
+                title="决赛附加规则"
+              >
+                <div className="space-y-4">
+                  <CheckboxCard
+                    checked={Boolean(snapshots.sui[FINALS_ENABLED_FIELD.key])}
+                    field={FINALS_ENABLED_FIELD}
+                    onChange={(value) => updateSnapshotField("sui", FINALS_ENABLED_FIELD.key, value)}
+                  />
+                  <fieldset
+                    className={Boolean(snapshots.sui[FINALS_ENABLED_FIELD.key]) ? "space-y-4" : "space-y-4 opacity-60"}
+                    disabled={!Boolean(snapshots.sui[FINALS_ENABLED_FIELD.key])}
+                  >
+                    <CheckboxCard
+                      checked={Boolean(snapshots.sui[SUI_FINALS_JINXI_FIELD.key])}
+                      field={SUI_FINALS_JINXI_FIELD}
+                      onChange={(value) => updateSnapshotField("sui", SUI_FINALS_JINXI_FIELD.key, value)}
+                    />
+                    <div className="text-sm leading-6 text-text3">界园赛道不会进行 Pick 校验，也不会产生 BP 扣分提示。</div>
+                  </fieldset>
+                </div>
+              </SectionCard>
+            </fieldset>
           ) : null}
         </div>
 
@@ -1653,7 +1864,8 @@ export function ScoreCalculator() {
                   复制分数
                 </button>
                 <button
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-live/20 bg-live/10 px-4 py-3 text-sm text-live transition-colors hover:bg-live/15"
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-live/20 bg-live/10 px-4 py-3 text-sm text-live transition-colors hover:bg-live/15 disabled:cursor-not-allowed disabled:opacity-50"
+                  disabled={activeTab !== "team" && !canEditActiveSheet}
                   onClick={resetCurrentTheme}
                   type="button"
                 >
@@ -1663,6 +1875,59 @@ export function ScoreCalculator() {
               </div>
             </div>
           </SectionCard>
+
+          {activeTab !== "team" && preview.finalsValidation?.enabled ? (
+            <SectionCard title="决赛校验">
+              <div className="space-y-4 rounded-2xl border border-strokeSoft bg-surface3 p-4">
+                <div className="grid gap-3">
+                  <div className="rounded-xl border border-strokeSoft bg-surface2 px-4 py-3">
+                    <div className="text-xs uppercase tracking-[0.12em] text-text3">当前赛道</div>
+                    <div className="mt-2 text-sm text-text1">
+                      {preview.finalsValidation.trackLabel ?? (preview.finalsValidation.pickEnabled ? "待绑定" : "不参与 Pick / BP")}
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-strokeSoft bg-surface2 px-4 py-3">
+                    <div className="text-xs uppercase tracking-[0.12em] text-text3">建议处罚</div>
+                    <div className="mt-2 text-sm text-text1">
+                      {preview.finalsValidation.suggestedPenalty > 0 ? `-${preview.finalsValidation.suggestedPenalty}` : "无"}
+                    </div>
+                  </div>
+
+                  {preview.finalsValidation.pickEnabled ? (
+                    <>
+                      <div className="rounded-xl border border-strokeSoft bg-surface2 px-4 py-3">
+                        <div className="text-xs uppercase tracking-[0.12em] text-text3">我方 Pick</div>
+                        <div className="mt-2 text-sm text-text1">
+                          {preview.finalsValidation.ownPicks.length ? preview.finalsValidation.ownPicks.join("、") : "未配置"}
+                        </div>
+                      </div>
+                      <div className="rounded-xl border border-strokeSoft bg-surface2 px-4 py-3">
+                        <div className="text-xs uppercase tracking-[0.12em] text-text3">对方 Pick</div>
+                        <div className="mt-2 text-sm text-text1">
+                          {preview.finalsValidation.opponentPicks.length ? preview.finalsValidation.opponentPicks.join("、") : "未配置"}
+                        </div>
+                      </div>
+                    </>
+                  ) : null}
+                </div>
+
+                {preview.finalsValidation.messages.length ? (
+                  <div className="space-y-2">
+                    {preview.finalsValidation.messages.map((message) => (
+                      <div className="rounded-xl border border-live/20 bg-live/10 px-4 py-3 text-sm text-live" key={message}>
+                        {message}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-xl border border-green-500/20 bg-green-500/10 px-4 py-3 text-sm text-green-300">
+                    当前没有识别到决赛 Pick 违规项。
+                  </div>
+                )}
+              </div>
+            </SectionCard>
+          ) : null}
 
           <SectionCard title="当前建议">
             <div className="rounded-2xl border border-strokeSoft bg-surface3 p-4">

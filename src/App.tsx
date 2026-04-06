@@ -23,6 +23,7 @@ const ScoreManagement = lazy(() => import("./pages/admin/ScoreManagement").then(
 const TeamManagement = lazy(() => import("./pages/admin/TeamManagement").then((m) => ({ default: m.TeamManagement })));
 const BroadcastControl = lazy(() => import("./pages/admin/BroadcastControl").then((m) => ({ default: m.BroadcastControl })));
 const ScoreCalculator = lazy(() => import("./pages/admin/ScoreCalculator").then((m) => ({ default: m.ScoreCalculator })));
+const FinalsManagement = lazy(() => import("./pages/admin/FinalsManagement").then((m) => ({ default: m.FinalsManagement })));
 
 const navItems = [
   { to: "/", label: "首页" },
@@ -164,6 +165,7 @@ function AppShell() {
                 <Route element={<AdminDashboard />} path="dashboard" />
                 <Route element={<ScoreManagement />} path="scores" />
                 <Route element={<TeamManagement />} path="teams" />
+                <Route element={<FinalsManagement />} path="finals" />
                 <Route element={<BroadcastControl />} path="broadcast" />
                 <Route element={<ScoreCalculator />} path="calculator" />
               </Route>

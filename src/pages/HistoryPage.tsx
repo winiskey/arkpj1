@@ -1,10 +1,15 @@
-import { PageFrame } from "../components/PageFrame";
 import { PageBackground } from "../components/PageBackground";
-import { SectionHeader } from "../components/SectionHeader";
+import { PageFrame } from "../components/PageFrame";
 import { ScrollReveal } from "../components/ScrollReveal";
-import { SpotlightCard } from "../components/SpotlightCard";
+import { SectionHeader } from "../components/SectionHeader";
+import { ClipButton } from "../components/ClipButton";
 import { useParallaxLogo } from "../lib/useParallaxLogo";
-import { historyEvents } from "../content/history";
+
+const plannedModules = [
+  "历届赛程与赛果归档",
+  "冠军与队伍档案整理",
+  "高光对局与赛事回顾",
+];
 
 export function HistoryPage() {
   const logoRef = useParallaxLogo();
@@ -15,109 +20,58 @@ export function HistoryPage() {
 
       <PageFrame className="relative z-10 gap-8 md:gap-10 lg:gap-14">
         <SectionHeader
-          cnTitle="历史赛事回顾"
-          description="回顾荆楚歌历届赛事的精彩历程与冠军荣耀。"
+          cnTitle="往届赛事"
+          description="历史赛事页面仍在整理中，完整的往届档案与精彩回顾将在后续版本开放。"
           enTitle="EVENT HISTORY"
         />
 
-        {/* Timeline */}
-        <div className="relative">
-          {/* Vertical timeline line */}
-          <div className="absolute left-6 top-0 bottom-0 hidden w-px bg-gradient-to-b from-brand/40 via-brand/20 to-transparent md:block" />
+        <ScrollReveal>
+          <section className="relative overflow-hidden rounded-[36px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))] p-6 backdrop-blur-3xl md:p-10 lg:p-14">
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand/35 to-transparent" />
+            <div className="absolute -right-24 top-12 h-48 w-48 rounded-full bg-brand/10 blur-3xl" />
+            <div className="absolute -left-20 bottom-0 h-40 w-40 rounded-full bg-white/5 blur-3xl" />
 
-          <div className="space-y-8 md:space-y-12">
-            {historyEvents.map((event, index) => (
-              <ScrollReveal key={event.id} delay={index * 0.08}>
-                <div className="relative md:pl-16">
-                  {/* Timeline dot */}
-                  <div className="absolute left-4 top-8 hidden h-5 w-5 items-center justify-center md:flex">
-                    <div className="absolute h-full w-full rotate-45 border border-brand/50 bg-brand/10" />
-                    <div className="relative h-1.5 w-1.5 bg-brand" />
-                  </div>
-
-                  <SpotlightCard
-                    className="overflow-hidden rounded-[32px] border border-white/5 bg-white/[0.02] p-6 backdrop-blur-3xl md:p-8 lg:p-10"
-                    spotlightColor="rgba(214,192,138,0.06)"
-                  >
-                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand/25 to-transparent opacity-50" />
-
-                    <div className="flex flex-wrap items-start justify-between gap-4">
-                      <div>
-                        <div className="font-display text-[10px] uppercase tracking-[0.3em] text-brand/70">
-                          {event.season}
-                        </div>
-                        <h3 className="mt-3 font-title text-3xl font-black tracking-[0.03em] text-white/90 md:text-4xl">
-                          {event.name}
-                        </h3>
-                        <div className="mt-2 font-display text-sm tracking-[0.08em] text-white/40">
-                          {event.date}
-                        </div>
-                      </div>
-
-                      <div className="flex gap-3">
-                        <div className="rounded-[20px] border border-brand/25 bg-brand/10 px-5 py-4 text-center">
-                          <div className="font-display text-[10px] uppercase tracking-[0.16em] text-brand/70">Champion</div>
-                          <div className="mt-2 font-title text-lg font-black tracking-[0.03em] text-brand">
-                            {event.champion.teamName}
-                          </div>
-                          <div className="mt-1 font-display text-[10px] uppercase tracking-[0.2em] text-brand/50">
-                            {event.champion.teamTag}
-                          </div>
-                        </div>
-                        {event.runnerUp ? (
-                          <div className="rounded-[20px] border border-white/8 bg-white/[0.03] px-5 py-4 text-center">
-                            <div className="font-display text-[10px] uppercase tracking-[0.16em] text-white/35">Runner-up</div>
-                            <div className="mt-2 font-title text-lg font-black tracking-[0.03em] text-white/70">
-                              {event.runnerUp.teamName}
-                            </div>
-                            <div className="mt-1 font-display text-[10px] uppercase tracking-[0.2em] text-white/30">
-                              {event.runnerUp.teamTag}
-                            </div>
-                          </div>
-                        ) : null}
-                      </div>
-                    </div>
-
-                    <p className="mt-8 border-t border-white/5 pt-6 text-[15px] leading-8 text-white/55">
-                      {event.summary}
-                    </p>
-
-                    {event.highlights.length > 0 ? (
-                      <div className="mt-6">
-                        <div className="font-display text-[10px] uppercase tracking-[0.25em] text-white/35">KEY MOMENTS</div>
-                        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                          {event.highlights.map((highlight, hIndex) => (
-                            <div
-                              key={hIndex}
-                              className="flex items-start gap-3 rounded-[16px] border border-white/5 bg-white/[0.02] px-4 py-3"
-                            >
-                              <div className="mt-1 flex h-4 w-4 shrink-0 items-center justify-center">
-                                <div className="h-1.5 w-1.5 rotate-45 bg-brand/60" />
-                              </div>
-                              <span className="text-sm leading-6 text-white/50">{highlight}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ) : null}
-                  </SpotlightCard>
+            <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)] lg:items-end">
+              <div className="space-y-6">
+                <div className="inline-flex items-center gap-3 rounded-full border border-brand/20 bg-brand/8 px-4 py-2">
+                  <span className="h-2 w-2 rounded-full bg-brand shadow-[0_0_12px_rgba(214,192,138,0.75)]" />
+                  <span className="font-display text-[11px] uppercase tracking-[0.28em] text-brand/80">
+                    In Development
+                  </span>
                 </div>
-              </ScrollReveal>
-            ))}
-          </div>
-        </div>
 
-        {/* Current season callout */}
-        <ScrollReveal delay={0.2}>
-          <div className="mt-4 rounded-[32px] border border-brand/15 bg-brand/5 p-6 text-center md:p-10">
-            <div className="font-display text-[10px] uppercase tracking-[0.3em] text-brand/70">NOW PLAYING</div>
-            <h3 className="mt-3 font-title text-2xl font-black tracking-[0.03em] text-white/90 md:text-3xl">
-              荆楚歌 #2 正在进行中
-            </h3>
-            <p className="mx-auto mt-3 max-w-lg text-sm leading-7 text-white/50">
-              第二届荆楚歌集成战略赛事火热进行中，前往赛事大厅查看实时战况。
-            </p>
-          </div>
+                <div className="space-y-4">
+                  <h3 className="max-w-3xl font-title text-4xl font-black tracking-[0.03em] text-white/92 md:text-5xl lg:text-6xl lg:leading-[1.04]">
+                    往届赛事页面正在开发中
+                  </h3>
+                  <p className="max-w-2xl text-[15px] leading-8 text-white/55 md:text-base">
+                    当前版本暂不展示历届赛事详情。后续会补充完整的冠军记录、赛事脉络、高光回顾与历史数据，方便统一查阅。
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-4">
+                  <ClipButton size="lg" to="/live" variant="primary">
+                    前往赛事大厅
+                  </ClipButton>
+                  <ClipButton size="lg" to="/" variant="secondary">
+                    返回首页
+                  </ClipButton>
+                </div>
+              </div>
+
+              <div className="grid gap-3">
+                {plannedModules.map((item) => (
+                  <div
+                    key={item}
+                    className="rounded-[22px] border border-white/8 bg-black/20 px-5 py-4 text-sm leading-7 text-white/68"
+                  >
+                    <div className="font-display text-[10px] uppercase tracking-[0.2em] text-brand/58">Planned</div>
+                    <div className="mt-2 font-title text-xl font-bold tracking-[0.03em] text-white/88">{item}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
         </ScrollReveal>
       </PageFrame>
     </div>

@@ -2,12 +2,12 @@
 import {
   createDefaultOpsState,
   createDefaultScoreSheetsState,
-  createEmptyPublicContent,
   ruleVersion,
   tournamentConfig,
 } from "./domain.mjs";
 import { createRequestContext, handlePreflight, HttpError, Router } from "./http.mjs";
 import { createJsonFileStore } from "./json-file-store.mjs";
+import { readPublicContentSeed } from "./public-content-seed.mjs";
 import { calculateThemeScore } from "./scoring.mjs";
 import { createBackendService } from "./service.mjs";
 import {
@@ -33,7 +33,7 @@ function withAdmin(handler) {
 }
 
 export function createApp(config) {
-  const publicContentStore = createJsonFileStore(config.publicContentPath, async () => createEmptyPublicContent());
+  const publicContentStore = createJsonFileStore(config.publicContentPath, async () => readPublicContentSeed());
   const opsStateStore = createJsonFileStore(
     config.opsStatePath,
     async () => createDefaultOpsState(await publicContentStore.read()),
@@ -82,12 +82,20 @@ export function createApp(config) {
   }));
 
   router.register("POST", "/api/admin/calculator/solo", withAdmin(async (context) => {
-    const { theme, snapshot } = validateSoloCalcPayload(await context.readJson());
-    context.sendJson(200, calculateThemeScore(theme, snapshot));
+    context.sendJson(200, await service.calculateSoloScore(validateSoloCalcPayload(await context.readJson())));
   }));
 
   router.register("GET", "/api/admin/public-content", withAdmin(async (context) => {
     context.sendJson(200, await service.getPublicContent());
+  }));
+
+  router.register("GET", "/api/admin/finals-config", withAdmin(async (context) => {
+    context.sendJson(200, await service.getFinalsConfig());
+  }));
+
+  router.register("PUT", "/api/admin/finals-config", withAdmin(async (context) => {
+    const payload = expectPlainObject(await context.readJson(), "finalsConfig");
+    context.sendJson(200, await service.replaceFinalsConfig(payload));
   }));
 
   router.register("PUT", "/api/admin/public-content", withAdmin(async (context) => {
@@ -146,6 +154,10 @@ export function createApp(config) {
   router.register("PATCH", "/api/admin/score-sheets/:sheetId/status", withAdmin(async (context) => {
     const payload = validateScoreSheetStatusPayload(await context.readJson());
     context.sendJson(200, await service.updateScoreSheetStatus(context.params.sheetId, payload.status));
+  }));
+
+  router.register("DELETE", "/api/admin/score-sheets/:sheetId", withAdmin(async (context) => {
+    context.sendJson(200, await service.deleteScoreSheet(context.params.sheetId));
   }));
 
   router.register("POST", "/api/admin/teams/:teamId/operators", withAdmin(async (context) => {

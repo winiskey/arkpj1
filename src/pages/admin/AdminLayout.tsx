@@ -5,6 +5,7 @@ import {
   Users,
   Radio,
   Calculator,
+  Trophy,
   LogOut,
 } from "lucide-react";
 import { useRef, useEffect, useState, type ReactNode } from "react";
@@ -16,6 +17,7 @@ const navItems = [
   { to: "/admin/dashboard", label: "赛事总览", icon: LayoutDashboard },
   { to: "/admin/scores", label: "成绩审核", icon: FileText },
   { to: "/admin/teams", label: "战队管理", icon: Users },
+  { to: "/admin/finals", label: "决赛配置", icon: Trophy },
   { to: "/admin/broadcast", label: "直播控制", icon: Radio },
   { to: "/admin/calculator", label: "单人计分器", icon: Calculator },
 ];

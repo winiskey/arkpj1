@@ -1,6 +1,6 @@
 export type CalculatorTheme = "sami" | "sarkaz" | "sui";
 export type CalculatorTab = "team" | CalculatorTheme;
-export type SnapshotValue = boolean | number | string;
+export type SnapshotValue = boolean | number | string | string[];
 export type ThemeSnapshot = Record<string, SnapshotValue>;
 
 export interface NumberField {
@@ -28,7 +28,7 @@ export interface SelectField {
 
 export const TAB_LABELS: Record<CalculatorTab, string> = {
   team: "战队总览",
-  sami: "探索者的银淞止境",
+  sami: "探索者的银凇止境",
   sarkaz: "萨卡兹的无终奇语",
   sui: "岁的界园志异",
 };
@@ -52,7 +52,7 @@ export function inferThemeCodeFromMemberTheme(themeLabel: string | null | undefi
     return "sui";
   }
 
-  if (themeLabel.includes("萨米") || themeLabel.includes("银淞")) {
+  if (themeLabel.includes("萨米") || themeLabel.includes("银淞") || themeLabel.includes("银凇")) {
     return "sami";
   }
 
@@ -61,6 +61,8 @@ export function inferThemeCodeFromMemberTheme(themeLabel: string | null | undefi
 
 const defaultThemeSnapshots: Record<CalculatorTheme, ThemeSnapshot> = {
   sami: {
+    "finals-enabled": false,
+    "finals-active-operators": [],
     "sa-score": 0,
     "sa-items": 0,
     "sa-plates": 0,
@@ -93,6 +95,8 @@ const defaultThemeSnapshots: Record<CalculatorTheme, ThemeSnapshot> = {
     "sa-stage-eternity": false,
   },
   sarkaz: {
+    "finals-enabled": false,
+    "finals-active-operators": [],
     "sk-score": 0,
     "sk-items": 0,
     "sk-6s": 0,
@@ -130,6 +134,8 @@ const defaultThemeSnapshots: Record<CalculatorTheme, ThemeSnapshot> = {
     "sk-n4-perf": false,
   },
   sui: {
+    "finals-enabled": false,
+    "finals-active-operators": [],
     "sui-score": 0,
     "sui-items": 0,
     "sui-steps": 0,
@@ -145,6 +151,7 @@ const defaultThemeSnapshots: Record<CalculatorTheme, ThemeSnapshot> = {
     "sui-it-ws": false,
     "sui-it-yyq": false,
     "sui-it-wf": false,
+    "sui-finals-jinxi": false,
     "sui-ending": "none",
     "sui-end-perf": false,
     "sui-beast-loss": "0",
@@ -194,6 +201,13 @@ export function hydrateThemeSnapshot(theme: CalculatorTheme, incoming: Record<st
 
   for (const [key, fallback] of Object.entries(defaults)) {
     const candidate = incoming?.[key];
+
+    if (Array.isArray(fallback)) {
+      nextSnapshot[key] = Array.isArray(candidate)
+        ? candidate.filter((entry): entry is string => typeof entry === "string")
+        : fallback;
+      continue;
+    }
 
     if (typeof fallback === "boolean") {
       nextSnapshot[key] = Boolean(candidate);
@@ -263,6 +277,21 @@ export const SAMI_STAGE_FIELDS: CheckboxField[] = [
   { key: "sa-stage-sands", label: "时光之沙", badge: "+100" },
   { key: "sa-stage-eternity", label: "迈入永恒", badge: "+180" },
 ];
+
+export const FINALS_ENABLED_FIELD: CheckboxField = {
+  key: "finals-enabled",
+  label: "启用决赛 Pick 规则",
+};
+
+export const FINALS_BP_OUTSIDE_POOL_FIELD: NumberField = {
+  key: "finals-bp-outside-pool-count",
+  label: "使用初赛池外干员数（每名 -100）",
+};
+
+export const FINALS_BP_OPPONENT_PICK_FIELD: NumberField = {
+  key: "finals-bp-opponent-pick-count",
+  label: "使用对方 Pick 干员数（每名 -500）",
+};
 
 export const SARKAZ_KEY_FIELDS: CheckboxField[] = [
   { key: "sk-karma", label: "持有阿纳萨羯磨" },
@@ -357,7 +386,7 @@ export const SARKAZ_ENDING_GROUPS: Array<{ title: string; fields: CheckboxField[
 export const SUI_BASE_ROWS: NumberField[][] = [
   [
     { key: "sui-score", label: "结算分" },
-    { key: "sui-items", label: "藏品数（+5/个，最多 120）" },
+    { key: "sui-items", label: "藏品数（+5/个；初赛最多 120，决赛今昔境最多 80）" },
     { key: "sui-steps", label: "步数（>150 直接 0 分）" },
   ],
   [
@@ -416,6 +445,11 @@ export const SUI_BEAST_LOSS_FIELD: SelectField = {
     { value: "300", label: "(0,5] +300" },
     { value: "200", label: "(5,50] +200" },
   ],
+};
+
+export const SUI_FINALS_JINXI_FIELD: CheckboxField = {
+  key: "sui-finals-jinxi",
+  label: "本局进入过「今昔境」",
 };
 
 export const SUI_STAGE_FIELDS: CheckboxField[] = [

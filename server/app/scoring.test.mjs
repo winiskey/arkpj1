@@ -67,6 +67,19 @@ test("calculateSarkazScore handles karma branching and roll ancestor ending mult
   assert.equal(result.formulaText, "(974.00 x 0.75)");
 });
 
+test("calculateSarkazScore applies the finals multiplier without auto-deducting pick penalties", () => {
+  const result = calculateSarkazScore({
+    "sk-score": 1000,
+    "sk-stage-foe": true,
+    "finals-enabled": true,
+  });
+
+  assert.equal(result.rawScore, 1075);
+  assert.equal(result.multiplier, 0.85);
+  assert.equal(result.previewScore, 913.75);
+  assert.equal(result.formulaText, "(1075.00 x 0.85)");
+});
+
 test("calculateSuiScore zeros the theme when hard rule violations are present", () => {
   const result = calculateSuiScore({
     "sui-score": 200,
@@ -97,6 +110,43 @@ test("calculateSuiScore applies item bonuses and overflow deductions before the 
   assert.equal(result.multiplier, 0.48);
   assert.equal(result.previewScore, 801.6);
   assert.equal(result.formulaText, "(1670.00 x 0.48)");
+});
+
+test("calculateSuiScore applies the finals multiplier override", () => {
+  const result = calculateSuiScore({
+    "sui-score": 100,
+    "finals-enabled": true,
+  });
+
+  assert.equal(result.rawScore, 100);
+  assert.equal(result.multiplier, 0.5);
+  assert.equal(result.previewScore, 50);
+  assert.equal(result.formulaText, "(100.00 x 0.50)");
+});
+
+test("calculateSuiScore uses the lower item cap in finals after entering 今昔境", () => {
+  const result = calculateSuiScore({
+    "sui-items": 90,
+    "finals-enabled": true,
+    "sui-finals-jinxi": true,
+  });
+
+  assert.equal(result.rawScore, 325);
+  assert.equal(result.multiplier, 0.5);
+  assert.equal(result.previewScore, 162.5);
+  assert.equal(result.formulaText, "(325.00 x 0.50)");
+});
+
+test("calculateSamiScore keeps finals mode score unchanged without auto-deducting pick penalties", () => {
+  const result = calculateSamiScore({
+    "sa-score": 800,
+    "finals-enabled": true,
+  });
+
+  assert.equal(result.rawScore, 800);
+  assert.equal(result.multiplier, 1);
+  assert.equal(result.previewScore, 800);
+  assert.equal(result.formulaText, "(800.00)");
 });
 
 test("calculateTeamScore sums four player scores", () => {
