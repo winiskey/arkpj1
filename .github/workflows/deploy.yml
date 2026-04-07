@@ -40,18 +40,47 @@ jobs:
           DEPLOY_STARTUP_WAIT_SECONDS: ${{ secrets.DEPLOY_STARTUP_WAIT_SECONDS }}
         run: |
           set -euo pipefail
+
+          trim() {
+            local value="$1"
+            value="${value#"${value%%[![:space:]]*}"}"
+            value="${value%"${value##*[![:space:]]}"}"
+            printf '%s' "$value"
+          }
+
+          DEPLOY_HOST="$(trim "${DEPLOY_HOST:-}")"
+          DEPLOY_USER="$(trim "${DEPLOY_USER:-}")"
+          DEPLOY_PORT="$(trim "${DEPLOY_PORT:-22}")"
+          DEPLOY_APP_DIR="$(trim "${DEPLOY_APP_DIR:-/home/admin/arkpj1}")"
+          DEPLOY_SERVICE_NAME="$(trim "${DEPLOY_SERVICE_NAME:-ark-backend}")"
+          DEPLOY_NGINX_SITE_NAME="$(trim "${DEPLOY_NGINX_SITE_NAME:-arkproject}")"
+          DEPLOY_HEALTHCHECK_URL="$(trim "${DEPLOY_HEALTHCHECK_URL:-http://127.0.0.1:8787/api/health}")"
+          DEPLOY_RUN_CONTENT_SYNC="$(trim "${DEPLOY_RUN_CONTENT_SYNC:-0}")"
+          DEPLOY_RUN_NGINX_RELOAD="$(trim "${DEPLOY_RUN_NGINX_RELOAD:-0}")"
+          DEPLOY_STARTUP_WAIT_SECONDS="$(trim "${DEPLOY_STARTUP_WAIT_SECONDS:-3}")"
+
           : "${DEPLOY_HOST:?Missing DEPLOY_HOST secret}"
           : "${DEPLOY_USER:?Missing DEPLOY_USER secret}"
+          : "${DEPLOY_APP_DIR:?Missing DEPLOY_APP_DIR after trimming}"
+
+          case "$DEPLOY_APP_DIR" in
+            /*) ;;
+            *)
+              echo "DEPLOY_APP_DIR must be an absolute path after trimming: '$DEPLOY_APP_DIR'" >&2
+              exit 1
+              ;;
+          esac
+
           echo "DEPLOY_HOST=$DEPLOY_HOST" >> "$GITHUB_ENV"
           echo "DEPLOY_USER=$DEPLOY_USER" >> "$GITHUB_ENV"
-          echo "DEPLOY_PORT=${DEPLOY_PORT:-22}" >> "$GITHUB_ENV"
-          echo "DEPLOY_APP_DIR=${DEPLOY_APP_DIR:-/home/admin/arkpj1}" >> "$GITHUB_ENV"
-          echo "DEPLOY_SERVICE_NAME=${DEPLOY_SERVICE_NAME:-ark-backend}" >> "$GITHUB_ENV"
-          echo "DEPLOY_NGINX_SITE_NAME=${DEPLOY_NGINX_SITE_NAME:-arkproject}" >> "$GITHUB_ENV"
-          echo "DEPLOY_HEALTHCHECK_URL=${DEPLOY_HEALTHCHECK_URL:-http://127.0.0.1:8787/api/health}" >> "$GITHUB_ENV"
-          echo "DEPLOY_RUN_CONTENT_SYNC=${DEPLOY_RUN_CONTENT_SYNC:-0}" >> "$GITHUB_ENV"
-          echo "DEPLOY_RUN_NGINX_RELOAD=${DEPLOY_RUN_NGINX_RELOAD:-0}" >> "$GITHUB_ENV"
-          echo "DEPLOY_STARTUP_WAIT_SECONDS=${DEPLOY_STARTUP_WAIT_SECONDS:-3}" >> "$GITHUB_ENV"
+          echo "DEPLOY_PORT=$DEPLOY_PORT" >> "$GITHUB_ENV"
+          echo "DEPLOY_APP_DIR=$DEPLOY_APP_DIR" >> "$GITHUB_ENV"
+          echo "DEPLOY_SERVICE_NAME=$DEPLOY_SERVICE_NAME" >> "$GITHUB_ENV"
+          echo "DEPLOY_NGINX_SITE_NAME=$DEPLOY_NGINX_SITE_NAME" >> "$GITHUB_ENV"
+          echo "DEPLOY_HEALTHCHECK_URL=$DEPLOY_HEALTHCHECK_URL" >> "$GITHUB_ENV"
+          echo "DEPLOY_RUN_CONTENT_SYNC=$DEPLOY_RUN_CONTENT_SYNC" >> "$GITHUB_ENV"
+          echo "DEPLOY_RUN_NGINX_RELOAD=$DEPLOY_RUN_NGINX_RELOAD" >> "$GITHUB_ENV"
+          echo "DEPLOY_STARTUP_WAIT_SECONDS=$DEPLOY_STARTUP_WAIT_SECONDS" >> "$GITHUB_ENV"
 
       - name: Configure SSH
         env:
