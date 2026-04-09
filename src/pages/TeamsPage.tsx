@@ -11,6 +11,11 @@ import { findOperatorCatalogEntry, normalizeOperatorName } from "./admin/operato
 
 const MAX_MEMBER_SIX_STAR_PICKS = 13;
 
+function parseTeamTotalScore(totalScore: string) {
+  const parsed = Number.parseFloat(totalScore);
+  return Number.isFinite(parsed) ? parsed : Number.NEGATIVE_INFINITY;
+}
+
 function OperatorPickSlot({
   operatorName,
   order,
@@ -73,12 +78,35 @@ export function TeamsPage() {
   const {
     data: { teams },
   } = useSiteData();
-  const [selectedTeamId, setSelectedTeamId] = useState(teams[0]?.id ?? "");
+  const [selectedTeamId, setSelectedTeamId] = useState("");
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
 
   const logoRef = useParallaxLogo();
 
-  const selectedTeam = useMemo(() => teams.find((team) => team.id === selectedTeamId) ?? teams[0], [selectedTeamId, teams]);
+  const sortedTeams = useMemo(
+    () =>
+      [...teams].sort((left, right) => {
+        const scoreDiff = parseTeamTotalScore(right.totalScore) - parseTeamTotalScore(left.totalScore);
+        if (scoreDiff !== 0) {
+          return scoreDiff;
+        }
+
+        if (left.rank !== right.rank) {
+          return left.rank - right.rank;
+        }
+
+        return left.name.localeCompare(right.name, "zh-CN");
+      }),
+    [teams],
+  );
+  const selectedTeam = useMemo(
+    () => sortedTeams.find((team) => team.id === selectedTeamId) ?? sortedTeams[0],
+    [selectedTeamId, sortedTeams],
+  );
+  const selectedTeamRank = useMemo(
+    () => (selectedTeam ? sortedTeams.findIndex((team) => team.id === selectedTeam.id) + 1 : null),
+    [selectedTeam, sortedTeams],
+  );
   const selectedTeamDuplicatePickNames = useMemo(() => {
     if (!selectedTeam) {
       return new Set<string>();
@@ -117,10 +145,10 @@ export function TeamsPage() {
   }, [selectedTeam, selectedMemberId]);
 
   useEffect(() => {
-    if (!teams.some((team) => team.id === selectedTeamId)) {
-      setSelectedTeamId(teams[0]?.id ?? "");
+    if (!sortedTeams.some((team) => team.id === selectedTeamId)) {
+      setSelectedTeamId(sortedTeams[0]?.id ?? "");
     }
-  }, [selectedTeamId, teams]);
+  }, [selectedTeamId, sortedTeams]);
 
   // 切换队伍时重置选中的选手
   useEffect(() => {
@@ -148,9 +176,10 @@ export function TeamsPage() {
         <div className="grid gap-8 lg:grid-cols-[0.36fr_0.64fr] lg:items-start">
           {/* ─── 左侧：队伍选取器 ─── */}
           <aside className="space-y-4 gsap-stagger-item">
-            {teams.map((team) => {
+            {sortedTeams.map((team, index) => {
               const active = team.id === selectedTeam.id;
-              const isTop3 = team.rank <= 3;
+              const isTop3 = index < 3;
+              const displayRank = index + 1;
 
               return (
                 <SpotlightCard
@@ -190,7 +219,7 @@ export function TeamsPage() {
                         <span className={`font-display text-base font-black tracking-[0.04em] ${active ? "text-brand" : "text-white/50"}`}>{team.totalScore}</span>
                         <div className={`rounded-2xl border px-3 py-2 text-center transition-colors ${active ? "border-brand/30 bg-brand/20" : "border-white/5 bg-black/20"}`}>
                           <div className={`font-display text-xl font-black tracking-[0.03em] ${isTop3 ? "text-brand" : "text-white/55"}`}>
-                            #{team.rank}
+                            #{displayRank}
                           </div>
                         </div>
                       </div>
@@ -221,7 +250,7 @@ export function TeamsPage() {
                   <div className="flex flex-wrap items-center gap-2.5">
                     <div className="rounded-[18px] border border-white/5 bg-white/[0.02] px-4 py-2.5">
                       <div className="font-display text-[10px] uppercase tracking-[0.14em] text-white/30">Rank</div>
-                      <div className="mt-0.5 font-display text-2xl font-black tracking-[0.03em] text-white/80">#{selectedTeam.rank}</div>
+                      <div className="mt-0.5 font-display text-2xl font-black tracking-[0.03em] text-white/80">#{selectedTeamRank ?? "-"}</div>
                     </div>
                     <div className="rounded-[18px] border border-brand/20 bg-brand/5 px-4 py-2.5">
                       <div className="font-display text-[10px] uppercase tracking-[0.14em] text-brand/70">Score</div>
